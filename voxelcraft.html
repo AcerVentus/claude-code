@@ -1,0 +1,1049 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Voxelcraft</title>
+<style>
+  /* Layout: a full-bleed WebGL diorama of a floating voxel island. Copy sits on the
+     left over a sky-tinted scrim, the island is offset to the right, and a HUD strip
+     runs along the bottom. On narrow screens the copy moves to the top. */
+  :root {
+    --sky-top: #a9d6fb;            /* fallback sky, shown until WebGL paints */
+    --sky-low: #4f97e6;
+    --scrim: 14 40 88;             /* rgb triplet behind the copy */
+    --ink: #ffffff;
+    --ink-soft: #dcebff;
+    --ink-shadow: rgba(6, 18, 42, 0.6);
+    --edge: #0d1629;               /* hard outlines and pixel extrusion */
+    --grass: #63b944;
+    --grass-lite: #a4e86f;
+    --grass-deep: #2f6b22;
+    --stone: #7d8794;
+    --stone-lite: #b3bcc8;
+    --stone-deep: #49515e;
+    --panel: rgba(10, 24, 52, 0.46);
+    --font-ui: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --step--1: 0.75rem;
+    --step-0: 0.9375rem;
+    --step-1: 1.125rem;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --sky-top: #17245a; --sky-low: #0a1030; --scrim: 2 5 18;
+      --ink-soft: #c9d6ff; --ink-shadow: rgba(0, 0, 0, 0.7); --edge: #05070f;
+      --panel: rgba(4, 8, 24, 0.55); color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --sky-top: #17245a; --sky-low: #0a1030; --scrim: 2 5 18;
+    --ink-soft: #c9d6ff; --ink-shadow: rgba(0, 0, 0, 0.7); --edge: #05070f;
+    --panel: rgba(4, 8, 24, 0.55); color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: linear-gradient(var(--sky-top), var(--sky-low));
+    color: var(--ink);
+    font: 400 var(--step-0)/1.55 var(--font-ui);
+    overflow: hidden;
+  }
+
+  .hero { position: relative; height: 100%; min-height: 34rem; overflow: hidden; }
+  .hero__canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    display: block; touch-action: none; cursor: grab;
+  }
+  .hero__canvas.is-dragging { cursor: grabbing; }
+  .hero__scrim {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(90deg, rgb(var(--scrim) / 0.6) 0%, rgb(var(--scrim) / 0.32) 32%, rgb(var(--scrim) / 0) 58%);
+  }
+  .hero__inner {
+    position: relative; height: 100%;
+    display: grid; grid-template-rows: auto 1fr auto; gap: 1rem;
+    padding-block: 1.25rem;
+    padding-left: max(16px, env(safe-area-inset-left, 0px), 4vw);
+    padding-right: max(16px, env(safe-area-inset-right, 0px), 4vw);
+    pointer-events: none;           /* let drags reach the canvas */
+  }
+  .hero__inner :is(a, button) { pointer-events: auto; }
+
+  /* Top bar */
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .brand {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    text-shadow: 2px 2px 0 var(--ink-shadow);
+  }
+  .brand svg { width: 1.75rem; height: 1.75rem; flex: none; }
+  .bar__meta { font-size: var(--step--1); color: var(--ink-soft); text-shadow: 1px 1px 0 var(--ink-shadow); }
+
+  /* Pitch */
+  .pitch {
+    align-self: center; max-width: 36rem; min-width: 0;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 1.1rem;
+  }
+  .eyebrow {
+    margin: 0; padding: 0.2rem 0.55rem;
+    font-size: var(--step--1); letter-spacing: 0.16em; text-transform: uppercase;
+    background: var(--panel); border: 2px solid var(--edge);
+  }
+  .logo { margin: 0; width: min(100%, 34rem); line-height: 0; }
+  .logo svg { width: 100%; height: auto; overflow: visible; }
+  .px-depth { fill: var(--edge); }
+  .px-face { fill: var(--ink); }
+  .px-top { fill: var(--grass-lite); }
+  .lede {
+    margin: 0; max-width: 30rem; font-size: var(--step-1); line-height: 1.5;
+    text-shadow: 2px 2px 0 var(--ink-shadow); text-wrap: balance;
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  .btn {
+    font: 700 var(--step-0)/1 var(--font-ui); letter-spacing: 0.04em;
+    color: var(--ink); text-shadow: 2px 2px 0 var(--ink-shadow);
+    padding: 0.85rem 1.15rem; border: 2px solid var(--edge); border-radius: 0;
+    background: var(--stone);
+    box-shadow: inset 2px 2px 0 var(--stone-lite), inset -2px -4px 0 var(--stone-deep), 0 4px 0 var(--edge);
+    cursor: pointer; transition: transform 80ms, box-shadow 80ms, filter 120ms;
+  }
+  .btn--primary {
+    background: var(--grass);
+    box-shadow: inset 2px 2px 0 var(--grass-lite), inset -2px -4px 0 var(--grass-deep), 0 4px 0 var(--edge);
+  }
+  .btn:hover { filter: brightness(1.1); }
+  .btn:active { transform: translateY(3px); box-shadow: inset 2px 2px 0 var(--stone-deep), inset -2px -2px 0 var(--stone-lite), 0 1px 0 var(--edge); }
+  .btn--primary:active { box-shadow: inset 2px 2px 0 var(--grass-deep), inset -2px -2px 0 var(--grass-lite), 0 1px 0 var(--edge); }
+  .btn:focus-visible, .brand:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .btn[disabled] { filter: saturate(0.4) brightness(0.9); cursor: progress; }
+  .hint { margin: 0; font-size: var(--step--1); color: var(--ink-soft); text-shadow: 1px 1px 0 var(--ink-shadow); }
+
+  /* HUD */
+  .hud {
+    justify-self: start; margin: 0;
+    display: grid; grid-template-columns: repeat(4, auto); gap: 0 1.5rem;
+    padding: 0.55rem 0.9rem; background: var(--panel); border: 2px solid var(--edge);
+    font-size: var(--step--1); font-variant-numeric: tabular-nums;
+  }
+  .hud div { display: flex; gap: 0.5rem; align-items: baseline; }
+  .hud dt { color: var(--ink-soft); letter-spacing: 0.1em; text-transform: uppercase; }
+  .hud dd { margin: 0; font-weight: 700; min-width: 2ch; }
+  .fallback { margin: 0; padding: 0.6rem 0.8rem; background: var(--panel); border: 2px solid var(--edge); }
+
+  @media (max-width: 820px) {
+    .hero__scrim { background: linear-gradient(180deg, rgb(var(--scrim) / 0.62) 0%, rgb(var(--scrim) / 0.32) 38%, rgb(var(--scrim) / 0) 60%); }
+    .pitch { align-self: start; gap: 0.85rem; }
+    .lede { font-size: var(--step-0); }
+    .bar__meta { display: none; }
+    .hud { grid-template-columns: repeat(2, auto); gap: 0.15rem 1.25rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+</style>
+</head>
+<body>
+<main class="hero" id="hero">
+  <canvas class="hero__canvas" id="world" aria-label="A floating island of grass, stone and water blocks. Drag to orbit, scroll to zoom."></canvas>
+  <div class="hero__scrim"></div>
+
+  <div class="hero__inner">
+    <header class="bar">
+      <span class="brand">
+        <svg viewBox="0 0 28 28" aria-hidden="true" shape-rendering="crispEdges">
+          <path d="M14 2 26 8 14 14 2 8Z" fill="#8fdc5c"/>
+          <path d="M2 8 14 14V27L2 21Z" fill="#8a5a3c"/>
+          <path d="M26 8 14 14V27L26 21Z" fill="#6a432b"/>
+          <path d="M2 8 14 14V17L2 11Z" fill="#63b944"/>
+          <path d="M26 8 14 14V17L26 11Z" fill="#4e9a37"/>
+        </svg>
+        Voxelcraft
+      </span>
+      <span class="bar__meta">Rendered live with Three.js</span>
+    </header>
+
+    <section class="pitch">
+      <p class="eyebrow">Procedural voxel sandbox</p>
+      <h1 class="logo" aria-label="Voxelcraft"><svg id="logo" role="img" aria-hidden="true" shape-rendering="crispEdges"></svg></h1>
+      <p class="lede">A tiny world, built block by block in your browser. Every island grows from a single seed.</p>
+      <div class="actions">
+        <button class="btn btn--primary" id="regen" type="button">Generate new world</button>
+        <button class="btn" id="time" type="button">Time: Day</button>
+      </div>
+      <p class="hint">Drag to orbit · Scroll or pinch to zoom</p>
+    </section>
+
+    <dl class="hud" id="hud">
+      <div><dt>Seed</dt><dd id="stat-seed">–</dd></div>
+      <div><dt>Blocks</dt><dd id="stat-blocks">–</dd></div>
+      <div><dt>Tris</dt><dd id="stat-tris">–</dd></div>
+      <div><dt>FPS</dt><dd id="stat-fps">–</dd></div>
+    </dl>
+  </div>
+</main>
+
+<script type="module">
+import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.module.min.js';
+
+/* ───────────────────────────── Config ───────────────────────────── */
+
+const SIZE = 96;            // world width and depth, in blocks
+const HEIGHT = 96;          // world height, in blocks
+const SEA = 40;             // water level
+const HALF = SIZE / 2;
+const WATER_DROP = 0.14;    // how far the water surface sits below the block top
+const RIVER_ANGLE = 0.5;    // direction the river flows toward (radians)
+const DEFAULT_SEED = 20413;
+
+const B = Object.freeze({
+  AIR: 0, GRASS: 1, DIRT: 2, STONE: 3, DEEP: 4, SAND: 5, SNOW: 6, WATER: 7,
+  LOG: 8, LEAVES: 9, PINE: 10, BLOSSOM: 11, AUTUMN: 12, COAL: 13, GOLD: 14, CRYSTAL: 15,
+});
+
+// Block colors, with how much each block's brightness varies from its neighbors.
+const BLOCK_STYLE = {
+  [B.GRASS]:   ['#66bb45', 0.10],
+  [B.DIRT]:    ['#8b5a3b', 0.12],
+  [B.STONE]:   ['#8e939c', 0.14],
+  [B.DEEP]:    ['#5a5f70', 0.16],
+  [B.SAND]:    ['#ecdca0', 0.07],
+  [B.SNOW]:    ['#f6f9ff', 0.03],
+  [B.LOG]:     ['#6b4a2e', 0.12],
+  [B.LEAVES]:  ['#3d9a3a', 0.16],
+  [B.PINE]:    ['#226b48', 0.16],
+  [B.BLOSSOM]: ['#f6a5c9', 0.12],
+  [B.AUTUMN]:  ['#e8892b', 0.16],
+  [B.COAL]:    ['#2a2c33', 0.10],
+  [B.GOLD]:    ['#f4c63a', 0.10],
+  [B.CRYSTAL]: ['#4fe3d6', 0.10],
+};
+const linear = (hex) => { const c = new THREE.Color(hex); return [c.r, c.g, c.b]; };
+const PALETTE = [];
+for (const [id, [hex, jitter]] of Object.entries(BLOCK_STYLE)) PALETTE[id] = { rgb: linear(hex), jitter };
+const GRASS_LUSH = linear('#58ad3e');
+const GRASS_DRY = linear('#93cf52');
+const TUFT = linear('#4c9c38');
+const LILY = linear('#3f9a45');
+const FLOWERS = ['#ff5d6c', '#ffd23f', '#ffffff', '#b98cff'].map(linear);
+const WHITE = [1, 1, 1];
+
+// Time-of-day presets. The scene eases between them.
+const TIMES = [
+  { name: 'Day',   zenith: '#2f7fe6', horizon: '#c4e6ff', nadir: '#3d8ee8', sun: '#fff0d0', sunPower: 3.0,
+    hemiSky: '#cfe6ff', hemiGround: '#8f8a6a', hemiPower: 1.9, elevation: 46, azimuth: 40, stars: 0,
+    cloud: '#ffffff', water: '#2f8fe8', mote: '#ffffff', moteAlpha: 0.3 },
+  { name: 'Dusk',  zenith: '#27306f', horizon: '#ff9a62', nadir: '#6d4a8f', sun: '#ffac6a', sunPower: 3.0,
+    hemiSky: '#9484cf', hemiGround: '#7a4e4e', hemiPower: 1.3, elevation: 14, azimuth: 70, stars: 0.35,
+    cloud: '#ffcdb0', water: '#3f7fd6', mote: '#ffe9a8', moteAlpha: 0.7 },
+  { name: 'Night', zenith: '#040818', horizon: '#1c2b66', nadir: '#0a1030', sun: '#b9cdff', sunPower: 2.3,
+    hemiSky: '#6078cf', hemiGround: '#232a52', hemiPower: 1.6, elevation: 52, azimuth: -50, stars: 1,
+    cloud: '#4c5788', water: '#2f66cc', mote: '#d9ff7a', moteAlpha: 1 },
+];
+
+/* ───────────────────────────── Math helpers ───────────────────────────── */
+
+const TAU = Math.PI * 2;
+const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const smoothstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+
+function mulberry32(seed) {
+  let a = seed | 0;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Seeded 2D gradient noise, roughly in [-1, 1]. */
+function createNoise(rand) {
+  const perm = new Uint8Array(512);
+  const p = Uint8Array.from({ length: 256 }, (_, i) => i);
+  for (let i = 255; i > 0; i--) { const j = (rand() * (i + 1)) | 0; [p[i], p[j]] = [p[j], p[i]]; }
+  for (let i = 0; i < 512; i++) perm[i] = p[i & 255];
+  const GX = [1, -1, 1, -1, 1, -1, 0, 0], GY = [1, 1, -1, -1, 0, 0, 1, -1];
+  const grad = (h, x, y) => GX[h & 7] * x + GY[h & 7] * y;
+  const fade = (t) => t * t * t * (t * (t * 6 - 15) + 10);
+  return (x, y) => {
+    const X = Math.floor(x), Y = Math.floor(y);
+    x -= X; y -= Y;
+    const xi = X & 255, yi = Y & 255, u = fade(x), v = fade(y);
+    const a = perm[xi + perm[yi]], b = perm[xi + 1 + perm[yi]];
+    const c = perm[xi + perm[yi + 1]], d = perm[xi + 1 + perm[yi + 1]];
+    return lerp(lerp(grad(a, x, y), grad(b, x - 1, y), u), lerp(grad(c, x, y - 1), grad(d, x - 1, y - 1), u), v);
+  };
+}
+
+/* ───────────────────────────── World generation ───────────────────────────── */
+
+/**
+ * Builds a floating island: a height field shaped by noise, a central lake that
+ * drains through a river and off the edge as a waterfall, mountains behind it,
+ * and a tapering stone underside.
+ */
+function generateWorld(seed) {
+  const rand = mulberry32(seed);
+  const noise = createNoise(rand);
+  const fbm = (x, z, octaves = 4) => {
+    let amp = 1, freq = 1, sum = 0, norm = 0;
+    for (let i = 0; i < octaves; i++) { sum += amp * noise(x * freq, z * freq); norm += amp; amp *= 0.5; freq *= 2; }
+    return sum / norm;
+  };
+  const hash3 = (x, y, z) => {
+    let h = (Math.imul(x, 374761393) + Math.imul(y, 668265263) + Math.imul(z, 1440662683) + Math.imul(seed, 1274126177)) | 0;
+    h = Math.imul(h ^ (h >>> 13), 1274126177);
+    return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+  };
+
+  const voxels = new Uint8Array(SIZE * SIZE * HEIGHT);
+  const top = new Int16Array(SIZE * SIZE).fill(-1);       // highest solid block per column, -1 = no land
+  const heights = new Float32Array(SIZE * SIZE).fill(-1);
+  const inland = new Float32Array(SIZE * SIZE);           // 0 at the island rim, 1 well inside
+  const tint = new Float32Array(SIZE * SIZE);             // grass color variation
+  const delay = new Float32Array(SIZE * SIZE);            // build-animation order
+  const fall = new Uint8Array(SIZE * SIZE);               // columns that hold the waterfall
+
+  const at = (x, y, z) => x + SIZE * (z + SIZE * y);
+  const inBounds = (x, y, z) => x >= 0 && z >= 0 && y >= 0 && x < SIZE && z < SIZE && y < HEIGHT;
+  const get = (x, y, z) => (inBounds(x, y, z) ? voxels[at(x, y, z)] : B.AIR);
+  const setIfAir = (x, y, z, block) => { if (inBounds(x, y, z) && voxels[at(x, y, z)] === B.AIR) voxels[at(x, y, z)] = block; };
+
+  const C = (SIZE - 1) / 2;
+  const riverX = Math.sin(RIVER_ANGLE), riverZ = Math.cos(RIVER_ANGLE);
+  const riverPhase = rand() * TAU;
+
+  // Pass 1: height field.
+  for (let z = 0; z < SIZE; z++) {
+    for (let x = 0; x < SIZE; x++) {
+      const i = x + z * SIZE;
+      const nx = (x - C) / C, nz = (z - C) / C, r = Math.hypot(nx, nz);
+      delay[i] = clamp(r * 0.8 + hash3(x, 0, z) * 0.2, 0, 1);
+      tint[i] = smoothstep(-0.35, 0.35, fbm(x * 0.06 + 900, z * 0.06 + 900, 2));
+
+      const edge = r * 1.18 + fbm(x * 0.03 + 40, z * 0.03 + 40, 3) * 0.28;
+      if (edge >= 1) continue;
+      inland[i] = 1 - smoothstep(0.5, 1, edge);
+
+      const base = fbm(x * 0.024, z * 0.024, 5);
+      const along = nx * riverX + nz * riverZ;      // positive toward the river mouth
+      const across = -nx * riverZ + nz * riverX;
+
+      let h = SEA + 5 + base * 17 - along * 8;
+      const ridge = Math.max(0, 1 - Math.abs(fbm(x * 0.028 + 100, z * 0.028 + 100, 4)) * 1.6);
+      h += smoothstep(-0.05, 0.55, -along + base * 0.6) * ridge ** 2.2 * 26;                // mountains behind
+      h = lerp(h, SEA - 4.5, 1 - smoothstep(0.1, 0.27, r + fbm(x * 0.06 + 7, z * 0.06 + 7, 2) * 0.1)); // lake
+      h = lerp(SEA + 2.6 + base * 2, h, inland[i]);                                         // rim holds the water in
+      if (along > 0) {                                                                      // river cuts through the rim
+        const meander = Math.sin(along * 7 + riverPhase) * 0.07 * smoothstep(0, 0.25, along);
+        h = lerp(h, SEA - 2.4, 1 - smoothstep(1.4, 6, Math.abs(across - meander) * C));
+      }
+      heights[i] = clamp(h, 4, HEIGHT - 16);
+    }
+  }
+
+  // Pass 2: fill columns with blocks.
+  for (let z = 0; z < SIZE; z++) {
+    for (let x = 0; x < SIZE; x++) {
+      const i = x + z * SIZE;
+      if (heights[i] < 0) continue;
+      const t = Math.floor(heights[i]);
+      top[i] = t;
+
+      let slope = 0;
+      for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx, nz = z + dz;
+        if (nx < 0 || nz < 0 || nx >= SIZE || nz >= SIZE) continue;
+        const nh = heights[nx + nz * SIZE];
+        if (nh >= 0) slope = Math.max(slope, Math.abs(nh - heights[i]));
+      }
+
+      const thickness = 3
+        + inland[i] ** 0.8 * (13 + (fbm(x * 0.05 + 200, z * 0.05 + 200, 3) * 0.5 + 0.5) * 16)
+        + Math.max(0, noise(x * 0.21 + 300, z * 0.21 + 300)) ** 1.5 * 14 * inland[i];       // stalactites
+      const bottom = clamp(Math.floor(SEA - thickness), 1, t - 2);
+
+      const rough = noise(x * 0.1 + 60, z * 0.1 + 60);
+      const surface =
+        t <= SEA + 1 ? B.SAND :
+        t >= SEA + 19 + rough * 2.5 ? B.SNOW :
+        t >= SEA + 15 + rough * 3 || (slope > 2.6 && t > SEA + 5) ? B.STONE : B.GRASS;
+      const deepLine = SEA - 14 + noise(x * 0.09 + 50, z * 0.09 + 50) * 5;
+
+      for (let y = bottom; y <= t; y++) {
+        const depth = t - y;
+        let block;
+        if (depth === 0) block = surface;
+        else if (depth <= 3 && surface === B.GRASS) block = B.DIRT;
+        else if (depth <= 2 && surface === B.SAND) block = B.SAND;
+        else {
+          block = y < deepLine ? B.DEEP : B.STONE;
+          const ore = depth > 3 ? hash3(x, y, z) : 1;
+          if (ore < 0.012) block = B.COAL;
+          else if (ore < 0.019) block = B.GOLD;
+          else if (ore < 0.03 && y < deepLine) block = B.CRYSTAL;
+        }
+        voxels[at(x, y, z)] = block;
+      }
+      for (let y = t + 1; y <= SEA; y++) voxels[at(x, y, z)] = B.WATER;
+    }
+  }
+
+  // Waterfall: wherever water meets the island's edge, it spills straight down.
+  const fallBottom = SEA - 34;
+  for (let z = 0; z < SIZE; z++) {
+    for (let x = 0; x < SIZE; x++) {
+      const t = top[x + z * SIZE];
+      if (t < 0 || t >= SEA) continue;
+      for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx, nz = z + dz;
+        if (nx < 0 || nz < 0 || nx >= SIZE || nz >= SIZE) continue;
+        const n = nx + nz * SIZE;
+        if (top[n] >= 0 || fall[n]) continue;
+        fall[n] = 1;
+        for (let y = fallBottom; y <= SEA; y++) voxels[at(nx, y, nz)] = B.WATER;
+      }
+    }
+  }
+
+  // Trees: oaks low down (a few in blossom or autumn color), pines higher up.
+  const trees = [];
+  for (let z = 3; z < SIZE - 3; z++) {
+    for (let x = 3; x < SIZE - 3; x++) {
+      const i = x + z * SIZE, t = top[i];
+      if (t < 0 || voxels[at(x, t, z)] !== B.GRASS || inland[i] < 0.3) continue;
+      const density = 0.012 + smoothstep(-0.15, 0.35, fbm(x * 0.04 + 500, z * 0.04 + 500, 2)) * 0.06;
+      if (hash3(x, 999, z) > density) continue;
+      if (trees.some((o) => Math.abs(o.x - x) < 3 && Math.abs(o.z - z) < 3)) continue;
+      trees.push({ x, z });
+
+      const roll = hash3(x, 7, z);
+      if (t > SEA + 9 + roll * 3) {
+        const trunk = 6 + ((roll * 3) | 0);
+        for (let y = 1; y <= trunk; y++) voxels[at(x, t + y, z)] = B.LOG;
+        const tip = t + trunk + 1;
+        for (let k = 0, y = tip; y >= t + 3; k++, y--) {
+          const radius = k === 0 ? 0 : k % 2 ? 1 : 2;
+          for (let dz = -radius; dz <= radius; dz++) for (let dx = -radius; dx <= radius; dx++) {
+            if (Math.abs(dx) + Math.abs(dz) <= radius + (radius === 2 ? 1 : 0)) setIfAir(x + dx, y, z + dz, B.PINE);
+          }
+        }
+      } else {
+        const trunk = 4 + ((roll * 3) | 0);
+        const kind = hash3(x, 13, z);
+        const leaves = kind < 0.07 ? B.BLOSSOM : kind < 0.13 ? B.AUTUMN : B.LEAVES;
+        for (let y = 1; y <= trunk; y++) voxels[at(x, t + y, z)] = B.LOG;
+        for (let dy = -1; dy <= 2; dy++) {
+          const radius = dy <= 0 ? 2 : 1, y = t + trunk + dy;
+          for (let dz = -radius; dz <= radius; dz++) for (let dx = -radius; dx <= radius; dx++) {
+            const corner = Math.abs(dx) === radius && Math.abs(dz) === radius;
+            if (corner && (dy === 2 || hash3(x + dx, y, z + dz) > 0.45)) continue;
+            setIfAir(x + dx, y, z + dz, leaves);
+          }
+        }
+      }
+    }
+  }
+
+  let blocks = 0;
+  for (let i = 0; i < voxels.length; i++) if (voxels[i]) blocks++;
+
+  return { seed, voxels, top, tint, delay, fall, fallBottom, blocks, get, hash3 };
+}
+
+/* ───────────────────────────── Meshing ───────────────────────────── */
+
+const AO_SHADE = [0.42, 0.63, 0.83, 1];        // brightness for 0–3 open neighbors at a corner
+const CORNERS = [[0, 0], [1, 0], [1, 1], [0, 1]];
+
+/** Collects quads and turns them into one indexed BufferGeometry. */
+class QuadBuffer {
+  position = []; normal = []; color = []; delay = []; fall = []; index = []; count = 0;
+
+  quad(verts, normal, rgb, shade, delay, fall = 0) {
+    const base = this.count;
+    for (let i = 0; i < 4; i++) {
+      this.position.push(verts[i][0], verts[i][1], verts[i][2]);
+      this.normal.push(normal[0], normal[1], normal[2]);
+      this.color.push(rgb[0] * shade[i], rgb[1] * shade[i], rgb[2] * shade[i]);
+      this.delay.push(delay);
+      this.fall.push(fall);
+    }
+    // Split along the diagonal that keeps ambient occlusion symmetric.
+    if (shade[0] + shade[2] > shade[1] + shade[3]) this.index.push(base, base + 1, base + 2, base, base + 2, base + 3);
+    else this.index.push(base, base + 1, base + 3, base + 1, base + 2, base + 3);
+    this.count += 4;
+  }
+
+  /** An axis-aligned box of any size, used for flowers, grass tufts and lily pads. */
+  box(min, size, rgb, delay) {
+    for (let axis = 0; axis < 3; axis++) {
+      for (const dir of [1, -1]) {
+        const u = (axis + 1) % 3, v = (axis + 2) % 3;
+        const normal = [0, 0, 0]; normal[axis] = dir;
+        const verts = [];
+        for (let k = 0; k < 4; k++) {
+          const [cu, cv] = CORNERS[dir > 0 ? k : (4 - k) % 4];
+          const p = [...min];
+          if (dir > 0) p[axis] += size[axis];
+          p[u] += cu * size[u]; p[v] += cv * size[v];
+          verts.push(p);
+        }
+        this.quad(verts, normal, rgb, [1, 1, 1, 1], delay);
+      }
+    }
+  }
+
+  toGeometry() {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(this.position, 3));
+    g.setAttribute('normal', new THREE.Float32BufferAttribute(this.normal, 3));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(this.color, 3));
+    g.setAttribute('aDelay', new THREE.Float32BufferAttribute(this.delay, 1));
+    g.setAttribute('aFall', new THREE.Float32BufferAttribute(this.fall, 1));
+    g.setIndex(this.index);
+    g.computeBoundingSphere();
+    return g;
+  }
+}
+
+/**
+ * Turns the voxel grid into two meshes: opaque terrain and water. Only faces that
+ * touch air (or water, for terrain) are emitted, and each terrain vertex carries
+ * baked ambient occlusion.
+ */
+function buildGeometry(world) {
+  const { voxels, get, hash3, top, tint, delay, fall } = world;
+  const solid = new QuadBuffer(), water = new QuadBuffer();
+  const opaque = (x, y, z) => { const b = get(x, y, z); return b !== B.AIR && b !== B.WATER; };
+
+  for (let y = 0; y < HEIGHT; y++) {
+    for (let z = 0; z < SIZE; z++) {
+      for (let x = 0; x < SIZE; x++) {
+        const block = voxels[x + SIZE * (z + SIZE * y)];
+        if (block === B.AIR) continue;
+        const column = x + z * SIZE;
+        const isWater = block === B.WATER;
+        const isSurface = isWater && get(x, y + 1, z) !== B.WATER;
+
+        let rgb = WHITE;
+        if (!isWater) {
+          const style = PALETTE[block];
+          const base = block === B.GRASS ? GRASS_LUSH.map((c, i) => lerp(c, GRASS_DRY[i], tint[column])) : style.rgb;
+          const k = 1 + (hash3(x, y, z) - 0.5) * style.jitter * 2;
+          rgb = [base[0] * k, base[1] * k, base[2] * k];
+        }
+
+        for (let axis = 0; axis < 3; axis++) {
+          for (let dir = 1; dir >= -1; dir -= 2) {
+            const q = [x, y, z]; q[axis] += dir;
+            const neighbor = get(q[0], q[1], q[2]);
+            if (isWater ? neighbor !== B.AIR : neighbor !== B.AIR && neighbor !== B.WATER) continue;
+
+            const u = (axis + 1) % 3, v = (axis + 2) % 3;
+            const normal = [0, 0, 0]; normal[axis] = dir;
+            const verts = [], shade = [];
+            for (let k = 0; k < 4; k++) {
+              const [cu, cv] = CORNERS[dir > 0 ? k : (4 - k) % 4];
+              const p = [x, y, z];
+              if (dir > 0) p[axis] += 1;
+              p[u] += cu; p[v] += cv;
+              if (isWater) {
+                if (isSurface && p[1] === y + 1) p[1] -= WATER_DROP;
+                shade.push(1);
+              } else {
+                const a = [...q], b = [...q], c = [...q];
+                a[u] += cu ? 1 : -1; b[v] += cv ? 1 : -1;
+                c[u] += cu ? 1 : -1; c[v] += cv ? 1 : -1;
+                const s1 = opaque(a[0], a[1], a[2]), s2 = opaque(b[0], b[1], b[2]), s3 = opaque(c[0], c[1], c[2]);
+                shade.push(AO_SHADE[s1 && s2 ? 0 : 3 - s1 - s2 - s3]);
+              }
+              p[0] -= HALF; p[2] -= HALF;
+              verts.push(p);
+            }
+            (isWater ? water : solid).quad(verts, normal, rgb, shade, delay[column], isWater ? fall[column] : 0);
+          }
+        }
+      }
+    }
+  }
+
+  // Small details that sit on top of blocks.
+  for (let z = 0; z < SIZE; z++) {
+    for (let x = 0; x < SIZE; x++) {
+      const column = x + z * SIZE, t = top[column];
+      if (t < 0) continue;
+      const wx = x - HALF, wz = z - HALF, roll = hash3(x, 31, z), d = delay[column];
+      if (get(x, t, z) === B.GRASS && get(x, t + 1, z) === B.AIR) {
+        if (roll < 0.05) {
+          solid.box([wx + 0.44, t + 1, wz + 0.44], [0.12, 0.34, 0.12], TUFT, d);
+          solid.box([wx + 0.33, t + 1.34, wz + 0.33], [0.34, 0.28, 0.34], FLOWERS[(hash3(x, 37, z) * FLOWERS.length) | 0], d);
+        } else if (roll < 0.17) {
+          for (let k = 0; k < 3; k++) {
+            const ox = 0.12 + hash3(x, 40 + k, z) * 0.62, oz = 0.12 + hash3(x, 50 + k, z) * 0.62;
+            solid.box([wx + ox, t + 1, wz + oz], [0.13, 0.22 + hash3(x, 60 + k, z) * 0.34, 0.13], TUFT, d);
+          }
+        }
+      } else if (t < SEA - 1 && roll < 0.035 && get(x, SEA + 1, z) === B.AIR) {
+        solid.box([wx + 0.16, SEA + 1 - WATER_DROP + 0.05, wz + 0.16], [0.68, 0.06, 0.68], LILY, d);
+      }
+    }
+  }
+
+  return { solid: solid.toGeometry(), water: water.toGeometry(), triangles: (solid.index.length + water.index.length) / 3 };
+}
+
+/* ───────────────────────────── Scene ───────────────────────────── */
+
+const canvas = document.getElementById('world');
+const hero = document.getElementById('hero');
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+} catch {
+  const note = Object.assign(document.createElement('p'), { className: 'fallback', textContent: 'This world needs WebGL, which this browser has turned off.' });
+  document.getElementById('hud').replaceWith(note);
+  throw new Error('WebGL unavailable');
+}
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.autoUpdate = false;        // the world is static, so shadows render only when it changes
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(32, 1, 1, 900);
+const focus = new THREE.Vector3(0, SEA + 3, 0);
+
+const shared = {
+  uBuild: { value: 0 },       // 0 = world hidden, 1 = fully built
+  uTime: { value: 0 },
+  uFallEnd: { value: 0 },
+};
+
+/** Adds the rise-from-below build animation to a built-in material. */
+function withBuildAnimation(material, cacheKey, extend) {
+  material.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, shared);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', `#include <common>
+        attribute float aDelay;
+        uniform float uBuild;`)
+      .replace('#include <begin_vertex>', `#include <begin_vertex>
+        float buildT = clamp((uBuild * 1.5 - aDelay) / 0.5, 0.0, 1.0);
+        float buildK = buildT - 1.0;
+        float buildEase = 1.0 + 2.2 * buildK * buildK * buildK + 1.2 * buildK * buildK;   // ease-out with a small overshoot
+        transformed.y += (buildEase - 1.0) * 42.0;
+        if (buildT <= 0.0) transformed = vec3(0.0, -400.0, 0.0);                           // not started: collapse out of sight`);
+    extend?.(shader);
+  };
+  material.customProgramCacheKey = () => cacheKey;
+  return material;
+}
+
+const terrainMaterial = withBuildAnimation(new THREE.MeshLambertMaterial({ vertexColors: true }), 'vx-terrain');
+const terrainDepthMaterial = withBuildAnimation(new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }), 'vx-depth');
+
+const waterMaterial = withBuildAnimation(
+  new THREE.MeshLambertMaterial({ color: TIMES[0].water, transparent: true, opacity: 0.74, depthWrite: false }),
+  'vx-water',
+  (shader) => {
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', `#include <common>
+        attribute float aFall;
+        uniform float uTime;
+        varying vec3 vWorld;
+        varying float vFall;`)
+      .replace('#include <begin_vertex>', `#include <begin_vertex>
+        transformed.y += (1.0 - aFall) * (sin(position.x * 0.9 + uTime * 1.4) + cos(position.z * 0.8 + uTime * 1.1)) * 0.03;`)
+      .replace('#include <project_vertex>', `vWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;
+        vFall = aFall;
+        #include <project_vertex>`);
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', `#include <common>
+        uniform float uTime;
+        uniform float uFallEnd;
+        varying vec3 vWorld;
+        varying float vFall;
+        float cellHash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }`)
+      .replace('#include <color_fragment>', `#include <color_fragment>
+        if (vFall > 0.5) {
+          // Waterfall: white streaks racing down, dissolving into mist at the bottom.
+          vec2 cell = floor(vec2((vWorld.x + vWorld.z) * 2.0, vWorld.y * 0.6 + uTime * 7.0));
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(1.0), 0.25 + 0.45 * step(0.55, cellHash(cell)));
+          diffuseColor.a *= smoothstep(uFallEnd, uFallEnd + 18.0, vWorld.y);
+        } else {
+          // Still water: square glints that fade in and out.
+          vec2 cell = floor(vWorld.xz * 2.0);
+          float t = uTime * 0.7 + cellHash(cell + 3.0) * 9.0;
+          float glint = mix(cellHash(cell + floor(t) * 7.0), cellHash(cell + (floor(t) + 1.0) * 7.0), smoothstep(0.0, 1.0, fract(t)));
+          diffuseColor.rgb += smoothstep(0.84, 1.0, glint) * 0.28;
+        }`);
+  },
+);
+
+const terrain = new THREE.Mesh(new THREE.BufferGeometry(), terrainMaterial);
+terrain.castShadow = terrain.receiveShadow = true;
+terrain.customDepthMaterial = terrainDepthMaterial;
+const water = new THREE.Mesh(new THREE.BufferGeometry(), waterMaterial);
+water.receiveShadow = true;
+scene.add(terrain, water);
+
+// Lights
+const hemi = new THREE.HemisphereLight();
+const sun = new THREE.DirectionalLight();
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.bias = -0.0006;
+sun.shadow.normalBias = 0.12;
+Object.assign(sun.shadow.camera, { left: -76, right: 76, top: 76, bottom: -76, near: 10, far: 380 });
+sun.target.position.set(0, SEA, 0);
+scene.add(hemi, sun, sun.target);
+
+// Sky dome: gradient, a square sun or moon, and square stars.
+const skyMaterial = new THREE.ShaderMaterial({
+  side: THREE.BackSide, depthWrite: false,
+  uniforms: {
+    uZenith: { value: new THREE.Color() }, uHorizon: { value: new THREE.Color() }, uNadir: { value: new THREE.Color() },
+    uSunColor: { value: new THREE.Color() }, uSunDir: { value: new THREE.Vector3(0, 1, 0) },
+    uStars: { value: 0 }, uTime: shared.uTime,
+  },
+  vertexShader: /* glsl */ `
+    varying vec3 vDir;
+    void main() {
+      vDir = position;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      gl_Position.z = gl_Position.w;     // always behind everything
+    }`,
+  fragmentShader: /* glsl */ `
+    uniform vec3 uZenith, uHorizon, uNadir, uSunColor, uSunDir;
+    uniform float uStars, uTime;
+    varying vec3 vDir;
+    float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+    void main() {
+      vec3 d = normalize(vDir);
+      vec3 col = d.y > 0.0 ? mix(uHorizon, uZenith, pow(d.y, 0.55)) : mix(uHorizon, uNadir, pow(-d.y, 0.6));
+
+      float facing = max(dot(d, uSunDir), 0.0);
+      vec3 t1 = normalize(cross(uSunDir, vec3(0.0, 1.0, 0.0)));
+      vec3 t2 = cross(uSunDir, t1);
+      float square = max(abs(dot(d, t1)), abs(dot(d, t2)));
+      col += uSunColor * (pow(facing, 20.0) * 0.22 + pow(facing, 300.0) * 0.5);
+      col = mix(col, min(uSunColor * 1.4, vec3(1.0)), step(square, 0.045) * step(0.5, facing));
+
+      vec2 grid = vec2(atan(d.z, d.x), asin(clamp(d.y, -1.0, 1.0))) * 150.0;
+      vec2 cell = floor(grid), f = fract(grid);
+      float seed = hash(cell);
+      float dot2 = step(0.3, f.x) * step(f.x, 0.7) * step(0.3, f.y) * step(f.y, 0.7);
+      col += step(0.975, seed) * dot2 * uStars * (0.7 + 0.5 * sin(uTime * 2.0 + seed * 90.0));
+
+      gl_FragColor = vec4(col, 1.0);
+      #include <colorspace_fragment>
+    }`,
+});
+const sky = new THREE.Mesh(new THREE.SphereGeometry(10, 32, 16), skyMaterial);
+sky.frustumCulled = false;
+sky.renderOrder = -1;
+scene.add(sky);
+
+// Clouds: flat boxes on a slowly turning ring around the island.
+const cloudMaterial = new THREE.MeshLambertMaterial({ color: '#ffffff', emissive: '#ffffff', emissiveIntensity: 0.3 });
+const clouds = (() => {
+  const rand = mulberry32(7);
+  const puffs = [];
+  for (let c = 0; c < 18; c++) {
+    const angle = rand() * TAU, radius = 78 + rand() * 50;
+    const origin = new THREE.Vector3(Math.cos(angle) * radius, SEA - 46 + rand() ** 1.6 * 74, Math.sin(angle) * radius);
+    const parts = 2 + ((rand() * 3) | 0);
+    for (let p = 0; p < parts; p++) {
+      puffs.push({
+        position: origin.clone().add(new THREE.Vector3((rand() - 0.5) * 16, (rand() - 0.5) * 3, (rand() - 0.5) * 12)),
+        scale: new THREE.Vector3(10 + rand() * 14, 3 + rand() * 2, 8 + rand() * 9),
+        turn: angle,
+      });
+    }
+  }
+  const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), cloudMaterial, puffs.length);
+  const dummy = new THREE.Object3D();
+  puffs.forEach((puff, i) => {
+    dummy.position.copy(puff.position);
+    dummy.scale.copy(puff.scale);
+    dummy.rotation.y = -puff.turn;
+    dummy.updateMatrix();
+    mesh.setMatrixAt(i, dummy.matrix);
+  });
+  mesh.frustumCulled = false;
+  return mesh;
+})();
+scene.add(clouds);
+
+// Motes: pollen by day, fireflies by night. Points render as squares, which suits the look.
+const moteMaterial = new THREE.ShaderMaterial({
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  uniforms: { uTime: shared.uTime, uBuild: shared.uBuild, uScale: { value: 1 }, uColor: { value: new THREE.Color() }, uAlpha: { value: 0 } },
+  vertexShader: /* glsl */ `
+    attribute float aPhase;
+    uniform float uTime, uScale;
+    varying float vTwinkle;
+    void main() {
+      vec3 p = position + vec3(sin(uTime * 0.4 + aPhase * 6.28) * 2.5, sin(uTime * 0.6 + aPhase * 9.0) * 1.5, cos(uTime * 0.33 + aPhase * 4.0) * 2.5);
+      vec4 mv = modelViewMatrix * vec4(p, 1.0);
+      gl_Position = projectionMatrix * mv;
+      gl_PointSize = uScale * (0.35 + aPhase * 0.3) / -mv.z;
+      vTwinkle = 0.5 + 0.5 * sin(uTime * 2.2 + aPhase * 40.0);
+    }`,
+  fragmentShader: /* glsl */ `
+    uniform vec3 uColor;
+    uniform float uAlpha, uBuild;
+    varying float vTwinkle;
+    void main() {
+      gl_FragColor = vec4(uColor, vTwinkle * uAlpha * smoothstep(0.7, 1.0, uBuild));
+      #include <colorspace_fragment>
+    }`,
+});
+const motes = (() => {
+  const rand = mulberry32(11), count = 160;
+  const position = new Float32Array(count * 3), phase = new Float32Array(count);
+  for (let i = 0; i < count; i++) {
+    const angle = rand() * TAU, radius = Math.sqrt(rand()) * 42;
+    position.set([Math.cos(angle) * radius, SEA + 3 + rand() * 24, Math.sin(angle) * radius], i * 3);
+    phase[i] = rand();
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(position, 3));
+  g.setAttribute('aPhase', new THREE.BufferAttribute(phase, 1));
+  return new THREE.Points(g, moteMaterial);
+})();
+scene.add(motes);
+
+/* ───────────────────────────── Time of day ───────────────────────────── */
+
+const COLOR_KEYS = ['zenith', 'horizon', 'nadir', 'sun', 'hemiSky', 'hemiGround', 'cloud', 'water', 'mote'];
+const NUMBER_KEYS = ['sunPower', 'hemiPower', 'elevation', 'azimuth', 'stars', 'moteAlpha'];
+const presets = TIMES.map((time) => {
+  const preset = { name: time.name };
+  for (const key of COLOR_KEYS) preset[key] = new THREE.Color(time[key]);
+  for (const key of NUMBER_KEYS) preset[key] = time[key];
+  return preset;
+});
+
+const prefersDark = () => {
+  const theme = document.documentElement.dataset.theme;
+  return theme ? theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+};
+let timeIndex = prefersDark() ? 2 : 0;
+const now = { ...presets[timeIndex] };
+for (const key of COLOR_KEYS) now[key] = presets[timeIndex][key].clone();
+
+function applyTime() {
+  const u = skyMaterial.uniforms;
+  u.uZenith.value.copy(now.zenith); u.uHorizon.value.copy(now.horizon); u.uNadir.value.copy(now.nadir);
+  u.uSunColor.value.copy(now.sun); u.uStars.value = now.stars;
+  const elevation = THREE.MathUtils.degToRad(now.elevation), azimuth = THREE.MathUtils.degToRad(now.azimuth);
+  u.uSunDir.value.set(Math.cos(elevation) * Math.sin(azimuth), Math.sin(elevation), Math.cos(elevation) * Math.cos(azimuth));
+  sun.position.copy(sun.target.position).addScaledVector(u.uSunDir.value, 180);
+  sun.color.copy(now.sun); sun.intensity = now.sunPower;
+  hemi.color.copy(now.hemiSky); hemi.groundColor.copy(now.hemiGround); hemi.intensity = now.hemiPower;
+  cloudMaterial.color.copy(now.cloud); cloudMaterial.emissive.copy(now.cloud);
+  waterMaterial.color.copy(now.water);
+  moteMaterial.uniforms.uColor.value.copy(now.mote);
+  moteMaterial.uniforms.uAlpha.value = now.moteAlpha;
+}
+
+let timeBlend = 0;      // seconds of easing left after a time change
+function easeTime(dt) {
+  if (timeBlend <= 0) return;
+  timeBlend -= dt;
+  const target = presets[timeIndex], k = timeBlend <= 0 ? 1 : 1 - Math.exp(-dt * 3.2);
+  for (const key of COLOR_KEYS) now[key].lerp(target[key], k);
+  for (const key of NUMBER_KEYS) now[key] = lerp(now[key], target[key], k);
+  applyTime();
+  renderer.shadowMap.needsUpdate = true;
+}
+
+/* ───────────────────────────── World lifecycle ───────────────────────────── */
+
+const stat = (id) => document.getElementById(`stat-${id}`);
+const format = new Intl.NumberFormat('en-US');
+let nextSeed = null;
+const build = { progress: reducedMotion ? 1 : 0.3, direction: 1 };
+
+function loadWorld(seed) {
+  const world = generateWorld(seed);
+  const geometry = buildGeometry(world);
+  terrain.geometry.dispose(); water.geometry.dispose();
+  terrain.geometry = geometry.solid;
+  water.geometry = geometry.water;
+  shared.uFallEnd.value = world.fallBottom;
+  stat('seed').textContent = seed;
+  stat('blocks').textContent = format.format(world.blocks);
+  stat('tris').textContent = format.format(geometry.triangles);
+  renderer.shadowMap.needsUpdate = true;
+}
+
+function stepBuild(dt) {
+  const before = build.progress;
+  build.progress = clamp(build.progress + build.direction * dt / (build.direction > 0 ? 2.6 : 0.7), 0, 1);
+  if (build.direction < 0 && build.progress === 0) {       // old world is gone: swap in the new one and raise it
+    loadWorld(nextSeed);
+    nextSeed = null;
+    build.direction = 1;
+    regenButton.disabled = false;
+  }
+  if (build.progress !== before) renderer.shadowMap.needsUpdate = true;
+  shared.uBuild.value = build.progress;
+}
+
+/* ───────────────────────────── Camera and input ───────────────────────────── */
+
+const view = { azimuth: RIVER_ANGLE - 0.62, polar: 1.1, distance: 215, spin: 0, fit: 1 };
+const pointers = new Map();
+let pinchStart = 0, lastInput = -Infinity;
+
+canvas.addEventListener('pointerdown', (e) => {
+  canvas.setPointerCapture(e.pointerId);
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pointers.size === 2) pinchStart = pinchSpan() * view.distance;
+  canvas.classList.add('is-dragging');
+});
+canvas.addEventListener('pointermove', (e) => {
+  const p = pointers.get(e.pointerId);
+  if (!p) return;
+  const dx = e.clientX - p.x, dy = e.clientY - p.y;
+  p.x = e.clientX; p.y = e.clientY;
+  lastInput = performance.now();
+  if (pointers.size === 1) {
+    view.spin = -dx * 0.005;
+    view.azimuth += view.spin;
+    view.polar = clamp(view.polar - dy * 0.004, 0.45, 1.5);
+  } else if (pointers.size === 2) {
+    view.distance = clamp(pinchStart / pinchSpan(), 120, 330);
+  }
+});
+const release = (e) => {
+  pointers.delete(e.pointerId);
+  if (!pointers.size) canvas.classList.remove('is-dragging');
+};
+canvas.addEventListener('pointerup', release);
+canvas.addEventListener('pointercancel', release);
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  view.distance = clamp(view.distance * Math.exp(e.deltaY * 0.001), 120, 330);
+}, { passive: false });
+
+function pinchSpan() {
+  const [a, b] = [...pointers.values()];
+  return Math.hypot(a.x - b.x, a.y - b.y) || 1;
+}
+
+function updateCamera(dt, time) {
+  if (!pointers.size) {
+    // Drag momentum fades out, then the slow idle turn comes back.
+    view.azimuth += view.spin;
+    view.spin *= Math.exp(-dt * 4);
+    const idle = reducedMotion ? 0 : smoothstep(600, 2600, performance.now() - lastInput);
+    view.azimuth += idle * dt * 0.07;
+  }
+  const intro = reducedMotion ? 1 : smoothstep(0, 1, build.progress);
+  const distance = view.distance * view.fit * lerp(1.22, 1, intro);
+  const bob = reducedMotion ? 0 : Math.sin(time * 0.6) * 0.9;        // the camera bobs, so the island seems to float
+  const sinPolar = Math.sin(view.polar);
+  camera.position.set(
+    focus.x + distance * sinPolar * Math.sin(view.azimuth),
+    focus.y + distance * Math.cos(view.polar) - bob,
+    focus.z + distance * sinPolar * Math.cos(view.azimuth),
+  );
+  camera.lookAt(focus.x, focus.y - bob, focus.z);
+  sky.position.copy(camera.position);
+}
+
+function resize() {
+  const width = hero.clientWidth, height = hero.clientHeight;
+  if (!width || !height) return;
+  renderer.setSize(width, height, false);
+  camera.aspect = width / height;
+  const wide = width > 820;
+  view.fit = Math.max(1, (wide ? 1.5 : 0.9) / camera.aspect);
+  // Shift the picture so the island clears the copy: right on wide screens, down on narrow ones.
+  if (wide) camera.setViewOffset(width, height, -width * 0.19, 0, width, height);
+  else camera.setViewOffset(width, height, 0, -height * 0.17, width, height);
+  camera.updateProjectionMatrix();
+  moteMaterial.uniforms.uScale.value = renderer.domElement.height / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+}
+new ResizeObserver(resize).observe(hero);
+
+/* ───────────────────────────── UI ───────────────────────────── */
+
+const regenButton = document.getElementById('regen');
+const timeButton = document.getElementById('time');
+
+regenButton.addEventListener('click', () => {
+  nextSeed = 10000 + ((Math.random() * 90000) | 0);
+  if (reducedMotion) { loadWorld(nextSeed); nextSeed = null; return; }
+  build.direction = -1;
+  regenButton.disabled = true;
+});
+
+const setTime = (index) => {
+  timeIndex = index;
+  timeBlend = 2.4;
+  timeButton.textContent = `Time: ${presets[index].name}`;
+};
+timeButton.addEventListener('click', () => setTime((timeIndex + 1) % presets.length));
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => setTime(prefersDark() ? 2 : 0));
+timeButton.textContent = `Time: ${presets[timeIndex].name}`;
+
+// The wordmark: a 5×7 pixel font drawn as SVG rectangles, with a hard extruded edge.
+(() => {
+  const GLYPHS = {
+    V: ['10001', '10001', '10001', '10001', '10001', '01010', '00100'],
+    O: ['01110', '10001', '10001', '10001', '10001', '10001', '01110'],
+    X: ['10001', '10001', '01010', '00100', '01010', '10001', '10001'],
+    E: ['11111', '10000', '10000', '11110', '10000', '10000', '11111'],
+    L: ['10000', '10000', '10000', '10000', '10000', '10000', '11111'],
+    C: ['01110', '10001', '10000', '10000', '10000', '10001', '01110'],
+    R: ['11110', '10001', '10001', '11110', '10100', '10010', '10001'],
+    A: ['01110', '10001', '10001', '11111', '10001', '10001', '10001'],
+    F: ['11111', '10000', '10000', '11110', '10000', '10000', '10000'],
+    T: ['11111', '00100', '00100', '00100', '00100', '00100', '00100'],
+  };
+  const word = 'VOXELCRAFT', depth = 0.7;
+  const rows = Array.from({ length: 7 }, (_, y) => [...word].map((ch) => GLYPHS[ch][y]).join('0'));
+  const runs = (cls, dx, dy, pick) => rows.map((row, y) => pick(y)
+    ? [...row.matchAll(/1+/g)].map((m) => `<rect class="${cls}" x="${m.index + dx}" y="${y + dy}" width="${m[0].length}" height="1.02"/>`).join('')
+    : '').join('');
+  const svg = document.getElementById('logo');
+  svg.setAttribute('viewBox', `0 0 ${rows[0].length + depth} ${7 + depth}`);
+  svg.innerHTML = runs('px-depth', depth, depth, () => true) + runs('px-depth', depth / 2, depth / 2, () => true)
+    + runs('px-face', 0, 0, (y) => y > 0) + runs('px-top', 0, 0, (y) => y === 0);
+})();
+
+/* ───────────────────────────── Main loop ───────────────────────────── */
+
+loadWorld(DEFAULT_SEED);
+applyTime();
+resize();
+
+let last = performance.now(), fps = 60, fpsShown = 0;
+renderer.setAnimationLoop((t) => {
+  const dt = Math.min((t - last) / 1000, 0.05);
+  last = t;
+  shared.uTime.value = t / 1000;
+
+  stepBuild(dt);
+  easeTime(dt);
+  updateCamera(dt, t / 1000);
+  if (!reducedMotion) clouds.rotation.y += dt * 0.012;
+  renderer.render(scene, camera);
+
+  fps = lerp(fps, 1 / Math.max(dt, 1e-4), 0.05);
+  if (t - fpsShown > 400) { stat('fps').textContent = Math.round(fps); fpsShown = t; }
+});
+</script>
+</body>
+</html>
