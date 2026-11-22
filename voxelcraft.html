@@ -124,7 +124,7 @@
   /* HUD */
   .hud {
     justify-self: start; margin: 0;
-    display: grid; grid-template-columns: repeat(4, auto); gap: 0 1.5rem;
+    display: grid; grid-template-columns: repeat(5, auto); gap: 0 1.5rem;
     padding: 0.55rem 0.9rem; background: var(--panel); border: 2px solid var(--edge);
     font-size: var(--step--1); font-variant-numeric: tabular-nums;
   }
@@ -145,7 +145,7 @@
 </head>
 <body>
 <main class="hero" id="hero">
-  <canvas class="hero__canvas" id="world" aria-label="A floating island of grass, stone and water blocks. Drag to orbit, scroll to zoom."></canvas>
+  <canvas class="hero__canvas" id="world" aria-label="A floating island of grass, stone and water blocks, with sheep, pigs and chickens wandering on it and birds circling above. Drag to orbit, scroll to zoom."></canvas>
   <div class="hero__scrim"></div>
 
   <div class="hero__inner">
@@ -178,6 +178,7 @@
       <div><dt>Seed</dt><dd id="stat-seed">–</dd></div>
       <div><dt>Blocks</dt><dd id="stat-blocks">–</dd></div>
       <div><dt>Tris</dt><dd id="stat-tris">–</dd></div>
+      <div><dt>Mobs</dt><dd id="stat-mobs">–</dd></div>
       <div><dt>FPS</dt><dd id="stat-fps">–</dd></div>
     </dl>
   </div>
@@ -614,7 +615,7 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.shadowMap.autoUpdate = false;        // the world is static, so shadows render only when it changes
+renderer.shadowMap.autoUpdate = false;        // shadows are refreshed by hand: every other frame is enough for the mobs
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(32, 1, 1, 900);
@@ -821,6 +822,169 @@ const motes = (() => {
 })();
 scene.add(motes);
 
+/* ───────────────────────────── Mobs ───────────────────────────── */
+
+// Every mob is a handful of boxes drawn through one InstancedMesh. Parts with `swing`
+// are legs and parts with `flap` are wings; both rotate around `pivot`. Mobs face +z.
+const fourLegs = (width, height, x, z, color) =>
+  [[x, z, 1], [-x, z, -1], [x, -z, -1], [-x, -z, 1]].map(([px, pz, swing]) =>
+    ({ size: [width, height, width], at: [px, height / 2, pz], pivot: [px, height, pz], color, swing }));
+
+const MOB_KINDS = {
+  sheep: { count: 12, scale: 1.35, speed: 1.0, parts: [
+    { size: [0.9, 0.7, 1.25], at: [0, 0.82, 0], color: '#f3efe4' },                  // wool
+    { size: [0.5, 0.5, 0.45], at: [0, 1.02, 0.8], color: '#4d4039' },                // head
+    ...fourLegs(0.2, 0.5, 0.28, 0.42, '#4d4039'),
+  ] },
+  pig: { count: 8, scale: 1.3, speed: 1.2, parts: [
+    { size: [0.85, 0.65, 1.2], at: [0, 0.7, 0], color: '#f2a7ad' },                  // body
+    { size: [0.65, 0.6, 0.5], at: [0, 0.8, 0.8], color: '#f2a7ad' },                 // head
+    { size: [0.32, 0.22, 0.12], at: [0, 0.72, 1.1], color: '#d9828b' },              // snout
+    ...fourLegs(0.24, 0.4, 0.27, 0.4, '#e0919a'),
+  ] },
+  chicken: { count: 12, scale: 1.25, speed: 1.5, parts: [
+    { size: [0.5, 0.45, 0.6], at: [0, 0.56, 0], color: '#fbfbf6' },                  // body
+    { size: [0.3, 0.3, 0.12], at: [0, 0.74, -0.34], color: '#e9e9e0' },              // tail
+    { size: [0.28, 0.4, 0.26], at: [0, 0.92, 0.32], color: '#fbfbf6' },              // head
+    { size: [0.14, 0.1, 0.14], at: [0, 0.9, 0.5], color: '#f2a02c' },                // beak
+    { size: [0.08, 0.12, 0.2], at: [0, 1.17, 0.32], color: '#e23b3b' },              // comb
+    { size: [0.09, 0.34, 0.09], at: [0.13, 0.17, 0], pivot: [0.13, 0.34, 0], color: '#f2a02c', swing: 1 },
+    { size: [0.09, 0.34, 0.09], at: [-0.13, 0.17, 0], pivot: [-0.13, 0.34, 0], color: '#f2a02c', swing: -1 },
+  ] },
+  bird: { scale: 2.2, parts: [
+    { size: [0.35, 0.3, 0.9], at: [0, 0, 0], color: '#f4f6fa' },                     // body
+    { size: [0.28, 0.28, 0.3], at: [0, 0.08, 0.55], color: '#f4f6fa' },              // head
+    { size: [0.1, 0.08, 0.16], at: [0, 0.05, 0.76], color: '#f2a02c' },              // beak
+    { size: [0.9, 0.07, 0.5], at: [0.62, 0.08, 0], pivot: [0.17, 0.08, 0], color: '#c5d0e0', flap: 1 },
+    { size: [0.9, 0.07, 0.5], at: [-0.62, 0.08, 0], pivot: [-0.17, 0.08, 0], color: '#c5d0e0', flap: -1 },
+  ] },
+};
+for (const kind of Object.values(MOB_KINDS)) {
+  for (const part of kind.parts) { part.color = new THREE.Color(part.color); part.pivot ??= part.at; }
+}
+
+const mobMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial(), 320);
+mobMesh.castShadow = mobMesh.receiveShadow = true;
+mobMesh.frustumCulled = false;
+mobMesh.count = 0;
+scene.add(mobMesh);
+
+// Birds: a V-shaped flock circling above the peaks, plus two loners out past the rim.
+const birds = [];
+for (let k = 0; k < 5; k++) {
+  const rank = Math.ceil(k / 2), side = k % 2 ? 1 : -1;
+  birds.push({ kind: MOB_KINDS.bird, radius: 38 + side * rank * 3.2, height: SEA + 46 - rank * 0.5, angle: -rank * 0.075, speed: 0.17, phase: k * 1.3 });
+}
+birds.push(
+  { kind: MOB_KINDS.bird, radius: 58, height: SEA + 13, angle: 2, speed: -0.2, phase: 0.4 },
+  { kind: MOB_KINDS.bird, radius: 64, height: SEA + 26, angle: 4.4, speed: 0.14, phase: 2.2 },
+);
+
+const landMobs = [];
+let mobWorld = null;
+
+/** A mob can stand on any dry column with two blocks of air above it. */
+function canStand(world, x, z) {
+  if (x < 0 || z < 0 || x >= SIZE || z >= SIZE) return false;
+  const t = world.top[x + z * SIZE];
+  return t >= SEA && world.get(x, t + 1, z) === B.AIR && world.get(x, t + 2, z) === B.AIR;
+}
+
+/** Scatters small herds across the grass. Returns how many mobs are alive. */
+function spawnMobs(world) {
+  mobWorld = world;
+  landMobs.length = 0;
+  const rand = mulberry32(world.seed + 77);
+  const meadow = [];
+  for (let z = 0; z < SIZE; z++) {
+    for (let x = 0; x < SIZE; x++) {
+      if (canStand(world, x, z) && world.get(x, world.top[x + z * SIZE], z) === B.GRASS) meadow.push([x, z]);
+    }
+  }
+  for (const kind of [MOB_KINDS.sheep, MOB_KINDS.pig, MOB_KINDS.chicken]) {
+    for (let placed = 0; placed < kind.count && meadow.length;) {
+      const [ax, az] = meadow[(rand() * meadow.length) | 0];
+      const herd = Math.min(kind.count - placed, 2 + ((rand() * 3) | 0));
+      placed += herd;
+      for (let h = 0; h < herd; h++) {
+        const x = ax + Math.round((rand() - 0.5) * 6), z = az + Math.round((rand() - 0.5) * 6);
+        if (!canStand(world, x, z)) continue;
+        const yaw = rand() * TAU;
+        landMobs.push({ kind, x: x + 0.5, z: z + 0.5, y: world.top[x + z * SIZE] + 1, yaw, heading: yaw, walking: false, timer: rand() * 3, phase: rand() * TAU, stride: 0 });
+      }
+    }
+  }
+  let i = 0;
+  for (const mob of [...birds, ...landMobs]) for (const part of mob.kind.parts) mobMesh.setColorAt(i++, part.color);
+  mobMesh.instanceColor.needsUpdate = true;
+  return birds.length + landMobs.length;
+}
+
+const UP = new THREE.Vector3(0, 1, 0);
+const mobMatrix = new THREE.Matrix4(), partMatrix = new THREE.Matrix4(), offsetMatrix = new THREE.Matrix4(), instanceMatrix = new THREE.Matrix4();
+const mobPosition = new THREE.Vector3(), mobScale = new THREE.Vector3(), partSize = new THREE.Vector3();
+const mobTurn = new THREE.Quaternion();
+let mobCursor = 0;
+
+/** Writes one mob's boxes into the instance buffer. `limb` is the leg or wing angle. */
+function drawMob(kind, x, y, z, yaw, scale, limb) {
+  mobMatrix.compose(mobPosition.set(x, y, z), mobTurn.setFromAxisAngle(UP, yaw), mobScale.setScalar(kind.scale * scale));
+  for (const part of kind.parts) {
+    if (part.swing) partMatrix.makeRotationX(part.swing * limb);
+    else if (part.flap) partMatrix.makeRotationZ(part.flap * limb);
+    else partMatrix.identity();
+    partMatrix.setPosition(part.pivot[0], part.pivot[1], part.pivot[2]);
+    offsetMatrix
+      .makeTranslation(part.at[0] - part.pivot[0], part.at[1] - part.pivot[1], part.at[2] - part.pivot[2])
+      .scale(partSize.fromArray(part.size));
+    mobMesh.setMatrixAt(mobCursor++, instanceMatrix.multiplyMatrices(mobMatrix, partMatrix).multiply(offsetMatrix));
+  }
+}
+
+function updateMobs(dt) {
+  const step = reducedMotion ? 0 : dt;
+  const grown = smoothstep(0.82, 1, build.progress);      // land mobs pop in once the island is built
+  mobCursor = 0;
+
+  for (const bird of birds) {
+    bird.angle += bird.speed * step;
+    bird.phase += step * 9;
+    const direction = Math.sign(bird.speed);
+    drawMob(bird.kind,
+      Math.cos(bird.angle) * bird.radius, bird.height + Math.sin(bird.phase * 0.12) * 1.5, Math.sin(bird.angle) * bird.radius,
+      Math.atan2(-Math.sin(bird.angle) * direction, Math.cos(bird.angle) * direction), 1, Math.sin(bird.phase) * 0.75);
+  }
+
+  for (const mob of landMobs) {
+    const { kind } = mob;
+    mob.timer -= step;
+    if (mob.timer <= 0) {                                   // alternate between grazing and wandering
+      mob.walking = !mob.walking;
+      mob.timer = mob.walking ? 1.5 + Math.random() * 3.5 : 1 + Math.random() * 4;
+      if (mob.walking) mob.heading = Math.random() * TAU;
+    }
+    if (mob.walking) {
+      const dx = Math.sin(mob.heading), dz = Math.cos(mob.heading);
+      const cx = Math.floor(mob.x), cz = Math.floor(mob.z);
+      const ax = Math.floor(mob.x + dx * 0.55), az = Math.floor(mob.z + dz * 0.55);      // the block just ahead
+      const clear = (ax === cx && az === cz) || (canStand(mobWorld, ax, az)
+        && Math.abs(mobWorld.top[ax + az * SIZE] - mobWorld.top[cx + cz * SIZE]) <= 1);
+      if (clear) { mob.x += dx * kind.speed * step; mob.z += dz * kind.speed * step; }
+      else mob.heading += 1.6 + Math.random() * 1.6;        // blocked by water, a cliff or a tree: turn away
+    }
+    const ground = mobWorld.top[Math.floor(mob.x) + Math.floor(mob.z) * SIZE] + 1;
+    mob.y += (ground - mob.y) * Math.min(1, step * 12);
+    const turn = ((mob.heading - mob.yaw + Math.PI) % TAU + TAU) % TAU - Math.PI;
+    mob.yaw += turn * Math.min(1, step * 8);
+    mob.stride = lerp(mob.stride, mob.walking ? 1 : 0, Math.min(1, step * 8));
+    mob.phase += step * 9 * mob.stride;
+    drawMob(kind, mob.x - HALF, mob.y, mob.z - HALF, mob.yaw, grown, Math.sin(mob.phase) * 0.6 * mob.stride);
+  }
+
+  mobMesh.count = mobCursor;
+  mobMesh.instanceMatrix.needsUpdate = true;
+}
+
 /* ───────────────────────────── Time of day ───────────────────────────── */
 
 const COLOR_KEYS = ['zenith', 'horizon', 'nadir', 'sun', 'hemiSky', 'hemiGround', 'cloud', 'water', 'mote'];
@@ -883,6 +1047,7 @@ function loadWorld(seed) {
   stat('seed').textContent = seed;
   stat('blocks').textContent = format.format(world.blocks);
   stat('tris').textContent = format.format(geometry.triangles);
+  stat('mobs').textContent = spawnMobs(world);
   renderer.shadowMap.needsUpdate = true;
 }
 
@@ -1029,7 +1194,7 @@ loadWorld(DEFAULT_SEED);
 applyTime();
 resize();
 
-let last = performance.now(), fps = 60, fpsShown = 0;
+let last = performance.now(), fps = 60, fpsShown = 0, frame = 0;
 renderer.setAnimationLoop((t) => {
   const dt = Math.min((t - last) / 1000, 0.05);
   last = t;
@@ -1038,6 +1203,8 @@ renderer.setAnimationLoop((t) => {
   stepBuild(dt);
   easeTime(dt);
   updateCamera(dt, t / 1000);
+  updateMobs(dt);
+  if (!reducedMotion && frame++ % 2) renderer.shadowMap.needsUpdate = true;      // keeps mob shadows moving
   if (!reducedMotion) clouds.rotation.y += dt * 0.012;
   renderer.render(scene, camera);
 
