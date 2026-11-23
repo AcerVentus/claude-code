@@ -1,0 +1,1507 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STAAD Viewer</title>
+<style>
+:root{
+  --bg:#e9ece9; --panel:#fbfbfa; --panel2:#f0f2f0; --line:#d3d8d4; --ink:#1b2126; --mute:#5c6770;
+  --accent:#0b62b8; --accent-ink:#ffffff; --canvas:#f6f7f5;
+  --member:#27425f; --plate:#4f86b3; --node:#1b2126; --support:#0f7a45; --load:#c2391b;
+  --sel:#d97f00; --hover:#0b62b8; --halo:rgba(246,247,245,.88); --dim:rgba(40,60,80,.16);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101417; --panel:#171c20; --panel2:#1e252a; --line:#2c353c; --ink:#e4e9ec; --mute:#95a2ab;
+    --accent:#58a6f0; --accent-ink:#0b1116; --canvas:#12171b;
+    --member:#b9cbdc; --plate:#5f9fd0; --node:#e4e9ec; --support:#3fc887; --load:#ff7a55;
+    --sel:#ffb02e; --hover:#58a6f0; --halo:rgba(18,23,27,.88); --dim:rgba(190,205,220,.14);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101417; --panel:#171c20; --panel2:#1e252a; --line:#2c353c; --ink:#e4e9ec; --mute:#95a2ab;
+  --accent:#58a6f0; --accent-ink:#0b1116; --canvas:#12171b;
+  --member:#b9cbdc; --plate:#5f9fd0; --node:#e4e9ec; --support:#3fc887; --load:#ff7a55;
+  --sel:#ffb02e; --hover:#58a6f0; --halo:rgba(18,23,27,.88); --dim:rgba(190,205,220,.14);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font:13px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);
+  display:flex;flex-direction:column;overflow:hidden}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+button,select,input{font:inherit;color:inherit}
+button{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer;white-space:nowrap}
+button:hover{border-color:var(--mute)}
+button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--panel)}
+select,input[type=text],input[type=search]{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 8px;min-width:0}
+
+header{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+.brand{font-weight:700;letter-spacing:.02em;margin-right:4px}
+.brand i{font-style:normal;color:var(--accent)}
+#fname{color:var(--mute);max-width:26ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spacer{flex:1}
+.seg{display:flex}
+.seg button{border-radius:0;margin-left:-1px}
+.seg button:first-child{border-radius:6px 0 0 6px;margin-left:0}
+.seg button:last-child{border-radius:0 6px 6px 0}
+#find{width:13ch}
+
+main{flex:1;display:flex;min-height:0}
+aside{width:330px;flex:none;display:flex;flex-direction:column;border-right:1px solid var(--line);background:var(--panel);min-height:0}
+.tabs{display:flex;border-bottom:1px solid var(--line);background:var(--panel2)}
+.tabs button{flex:1;border:0;border-radius:0;background:none;padding:8px 4px;color:var(--mute);border-bottom:2px solid transparent}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600;background:var(--panel)}
+.panel{flex:1;overflow:auto;padding:12px;min-height:0;display:none}
+.panel.on{display:block}
+.panel.flexcol.on{display:flex;flex-direction:column;padding:0}
+h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin:16px 0 6px;font-weight:600}
+h2:first-child{margin-top:0}
+h3{font-size:15px;margin:0 0 2px}
+.sub{color:var(--mute);margin:0 0 8px;overflow-wrap:anywhere}
+dl.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:0}
+dl.kv dt{color:var(--mute)}
+dl.kv dd{margin:0;text-align:right;overflow-wrap:anywhere}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:3px 8px}
+.checks label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.row{display:flex;gap:8px;align-items:center;margin:4px 0}
+.row select{flex:1}
+.legend{margin-top:6px;display:flex;flex-direction:column;gap:1px}
+.legend button{display:flex;gap:8px;align-items:center;border:0;background:none;padding:3px 4px;text-align:left;border-radius:4px}
+.legend button:hover{background:var(--panel2)}
+.legend button[aria-pressed="true"]{background:var(--panel2);color:var(--ink);outline:1px solid var(--line)}
+.legend .sw{width:12px;height:12px;border-radius:3px;flex:none}
+.legend .lb{flex:1;overflow:hidden;text-overflow:ellipsis}
+.legend .ct{color:var(--mute)}
+.warn{border-left:3px solid var(--sel);background:var(--panel2);padding:6px 8px;margin:3px 0;border-radius:0 4px 4px 0}
+.warn a{color:var(--accent);cursor:pointer}
+pre.raw{margin:6px 0 0;padding:8px;background:var(--panel2);border-radius:6px;overflow:auto;max-height:220px;font-size:12px}
+.chips{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}
+.chip{border:1px solid var(--line);border-radius:10px;padding:0 7px;cursor:pointer;background:var(--panel2)}
+.chip:hover{border-color:var(--accent)}
+.actions{display:flex;gap:6px;margin:8px 0 12px;flex-wrap:wrap}
+.empty{color:var(--mute);padding:20px 4px;text-align:center}
+
+.tblbar{display:flex;gap:6px;padding:8px;border-bottom:1px solid var(--line)}
+.tblbar input{flex:1}
+.tblwrap{flex:1;overflow:auto;min-height:0}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th,td{padding:3px 8px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{position:sticky;top:0;background:var(--panel2);color:var(--mute);font-weight:600}
+th:last-child,td:last-child{text-align:left}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--panel2)}
+tbody tr.on{background:var(--sel);color:#111}
+.more{padding:8px;text-align:center}
+
+.src{flex:1;overflow:auto;min-height:0;font-size:12px;line-height:18px;position:relative}
+.src-pad{position:relative;min-width:max-content}
+.src-win{position:absolute;left:0;top:0;min-width:100%}
+.ln{display:flex;height:18px;white-space:pre}
+.ln .no{flex:none;width:6ch;text-align:right;padding-right:1ch;color:var(--mute);user-select:none;background:var(--panel2)}
+.ln .tx{padding:0 8px}
+.ln.cm .tx{color:var(--mute)}
+.ln.hl{background:var(--sel);color:#111}
+.ln.hl .no{background:var(--sel);color:#111}
+
+#stage{flex:1;position:relative;min-width:0;background:var(--canvas)}
+canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;display:block}
+canvas.drag{cursor:grabbing}
+#tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--panel);padding:3px 8px;border-radius:5px;font-size:12px;
+  white-space:nowrap;display:none;z-index:3}
+#hud{position:absolute;right:10px;bottom:8px;color:var(--mute);font-size:11px;pointer-events:none;text-align:right}
+#banner{position:absolute;left:50%;top:10px;transform:translateX(-50%);background:var(--panel);border:1px solid var(--line);
+  border-radius:8px;padding:6px 12px;display:none;max-width:90%;z-index:2}
+#drop{position:absolute;inset:8px;border:2px dashed var(--accent);border-radius:12px;display:none;align-items:center;justify-content:center;
+  font-size:18px;font-weight:600;color:var(--accent);background:var(--halo);z-index:5;pointer-events:none}
+body.dragover #drop{display:flex}
+
+@media (max-width:760px){
+  main{flex-direction:column-reverse}
+  aside{width:100%;height:44%;border-right:0;border-top:1px solid var(--line)}
+  #hud{display:none}
+  #fname{max-width:14ch}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">STAAD<i>·</i>Viewer</div>
+  <button class="primary" id="openBtn" title="Open a STAAD input file (.std)">Open .std…</button>
+  <input type="file" id="file" accept=".std,.STD,.txt,text/plain" hidden>
+  <span id="fname" title=""></span>
+  <div class="spacer"></div>
+  <input type="search" id="find" placeholder="Find n12, m7…" title="Jump to an entity: n12 (node), m7 (member), p3 (plate). A bare number looks for a member first." aria-label="Find entity">
+  <div class="seg" role="group" aria-label="View direction">
+    <button data-view="iso" title="Isometric (1)">Iso</button>
+    <button data-view="front" title="Front elevation (2)">Front</button>
+    <button data-view="side" title="Side elevation (3)">Side</button>
+    <button data-view="top" title="Plan (4)">Top</button>
+  </div>
+  <button id="fitBtn" title="Fit model to window (F)">Fit</button>
+  <button id="projBtn" aria-pressed="false" title="Toggle perspective projection (P)">Perspective</button>
+  <button id="themeBtn" title="Switch light / dark">Theme</button>
+</header>
+<main>
+  <aside>
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="model" aria-selected="true">Model</button>
+      <button role="tab" data-tab="sel" aria-selected="false">Selection</button>
+      <button role="tab" data-tab="tables" aria-selected="false">Tables</button>
+      <button role="tab" data-tab="source" aria-selected="false">Source</button>
+    </div>
+    <div class="panel on" id="p-model"></div>
+    <div class="panel" id="p-sel"></div>
+    <div class="panel flexcol" id="p-tables">
+      <div class="tblbar">
+        <select id="tblKind" aria-label="Table">
+          <option value="nodes">Nodes</option><option value="members">Members</option><option value="plates">Plates</option>
+          <option value="supports">Supports</option><option value="sections">Sections</option>
+        </select>
+        <input type="search" id="tblFilter" placeholder="Filter…" aria-label="Filter rows">
+      </div>
+      <div class="tblwrap" id="tblWrap"></div>
+    </div>
+    <div class="panel flexcol" id="p-source">
+      <div class="src mono" id="src" tabindex="0"><div class="src-pad" id="srcPad"><div class="src-win" id="srcWin"></div></div></div>
+    </div>
+  </aside>
+  <div id="stage">
+    <canvas id="cv"></canvas>
+    <div id="banner"></div>
+    <div id="tip"></div>
+    <div id="hud">Drag: orbit · Shift/right-drag: pan · Wheel: zoom · Click: select · Double-click: centre</div>
+    <div id="drop">Drop a STAAD .std file to view it</div>
+  </div>
+</main>
+
+<script>
+'use strict';
+/* =====================================================================================
+   STAAD.Pro input (.std) parser
+   Reads the text command file: geometry, properties, supports, groups, loads.
+   ===================================================================================== */
+const LEN_UNITS = {INC:[0.0254,'in'],FEE:[0.3048,'ft'],FT:[0.3048,'ft'],CM:[0.01,'cm'],MET:[1,'m'],MMS:[0.001,'mm'],MM:[0.001,'mm'],DME:[0.1,'dm'],KM:[1000,'km']};
+const FRC_UNITS = {KIP:[4448.2216,'kip'],POU:[4.4482216,'lb'],LBS:[4.4482216,'lb'],KG:[9.80665,'kg'],MTO:[9806.65,'MTon'],NEW:[1,'N'],KNS:[1000,'kN'],KN:[1000,'kN'],MNS:[1e6,'MN'],MN:[1e6,'MN'],DNS:[10,'daN'],DN:[10,'daN']};
+const NUM_RE = /^[+-]?(\d+\.?\d*|\.\d+)([ED][+-]?\d+)?$/i;
+const isNum = s => s !== undefined && NUM_RE.test(s);
+const isInt = s => s !== undefined && /^[+-]?\d+$/.test(s);
+const num = s => isNum(s) ? parseFloat(s.replace(/d/i, 'e')) : NaN;
+const kw = (tok, full, min = 3) => tok !== undefined && tok.length >= Math.min(min, full.length) && full.startsWith(tok);
+
+function parseStaad(text) {
+  const M = {
+    title: '', type: '', zUp: false, job: [], lines: text.split(/\r\n|\r|\n/),
+    nodes: new Map(), members: new Map(), plates: new Map(), solids: new Map(),
+    supports: new Map(), groups: new Map(), materials: new Map(), sections: [],
+    loads: [], combos: [], warnings: [], lenUnit: '', lenF: 1, unitSeen: false, recognised: false
+  };
+  const warn = (line, msg) => { if (M.warnings.length < 300) M.warnings.push({ line, msg }); };
+  let len = { f: 1, n: 'm' }, frc = { f: 1000, n: 'kN' }, baseLen = null;
+  let section = 'other', groupKind = 'MEMBER', attr = '', country = '';
+  let jc = null, inc = null, lineOut = [];
+  let curLoad = null, curCombo = null, curMat = null;
+  const secIndex = new Map();
+  let dupNodes = 0;
+
+  // ---- physical lines -> logical lines (comments dropped, '-' continuations joined)
+  const logical = [];
+  {
+    let buf = null, bufLine = 0;
+    for (let i = 0; i < M.lines.length; i++) {
+      let s = M.lines[i].trim();
+      if (!s || s[0] === '*') continue;
+      if (buf !== null) s = buf + ' ' + s; else bufLine = i + 1;
+      if (/-$/.test(s) && !/^(STAAD|JOB|ENGINEER|CHECKER|APPROVED|LOAD\s)/i.test(s)) { buf = s.slice(0, -1).trimEnd(); continue; }
+      buf = null; logical.push({ s, line: bufLine });
+    }
+    if (buf !== null) logical.push({ s: buf, line: bufLine });
+  }
+
+  // ---- entity lists: "1 2 5 TO 9 BY 2 _GROUP"
+  function parseList(t, i) {
+    const ids = []; let last = null, used = false;
+    while (i < t.length) {
+      const k = t[i];
+      if (isInt(k)) { last = +k; ids.push(last); i++; used = true; }
+      else if (k === 'TO' && last !== null && isInt(t[i + 1])) {
+        const end = +t[i + 1]; let step = 1; i += 2;
+        if (t[i] === 'BY' && isInt(t[i + 1])) { step = Math.max(1, +t[i + 1]); i += 2; }
+        if (end - last < 5e6) for (let v = last + step; v <= end; v += step) ids.push(v);
+        last = end;
+      }
+      else if (k[0] === '_') { const g = M.groups.get(k); if (g) for (const v of g.ids) ids.push(v); i++; used = true; last = null; }
+      else break;
+    }
+    return { ids, next: i, used };
+  }
+  function targets(t, i) {
+    if (t[i] === 'ALL') return { all: true, ids: [] };
+    if (kw(t[i], 'MEMBER') || kw(t[i], 'BEAM') || kw(t[i], 'PLATE') || kw(t[i], 'ELEMENT') || kw(t[i], 'SOLID')) i++;
+    if (t[i] === 'ALL' || i >= t.length) return { all: true, ids: [] };
+    return { all: false, ids: parseList(t, i).ids };
+  }
+  const endLoad = () => { curLoad = null; curCombo = null; };
+
+  // ---- geometry writers
+  function putJoint(id, a, b, c, line) {
+    let x, y, z;
+    if (jc.mode === 1) { const th = b * Math.PI / 180; x = a * Math.cos(th); y = a * Math.sin(th); z = c; }
+    else if (jc.mode === 2) { const th = c * Math.PI / 180; x = a * Math.cos(th); y = b; z = a * Math.sin(th); }
+    else { x = a; y = b; z = c; }
+    const k = len.f / baseLen.f;
+    if (M.nodes.has(id)) dupNodes++;
+    M.nodes.set(id, { id, x: x * k, y: y * k, z: z * k, line });
+    const e = { id, a, b, c }; jc.block.push(e); lineOut.push(e);
+  }
+  function putMember(id, a, b, line) {
+    if (M.members.has(id)) warn(line, `Member ${id} is defined more than once`);
+    M.members.set(id, { id, a, b, line, sec: -1, beta: 0, mat: '', rel: null, attr: '' });
+    const e = { id, n: [a, b] }; inc.block.push(e); lineOut.push(e);
+  }
+  function putElem(id, n, line, solid) {
+    const map = solid ? M.solids : M.plates;
+    if (!solid) { n = n.filter(v => v > 0); if (n.length > 4) n = n.slice(0, 4); if (n.length === 4 && n[3] === n[2]) n.pop(); }
+    if (map.has(id)) warn(line, `${solid ? 'Solid' : 'Plate'} ${id} is defined more than once`);
+    map.set(id, { id, n, line, thk: null, thkUnit: '', mat: '' });
+    const e = { id, n }; inc.block.push(e); lineOut.push(e);
+  }
+  function repeatSrc(st, all) {
+    if (all) { const s = st.block.slice(st.mark); return s.length ? s : st.block.slice(); }
+    return st.prev.slice();
+  }
+
+  // ---- section handlers (return false when the statement does not belong to the section)
+  function hJoints(t, line) {
+    if (kw(t[0], 'REPEAT')) {
+      let i = 1, all = false; if (t[1] === 'ALL') { all = true; i = 2; }
+      const n = Math.round(num(t[i++])), d = t.slice(i).map(num);
+      if (isNaN(n) || d.some(isNaN)) { warn(line, 'Unreadable REPEAT in joint coordinates'); return true; }
+      const src = repeatSrc(jc, all);
+      if (src.length && n > 0) {
+        let lo = Infinity, hi = -Infinity; for (const e of src) { if (e.id < lo) lo = e.id; if (e.id > hi) hi = e.id; }
+        const span = hi - lo + 1, sets = Math.max(1, Math.floor(d.length / 3));
+        let dx = 0, dy = 0, dz = 0;
+        for (let r = 1; r <= n; r++) {
+          const j = Math.min(r - 1, sets - 1) * 3;
+          dx += d[j] || 0; dy += d[j + 1] || 0; dz += d[j + 2] || 0;
+          for (const e of src) putJoint(e.id + r * span, e.a + dx, e.b + dy, e.c + dz, line);
+        }
+      }
+      if (all) jc.mark = jc.block.length;
+      return true;
+    }
+    if (!isNum(t[0])) return false;
+    const v = t.map(num);
+    if (v.some(isNaN) || v.length < 2) { warn(line, 'Unreadable joint coordinate line'); return true; }
+    if (v.length <= 4) { putJoint(v[0], v[1] || 0, v[2] || 0, v[3] || 0, line); return true; }
+    const n1 = v[0], n2 = v[4], step = v[8] || 1, steps = Math.round((n2 - n1) / step);
+    const p1 = [v[1], v[2], v[3]], p2 = [v[5] || 0, v[6] || 0, v[7] || 0];
+    if (!(steps > 0) || steps > 2e6) { putJoint(n1, p1[0], p1[1], p1[2], line); if (n2 !== n1) putJoint(n2, p2[0], p2[1], p2[2], line); return true; }
+    for (let k = 0; k <= steps; k++) {
+      const f = k / steps;
+      putJoint(n1 + k * step, p1[0] + (p2[0] - p1[0]) * f, p1[1] + (p2[1] - p1[1]) * f, p1[2] + (p2[2] - p1[2]) * f, line);
+    }
+    return true;
+  }
+  function hIncRepeat(t, line, put) {
+    let i = 1, all = false; if (t[1] === 'ALL') { all = true; i = 2; }
+    const n = Math.round(num(t[i])), de = Math.round(num(t[i + 1])), dj = Math.round(num(t[i + 2]));
+    if ([n, de, dj].some(isNaN)) { warn(line, 'Unreadable REPEAT in incidences'); return; }
+    const src = repeatSrc(inc, all);
+    for (let r = 1; r <= n; r++) for (const e of src) put(e.id + r * de, e.n.map(v => v + r * dj));
+    if (all) inc.mark = inc.block.length;
+  }
+  function hMembers(t, line) {
+    if (kw(t[0], 'REPEAT')) { hIncRepeat(t, line, (id, n) => putMember(id, n[0], n[1], line)); return true; }
+    if (!isNum(t[0])) return false;
+    const v = t.map(s => Math.round(num(s)));
+    if (v.some(isNaN) || v.length < 3) { warn(line, 'Unreadable member incidence'); return true; }
+    putMember(v[0], v[1], v[2], line);
+    if (v.length >= 4) {
+      const end = v[3], dm = v[4] || 1, dj = v[5] || 1;
+      if (end - v[0] < 5e6) for (let id = v[0] + dm, k = 1; id <= end; id += dm, k++) putMember(id, v[1] + k * dj, v[2] + k * dj, line);
+    }
+    return true;
+  }
+  function hElems(t, line, solid) {
+    if (kw(t[0], 'REPEAT')) { hIncRepeat(t, line, (id, n) => putElem(id, n, line, solid)); return true; }
+    if (!isNum(t[0])) return false;
+    const ti = t.indexOf('TO');
+    const head = t.slice(0, ti < 0 ? t.length : ti).map(s => Math.round(num(s)));
+    const tail = ti < 0 ? [] : t.slice(ti + 1).map(s => Math.round(num(s)));
+    if (head.some(isNaN) || tail.some(isNaN) || head.length < 4) { warn(line, 'Unreadable element incidence'); return true; }
+    const id = head[0], n = head.slice(1);
+    putElem(id, n, line, solid);
+    if (tail.length) {
+      const end = tail[0], de = tail[1] || 1, dj = tail[2] || 1;
+      if (end - id < 5e6) for (let e = id + de, k = 1; e <= end; e += de, k++) putElem(e, n.map(v => v > 0 ? v + k * dj : v), line, solid);
+    }
+    return true;
+  }
+  function hGroup(t) {
+    if (t.length === 1 && t[0][0] !== '_') {
+      for (const k of ['JOINT', 'MEMBER', 'ELEMENT', 'SOLID', 'GEOMETRY', 'FLOOR']) if (kw(t[0], k)) { groupKind = k; return true; }
+      return false;
+    }
+    if (t[0][0] !== '_') return false;
+    const g = M.groups.get(t[0]) || { name: t[0], kind: groupKind, ids: [] };
+    for (const v of parseList(t, 1).ids) g.ids.push(v);
+    M.groups.set(t[0], g);
+    return true;
+  }
+  function hMProp(t, line) {
+    const L = parseList(t, 0); if (!L.used) return false;
+    const rest = t.slice(L.next); if (!rest.length) return true;
+    let label = rest.join(' '), kind = 'other';
+    if (kw(rest[0], 'TABLE', 2)) { kind = 'table'; label = rest.slice(rest[1] === 'ST' ? 2 : 1).join(' '); if (rest[1] !== 'ST') label = rest.slice(2).join(' ') + ' (' + rest[1] + ')'; }
+    else if (kw(rest[0], 'PRISMATIC', 3)) { kind = 'prismatic'; label = 'Prismatic ' + rest.slice(1).join(' ') + ' [' + len.n + ']'; }
+    else if (kw(rest[0], 'TAPERED', 3)) { kind = 'tapered'; label = 'Tapered ' + rest.slice(1).join(' ') + ' [' + len.n + ']'; }
+    else if (kw(rest[0], 'UPTABLE', 3)) { kind = 'user table'; label = rest.slice(2).join(' ') + ' (user table ' + rest[1] + ')'; }
+    else if (kw(rest[0], 'ASSIGN', 3)) { kind = 'assign'; label = 'Assign ' + rest.slice(1).join(' '); }
+    let si = secIndex.get(label);
+    if (si === undefined) { si = M.sections.length; secIndex.set(label, si); M.sections.push({ label, kind, country, spec: rest.join(' '), count: 0, line }); }
+    for (const id of L.ids) { const m = M.members.get(id); if (m) m.sec = si; }
+    return true;
+  }
+  function hEProp(t) {
+    const L = parseList(t, 0); if (!L.used) return false;
+    const rest = t.slice(L.next);
+    if (kw(rest[0], 'THICKNESS', 2) && isNum(rest[1])) for (const id of L.ids) { const p = M.plates.get(id); if (p) { p.thk = num(rest[1]); p.thkUnit = len.n; } }
+    return true;
+  }
+  function hConst(t) {
+    const a = t[0];
+    if (a === 'BETA') {
+      if (!isNum(t[1])) return true;
+      const b = num(t[1]), T = targets(t, 2);
+      if (T.all) for (const m of M.members.values()) m.beta = b; else for (const id of T.ids) { const m = M.members.get(id); if (m) m.beta = b; }
+      return true;
+    }
+    if (kw(a, 'MATERIAL', 3)) {
+      const name = t[1] || '', T = targets(t, 2);
+      const set = o => { if (o) o.mat = name; };
+      if (T.all) { M.members.forEach(set); M.plates.forEach(set); M.solids.forEach(set); }
+      else for (const id of T.ids) { set(M.members.get(id)); set(M.plates.get(id)); set(M.solids.get(id)); }
+      return true;
+    }
+    return /^(E|G|POI|POISSON|DEN|DENSITY|ALPHA|DAMP|CDAMP|REF|REFJT|REFVECTOR|TYPE)$/.test(a) || kw(a, 'POISSON') || kw(a, 'DENSITY');
+  }
+  function hMaterial(t) {
+    if (kw(t[0], 'ISOTROPIC', 3) || /^2DORTHO|^ORTHO/.test(t[0])) { curMat = { name: t[1] || '?', props: [] }; M.materials.set(curMat.name, curMat); return true; }
+    if (curMat) { curMat.props.push([t[0], t.slice(1).join(' ')]); return true; }
+    return false;
+  }
+  const DOFS = ['FX', 'FY', 'FZ', 'MX', 'MY', 'MZ'];
+  function hSupports(t, line) {
+    const L = parseList(t, 0); if (!L.used) return false;
+    const rest = t.slice(L.next), spec = rest.join(' ');
+    const has = k => rest.some(x => kw(x, k));
+    const but = rest.indexOf('BUT'), released = [], springs = [];
+    if (but >= 0) for (let i = but + 1; i < rest.length; i++) {
+      if (DOFS.includes(rest[i])) released.push(rest[i]);
+      else if (/^K[FM][XYZ]$/.test(rest[i])) { springs.push(rest[i] + ' ' + (rest[i + 1] || '')); i++; }
+    }
+    let kind = 'other';
+    if (has('PINNED')) kind = 'pinned';
+    else if ((has('FIXED') || has('ENFORCED')) && but < 0) kind = 'fixed';
+    else if (but >= 0) {
+      const tr = released.filter(d => d[0] === 'F').length, ro = released.filter(d => d[0] === 'M').length;
+      kind = springs.length ? 'spring' : tr ? 'roller' : ro === 3 ? 'pinned' : ro ? 'partial' : 'fixed';
+    }
+    else if (has('ELASTIC') || has('SPRING')) kind = 'spring';
+    for (const id of L.ids) M.supports.set(id, { id, kind, spec, released, springs, line });
+    return true;
+  }
+  function hRelease(t) {
+    const L = parseList(t, 0); if (!L.used) return false;
+    const rest = t.slice(L.next); if (!rest.length) return true;
+    const where = kw(rest[0], 'START', 2) ? 's' : kw(rest[0], 'END', 2) ? 'e' : 'b', dofs = rest.slice(1).join(' ') || 'released';
+    for (const id of L.ids) {
+      const m = M.members.get(id); if (!m) continue;
+      m.rel = m.rel || { s: '', e: '' };
+      if (where !== 'e') m.rel.s = dofs; if (where !== 's') m.rel.e = dofs;
+    }
+    return true;
+  }
+  function hAttr(t) {
+    const L = parseList(t, 0); if (!L.used) return false;
+    for (const id of L.ids) { const m = M.members.get(id); if (m) m.attr = attr; }
+    return true;
+  }
+  const loadUnits = () => ({ fF: frc.f, fN: frc.n, lF: len.f, lN: len.n });
+  function hLoadJoint(t, line) {
+    const L = parseList(t, 0); if (!L.used) return false;
+    const f = {};
+    for (let i = L.next; i < t.length - 1; i++) if (DOFS.includes(t[i]) && isNum(t[i + 1])) { f[t[i]] = num(t[i + 1]); i++; }
+    curLoad.items.push({ kind: 'joint', ids: L.ids, f, line, ...loadUnits() });
+    return true;
+  }
+  function hLoadMember(t, line) {
+    const L = parseList(t, 0); if (!L.used) return false;
+    const type = t[L.next]; let i = L.next + 1, dir = 'GY';
+    if (/^(G|P)?[XYZ]$/.test(t[i] || '')) dir = t[i++];
+    const vals = []; while (isNum(t[i])) vals.push(num(t[i++]));
+    if (type) curLoad.items.push({ kind: 'member', ids: L.ids, type, dir, vals, line, ...loadUnits() });
+    return true;
+  }
+  function hLoadElem(t, line) {
+    const L = parseList(t, 0); if (!L.used) return false;
+    const type = t[L.next]; let i = L.next + 1, dir = 'LZ';
+    if (/^(G|L)?[XYZ]$/.test(t[i] || '')) { dir = t[i++]; if (dir.length === 1) dir = 'L' + dir; }
+    const vals = []; while (isNum(t[i])) vals.push(num(t[i++]));
+    if (type && kw(type, 'PRESSURE', 2)) curLoad.items.push({ kind: 'elem', ids: L.ids, type: 'PR', dir, vals, line, ...loadUnits() });
+    return true;
+  }
+  function hCombo(t) {
+    if (!isNum(t[0])) return false;
+    for (let i = 0; i + 1 < t.length; i += 2) if (isNum(t[i + 1])) curCombo.factors.push({ id: t[i], f: num(t[i + 1]) });
+    return true;
+  }
+
+  // ---- command headers
+  function command(t, s, line) {
+    const a = t[0], b = t[1];
+    if (kw(a, 'UNIT', 4)) {
+      for (const k of t.slice(1)) {
+        const L = LEN_UNITS[k.slice(0, 3)] || LEN_UNITS[k.slice(0, 2)], F = FRC_UNITS[k.slice(0, 3)] || FRC_UNITS[k.slice(0, 2)];
+        if (L) { len = { f: L[0], n: L[1] }; M.unitSeen = true; } else if (F) frc = { f: F[0], n: F[1] };
+      }
+      return 'keep';
+    }
+    if (a === 'SET') { if (b === 'Z' && t[2] === 'UP') M.zUp = true; return 'keep'; }
+    if (a === 'START') { endLoad(); if (kw(b, 'GROUP')) { section = 'group'; groupKind = 'MEMBER'; } else if (b === 'JOB') section = 'job'; else section = 'skip'; return true; }
+    if (a === 'END') { section = 'other'; return true; }
+    if (kw(a, 'FINISH')) { endLoad(); section = 'other'; return true; }
+    const geo = () => { endLoad(); M.recognised = true; };
+    if (kw(a, 'JOINT') && kw(b, 'COORDINATES')) {
+      geo(); section = 'joints'; if (!baseLen) baseLen = { ...len };
+      jc = { mode: t.some(x => kw(x, 'CYLINDRICAL')) ? (t.some(x => kw(x, 'REVERSE')) ? 2 : 1) : 0, block: [], mark: 0, prev: [] };
+      return true;
+    }
+    if (kw(a, 'MEMBER') && kw(b, 'INCIDENCES')) { geo(); section = 'members'; inc = { block: [], mark: 0, prev: [] }; return true; }
+    if (kw(a, 'ELEMENT') && kw(b, 'INCIDENCES')) { geo(); section = t.some(x => kw(x, 'SOLID')) ? 'solids' : 'plates'; inc = { block: [], mark: 0, prev: [] }; return true; }
+    if (kw(a, 'MEMBER') && b && b.startsWith('PRO')) { endLoad(); section = 'mprop'; country = t[2] || ''; return true; }
+    if (kw(a, 'ELEMENT') && b && b.startsWith('PRO')) { endLoad(); section = 'eprop'; return true; }
+    if (kw(a, 'MEMBER') && kw(b, 'RELEASES')) { endLoad(); section = 'mrel'; return true; }
+    if (kw(a, 'MEMBER') && ['TRUSS', 'TENSION', 'COMPRESSION', 'CABLE'].some(k => kw(b, k))) {
+      endLoad(); section = 'mattr'; attr = ['Truss', 'Tension-only', 'Compression-only', 'Cable'][['TRU', 'TEN', 'COM', 'CAB'].indexOf(b.slice(0, 3))] || b; return true;
+    }
+    if (curLoad && kw(a, 'MEMBER') && kw(b, 'LOAD')) { section = 'load.member'; return true; }
+    if (curLoad && kw(a, 'JOINT') && kw(b, 'LOAD')) { section = 'load.joint'; return true; }
+    if (curLoad && kw(a, 'ELEMENT') && kw(b, 'LOAD')) { section = t.length === 2 ? 'load.elem' : 'load.other'; return true; }
+    if (curLoad && kw(a, 'SELFWEIGHT', 4)) {
+      const d = /^[XYZ]$/.test(b || '') ? b : 'Y', f = num(t[/^[XYZ]$/.test(b || '') ? 2 : 1]);
+      curLoad.items.push({ kind: 'self', dir: d, f: isNaN(f) ? 1 : f, line }); section = 'load.other'; return true;
+    }
+    if (kw(a, 'CONSTANTS', 4)) { endLoad(); section = 'const'; return true; }
+    if (kw(a, 'SUPPORTS') && t.length === 1) { endLoad(); section = 'supports'; return true; }
+    if (a === 'DEFINE') { endLoad(); section = kw(b, 'MATERIAL') ? 'material' : 'other'; curMat = null; return true; }
+    if (/^LOAD(ING)?$/.test(a)) {
+      endLoad();
+      if (kw(b, 'COMBINATION', 4)) {
+        let i = 2; if (!isNum(t[i])) i++;
+        const m = new RegExp('^\\S+\\s+\\S+\\s+' + (i === 3 ? '\\S+\\s+' : '') + '\\S+\\s*(.*)$').exec(s);
+        curCombo = { id: t[i] || '?', title: m ? m[1].trim() : '', factors: [], line };
+        M.combos.push(curCombo); section = 'combo'; return true;
+      }
+      if (!b || b === 'LIST' || kw(b, 'GENERATION') || kw(b, 'ENVELOPE')) { section = 'other'; return true; }
+      const rest = s.replace(/^\S+\s+\S+\s*/, '');
+      const ty = /LOADTYPE\s+(.+?)(?=\s+TITLE\b|$)/i.exec(rest), ti = /TITLE\s+(.*)$/i.exec(rest);
+      curLoad = { id: b, type: ty ? ty[1].trim() : '', title: ti ? ti[1].trim() : (ty ? '' : rest.trim()), items: [], raw: [], line };
+      M.loads.push(curLoad); section = 'load.other'; return 'header';
+    }
+    return false;
+  }
+
+  const LOAD_END = /^(PERF|PRIN|PARA|CHEC|SELE|CHAN|STEE|CONC|DESI|CODE|TRAC|PDEL|NONL|CUT|MODE|SLAV|FLOOR DIA|OUTP|PAGE|INPU|GENE|TAKE)/;
+  function statement(s, line) {
+    const t = s.toUpperCase().split(/[\s,]+/).filter(Boolean);
+    if (!t.length) return;
+    if (section === 'job' && t[0] !== 'END') { M.job.push(s); return; }
+    if (section === 'skip' && t[0] !== 'END') return;
+    let r = false;
+    if (!isNum(t[0]) && t[0][0] !== '_') r = command(t, s, line);
+    if (!r) {
+      switch (section) {
+        case 'joints': r = hJoints(t, line); break;
+        case 'members': r = hMembers(t, line); break;
+        case 'plates': r = hElems(t, line, false); break;
+        case 'solids': r = hElems(t, line, true); break;
+        case 'group': r = hGroup(t); break;
+        case 'mprop': r = hMProp(t, line); break;
+        case 'eprop': r = hEProp(t); break;
+        case 'const': r = hConst(t); break;
+        case 'material': r = hMaterial(t); break;
+        case 'supports': r = hSupports(t, line); break;
+        case 'mrel': r = hRelease(t); break;
+        case 'mattr': r = hAttr(t); break;
+        case 'load.joint': r = hLoadJoint(t, line); break;
+        case 'load.member': r = hLoadMember(t, line); break;
+        case 'load.elem': r = hLoadElem(t, line); break;
+        case 'load.other': r = isNum(t[0]) || t[0][0] === '_'; break;
+        case 'combo': r = hCombo(t); break;
+      }
+      if (!r) {
+        if (curLoad && section.startsWith('load') && !LOAD_END.test(s.toUpperCase())) section = 'load.other';
+        else { endLoad(); section = 'other'; }
+      }
+    }
+    if (curLoad && r !== 'header' && section.startsWith('load')) curLoad.raw.push(s);
+  }
+
+  for (const L of logical) {
+    const up = L.s.toUpperCase();
+    if (!M.type && /^STAAD\s/.test(up + ' ')) {
+      const m = /^STAAD\s+(\S+)\s*(.*)$/i.exec(L.s);
+      if (m) { M.type = m[1].toUpperCase(); M.title = m[2].trim(); M.recognised = true; }
+      continue;
+    }
+    lineOut = [];
+    for (const st of L.s.split(';')) { const s = st.trim(); if (s) statement(s, L.line); }
+    if (lineOut.length) { if (section === 'joints') jc.prev = lineOut; else if (inc) inc.prev = lineOut; }
+  }
+
+  // ---- post-process
+  baseLen = baseLen || len;
+  M.lenUnit = M.unitSeen ? baseLen.n : ''; M.lenF = baseLen.f;
+  for (const m of M.members.values()) if (m.sec >= 0) M.sections[m.sec].count++;
+  let missing = 0, zero = 0; const used = new Set();
+  for (const m of M.members.values()) {
+    const A = M.nodes.get(m.a), B = M.nodes.get(m.b);
+    if (!A || !B) { missing++; continue; }
+    used.add(m.a); used.add(m.b);
+    m.len = Math.hypot(B.x - A.x, B.y - A.y, B.z - A.z);
+    if (m.len === 0) zero++;
+  }
+  for (const map of [M.plates, M.solids]) for (const p of map.values()) for (const n of p.n) { if (M.nodes.has(n)) used.add(n); else { missing++; break; } }
+  let orphan = 0; for (const id of M.nodes.keys()) if (!used.has(id)) orphan++;
+  const noSec = [...M.members.values()].filter(m => m.sec < 0).length;
+  if (!M.unitSeen && M.nodes.size) warn(0, 'No UNIT command found before the geometry, so lengths are shown without a unit.');
+  if (dupNodes) warn(0, `${dupNodes} joint number(s) are defined more than once; the last definition is used.`);
+  if (missing) warn(0, `${missing} member(s)/element(s) reference joints that are not defined and are not drawn.`);
+  if (zero) warn(0, `${zero} member(s) have zero length.`);
+  if (orphan && (M.members.size || M.plates.size || M.solids.size)) warn(0, `${orphan} joint(s) are not connected to any member or element.`);
+  if (noSec && M.sections.length) warn(0, `${noSec} member(s) have no section property assigned.`);
+  return M;
+}
+
+/* =====================================================================================
+   Sample model
+   ===================================================================================== */
+const SAMPLE = `STAAD SPACE SAMPLE TWO-STOREY BRACED FRAME
+START JOB INFORMATION
+ENGINEER DATE 23-Nov-26
+JOB NAME STAAD Viewer sample
+END JOB INFORMATION
+INPUT WIDTH 79
+UNIT METER KN
+JOINT COORDINATES
+* one grid line, repeated along Z, then the whole floor repeated up
+1 0 0 0 3 12 0 0
+REPEAT 2 0 0 5
+REPEAT ALL 2 0 3.5 0
+MEMBER INCIDENCES
+* columns
+1 1 10 9
+11 10 19 19
+* first floor beams (X then Z)
+21 10 11 22; 23 13 14 24; 25 16 17 26
+31 10 13 33; 34 13 16 36
+* roof beams (X then Z)
+41 19 20 42; 43 22 23 44; 45 25 26 46
+51 19 22 53; 54 22 25 56
+* bracing
+61 1 11; 62 2 10; 63 7 17; 64 8 16
+ELEMENT INCIDENCES SHELL
+201 19 20 23 22 TO 202
+203 22 23 26 25 TO 204
+START GROUP DEFINITION
+MEMBER
+_COLUMNS 1 TO 9 11 TO 19
+_FLOOR_BEAMS 21 TO 26 31 TO 36
+_ROOF_BEAMS 41 TO 46 51 TO 56
+_BRACING 61 TO 64
+END GROUP DEFINITION
+ELEMENT PROPERTY
+201 TO 204 THICKNESS 0.2
+DEFINE MATERIAL START
+ISOTROPIC STEEL
+E 2.05e+08
+POISSON 0.3
+DENSITY 76.8195
+ALPHA 1.2e-05
+ISOTROPIC CONCRETE
+E 2.17185e+07
+POISSON 0.17
+DENSITY 23.5616
+END DEFINE MATERIAL
+MEMBER PROPERTY EUROPEAN
+_COLUMNS TABLE ST HE300B
+_FLOOR_BEAMS TABLE ST IPE360
+_ROOF_BEAMS TABLE ST IPE300
+_BRACING TABLE ST L100X100X10
+CONSTANTS
+MATERIAL STEEL MEMB 1 TO 64
+MATERIAL CONCRETE MEMB 201 TO 204
+BETA 90 MEMB 1 TO 3
+SUPPORTS
+1 TO 3 FIXED
+4 TO 6 PINNED
+7 TO 9 FIXED BUT MX MY MZ
+MEMBER TRUSS
+61 TO 64
+MEMBER RELEASE
+31 TO 36 START MZ
+31 TO 36 END MZ
+LOAD 1 LOADTYPE Dead TITLE DEAD LOAD
+SELFWEIGHT Y -1
+MEMBER LOAD
+21 TO 26 31 TO 36 UNI GY -12
+ELEMENT LOAD
+201 TO 204 PR GY -4.5
+LOAD 2 LOADTYPE Live TITLE LIVE LOAD
+MEMBER LOAD
+41 TO 46 UNI GY -8
+24 CON GY -25 3
+33 TRAP GY -2 -10
+LOAD 3 LOADTYPE Wind TITLE WIND +X
+JOINT LOAD
+10 13 16 FX 18
+19 22 25 FX 24
+LOAD COMB 4 1.35 DL + 1.5 LL
+1 1.35 2 1.5
+LOAD COMB 5 1.35 DL + 1.5 WL
+1 1.35 3 1.5
+PERFORM ANALYSIS PRINT STATICS CHECK
+FINISH
+`;
+
+/* =====================================================================================
+   Viewer state
+   ===================================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fmt = (v, d = 4) => { if (!isFinite(v)) return '–'; const a = Math.abs(v); if (a !== 0 && (a < 1e-4 || a >= 1e7)) return v.toExponential(3); return String(+v.toFixed(d)); };
+const PALETTE = ['#2f7fd8', '#e0752d', '#2e9d63', '#c64b8c', '#8e6bd1', '#b89a1f', '#17a2b3', '#d3493d', '#6b8e23', '#a0623a', '#5b6dd6', '#d062d0', '#3f9c95', '#8a8f98'];
+const FOV = 35 * Math.PI / 180;
+
+const state = {
+  M: null, S: null, sel: null, hover: null, fileName: '',
+  opt: { members: true, plates: true, nodes: true, supports: true, releases: true, loads: true, nodeNo: false, memNo: false, plateNo: false, loadVals: true, fade: true, axes: true },
+  colorBy: 'none', isolate: null, loadCase: '', persp: false, tab: 'model', srcLine: 0, tblLimit: 300
+};
+const view = { yaw: 0.6, pitch: 0.42, scale: 40, t: [0, 0, 0] };
+const cv = $('#cv'), ctx = cv.getContext('2d');
+let W = 300, H = 200, DPR = 1, C = {}, dirty = false, interacting = false, sized = false;
+
+function readTheme() {
+  const cs = getComputedStyle(document.documentElement), g = k => cs.getPropertyValue(k).trim();
+  C = { canvas: g('--canvas'), member: g('--member'), plate: g('--plate'), node: g('--node'), support: g('--support'), load: g('--load'), sel: g('--sel'), hover: g('--hover'), halo: g('--halo'), dim: g('--dim'), mute: g('--mute'), ink: g('--ink') };
+}
+function store(k, v) { try { localStorage.setItem('staadviewer.' + k, JSON.stringify(v)); } catch (e) { } }
+function recall(k, d) { try { const v = localStorage.getItem('staadviewer.' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } }
+
+/* ---- scene: typed arrays in viewer space (Y up) built from the parsed model ---- */
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const unit = a => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+function toV(M, x, y, z) { return M.zUp ? [x, z, -y] : [x, y, z]; }
+
+function buildScene(M) {
+  const n = M.nodes.size, S = { nIndex: new Map(), nid: new Int32Array(n), X: new Float64Array(n), Y: new Float64Array(n), Z: new Float64Array(n) };
+  let i = 0, lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+  for (const nd of M.nodes.values()) {
+    const p = toV(M, nd.x, nd.y, nd.z);
+    S.nIndex.set(nd.id, i); S.nid[i] = nd.id; S.X[i] = p[0]; S.Y[i] = p[1]; S.Z[i] = p[2];
+    for (let k = 0; k < 3; k++) { if (p[k] < lo[k]) lo[k] = p[k]; if (p[k] > hi[k]) hi[k] = p[k]; }
+    i++;
+  }
+  if (!n) { lo = [0, 0, 0]; hi = [1, 1, 1]; }
+  S.lo = lo; S.hi = hi; S.center = [(lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, (lo[2] + hi[2]) / 2];
+  S.diag = Math.hypot(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]) || 1;
+  S.sx = new Float32Array(n); S.sy = new Float32Array(n); S.sz = new Float32Array(n);
+  // members
+  const mem = [...M.members.values()].filter(m => S.nIndex.has(m.a) && S.nIndex.has(m.b));
+  S.mem = mem; S.mIndex = new Map(); S.ma = new Int32Array(mem.length); S.mb = new Int32Array(mem.length); S.mcat = new Uint16Array(mem.length);
+  mem.forEach((m, k) => { S.mIndex.set(m.id, k); S.ma[k] = S.nIndex.get(m.a); S.mb[k] = S.nIndex.get(m.b); });
+  // polygons: plates + solid faces
+  S.polys = [];
+  for (const p of M.plates.values()) {
+    const idx = p.n.map(v => S.nIndex.get(v)); if (idx.some(v => v === undefined) || idx.length < 3) continue;
+    S.polys.push({ kind: 'plate', id: p.id, ref: p, idx, cat: 0 });
+  }
+  const FACES = [[0, 1, 2, 3], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]];
+  for (const s of M.solids.values()) {
+    const idx = s.n.map(v => S.nIndex.get(v)); if (idx.some(v => v === undefined) || idx.length < 4) continue;
+    if (idx.length === 8) for (const f of FACES) S.polys.push({ kind: 'solid', id: s.id, ref: s, idx: [...new Set(f.map(k => idx[k]))], cat: 0 });
+    else S.polys.push({ kind: 'solid', id: s.id, ref: s, idx, cat: 0 });
+  }
+  for (const p of S.polys) {
+    const a = p.idx[0], b = p.idx[1], c = p.idx[p.idx.length - 1];
+    p.nrm = unit(cross([S.X[b] - S.X[a], S.Y[b] - S.Y[a], S.Z[b] - S.Z[a]], [S.X[c] - S.X[a], S.Y[c] - S.Y[a], S.Z[c] - S.Z[a]]));
+    p.depth = 0;
+  }
+  S.pIndex = new Map(); S.polys.forEach((p, k) => { if (p.kind === 'plate') S.pIndex.set(p.id, k); });
+  S.sup = [...M.supports.values()].filter(s => S.nIndex.has(s.id)).map(s => ({ ...s, i: S.nIndex.get(s.id) }));
+  S.cats = [{ label: 'All', color: null, count: 0 }];
+  return S;
+}
+
+function applyColorBy() {
+  const { M, S } = state, by = state.colorBy;
+  const cats = [], idx = new Map();
+  const cat = (key, label) => { let c = idx.get(key); if (c === undefined) { c = cats.length; idx.set(key, c); cats.push({ label, color: null, count: 0 }); } cats[c].count++; return c; };
+  let groupOf = null;
+  if (by === 'group') { groupOf = new Map(); for (const g of M.groups.values()) if (g.kind !== 'JOINT') for (const id of g.ids) if (!groupOf.has(id)) groupOf.set(id, g.name); }
+  const key = (o, isMember) => {
+    if (by === 'section') return isMember ? (o.sec >= 0 ? ['s' + o.sec, M.sections[o.sec].label] : ['-', 'No section']) : (o.thk !== null && o.thk !== undefined ? ['t' + o.thk + o.thkUnit, `Plate t = ${fmt(o.thk)} ${o.thkUnit}`] : ['p-', isMember === false && o.n.length > 4 ? 'Solid' : 'Plate, no thickness']);
+    if (by === 'material') return o.mat ? ['m' + o.mat, o.mat] : ['-', 'No material'];
+    if (by === 'group') { const g = groupOf.get(o.id); return g ? ['g' + g, g] : ['-', 'Ungrouped']; }
+    if (by === 'type') return isMember ? (o.attr ? ['a' + o.attr, o.attr + ' member'] : ['beam', 'Beam / column']) : ['plate', o.n.length > 4 ? 'Solid' : 'Plate'];
+    return ['all', 'All'];
+  };
+  S.mem.forEach((m, k) => { const [a, b] = key(m, true); S.mcat[k] = cat(a, b); });
+  for (const p of S.polys) { const [a, b] = key(p.ref, false); p.cat = cat(a, b); }
+  if (by !== 'none') { let c = 0; for (const k of cats) k.color = /^(No |Ungrouped)/.test(k.label) ? PALETTE[13] : PALETTE[c++ % 13]; }
+  S.cats = cats.length ? cats : [{ label: 'All', color: null, count: 0 }];
+  state.isolate = null;
+}
+
+/* =====================================================================================
+   Camera + projection
+   ===================================================================================== */
+let B = null, PD = 0;
+function setupProj() {
+  const cy = Math.cos(view.yaw), sy = Math.sin(view.yaw), cp = Math.cos(view.pitch), sp = Math.sin(view.pitch);
+  B = { r: [cy, 0, -sy], u: [-sp * sy, cp, -sp * cy], b: [cp * sy, sp, cp * cy] };
+  PD = state.persp ? (H / (2 * Math.tan(FOV / 2))) / view.scale : 0;
+}
+function proj(x, y, z) {
+  const dx = x - view.t[0], dy = y - view.t[1], dz = z - view.t[2];
+  const vx = dx * B.r[0] + dy * B.r[1] + dz * B.r[2], vy = dx * B.u[0] + dy * B.u[1] + dz * B.u[2], vz = dx * B.b[0] + dy * B.b[1] + dz * B.b[2];
+  let k = view.scale;
+  if (state.persp) { const q = PD - vz; if (q < PD * 0.03) return null; k *= PD / q; }
+  return [W / 2 + vx * k, H / 2 - vy * k, vz];
+}
+function projectNodes() {
+  const S = state.S, n = S.nid.length, sx = S.sx, sy = S.sy, sz = S.sz;
+  let zmin = Infinity, zmax = -Infinity;
+  for (let i = 0; i < n; i++) {
+    const p = proj(S.X[i], S.Y[i], S.Z[i]);
+    if (!p) { sx[i] = NaN; sy[i] = NaN; sz[i] = 0; continue; }
+    sx[i] = p[0]; sy[i] = p[1]; sz[i] = p[2];
+    if (p[2] < zmin) zmin = p[2]; if (p[2] > zmax) zmax = p[2];
+  }
+  S.zmin = zmin; S.zmax = zmax;
+}
+function fit(points) {
+  const S = state.S; if (!S) return;
+  setupProj();
+  let pts = points;
+  if (!pts) { pts = []; for (let i = 0; i < S.nid.length; i++) pts.push([S.X[i], S.Y[i], S.Z[i]]); }
+  if (!pts.length) return;
+  const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+  for (const p of pts) for (let k = 0; k < 3; k++) { if (p[k] < lo[k]) lo[k] = p[k]; if (p[k] > hi[k]) hi[k] = p[k]; }
+  view.t = [(lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, (lo[2] + hi[2]) / 2];
+  let mx = 0, my = 0;
+  for (const p of pts) {
+    const dx = p[0] - view.t[0], dy = p[1] - view.t[1], dz = p[2] - view.t[2];
+    mx = Math.max(mx, Math.abs(dx * B.r[0] + dy * B.r[1] + dz * B.r[2])); my = Math.max(my, Math.abs(dx * B.u[0] + dy * B.u[1] + dz * B.u[2]));
+  }
+  const pad = points ? 0.45 : (state.persp ? 0.74 : 0.8);
+  const s = Math.min(mx > 1e-9 ? (W / 2) * pad / mx : Infinity, my > 1e-9 ? (H / 2) * pad / my : Infinity);
+  view.scale = isFinite(s) ? s : Math.min(W, H) / (2 * S.diag);
+  if (points) view.scale = Math.min(view.scale, 6 * Math.min(W, H) / S.diag);
+  requestDraw();
+}
+function setView(name) {
+  const v = { iso: [0.6, 0.42], front: [0, 0], side: [Math.PI / 2, 0], top: [0, Math.PI / 2] }[name];
+  if (!v) return; view.yaw = v[0]; view.pitch = v[1]; fit();
+}
+
+/* =====================================================================================
+   Drawing
+   ===================================================================================== */
+function requestDraw() { if (!dirty) { dirty = true; requestAnimationFrame(draw); } }
+function resize() {
+  const r = cv.getBoundingClientRect(); DPR = Math.min(window.devicePixelRatio || 1, 2);
+  const ow = W, oh = H;
+  W = Math.max(50, r.width); H = Math.max(50, r.height);
+  if (sized) view.scale *= Math.min(W / ow, H / oh);
+  sized = true;
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); requestDraw();
+}
+function arrow(x1, y1, x2, y2, head) {
+  const dx = x2 - x1, dy = y2 - y1, l = Math.hypot(dx, dy); if (l < 0.5) return;
+  const ux = dx / l, uy = dy / l, h = Math.min(head, l * 0.6);
+  ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+  ctx.moveTo(x2 - ux * h - uy * h * 0.45, y2 - uy * h + ux * h * 0.45); ctx.lineTo(x2, y2); ctx.lineTo(x2 - ux * h + uy * h * 0.45, y2 - uy * h - ux * h * 0.45);
+}
+let occ = null, occCols = 0, occRows = 0;
+const CELL_W = 40, CELL_H = 13;
+function resetLabels() { occCols = Math.ceil(W / CELL_W) + 1; occRows = Math.ceil(H / CELL_H) + 1; if (!occ || occ.length !== occCols * occRows) occ = new Uint8Array(occCols * occRows); else occ.fill(0); }
+function label(x, y, text, color, force) {
+  if (!(x > -20 && x < W + 20 && y > 0 && y < H + 10)) return;
+  const c = Math.max(0, Math.min(occCols - 1, (x / CELL_W) | 0)), r = Math.max(0, Math.min(occRows - 1, (y / CELL_H) | 0)), k = r * occCols + c;
+  const wide = text.length > 6 && c + 1 < occCols;
+  if (!force && (occ[k] || (wide && occ[k + 1]))) return;
+  occ[k] = 1; if (wide) occ[k + 1] = 1;
+  ctx.lineWidth = 3; ctx.strokeStyle = C.halo; ctx.strokeText(text, x, y);
+  ctx.fillStyle = color; ctx.fillText(text, x, y);
+}
+
+function draw() {
+  dirty = false;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = C.canvas; ctx.fillRect(0, 0, W, H);
+  const { M, S, opt } = state; if (!S) return;
+  setupProj(); projectNodes(); resetLabels();
+  const sx = S.sx, sy = S.sy, sz = S.sz, nc = S.cats.length, iso = state.isolate;
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  ctx.font = '11px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace'; ctx.textBaseline = 'middle';
+  const catColor = (c, base) => (iso !== null && c !== iso) ? C.dim : (S.cats[c].color || base);
+
+  // ---- plates and solid faces, far to near
+  if (opt.plates && S.polys.length) {
+    const P = S.polys;
+    if (!S.order || S.order.length !== P.length) S.order = P.map((_, i) => i);
+    for (const p of P) { let d = 0, ok = true; for (const i of p.idx) { if (sx[i] !== sx[i]) ok = false; d += sz[i]; } p.depth = ok ? d / p.idx.length : NaN; }
+    if (P.length <= 4000) S.order.sort((a, b) => P[a].depth - P[b].depth);
+    ctx.lineWidth = 1;
+    if (P.length > 4000) {
+      // large model: skip depth sorting and paint in small batches per colour and shade band
+      // (vertex order is normalised so overlapping faces in a batch union instead of cancelling)
+      const NS = 4, nb = (nc + 1) * NS;
+      if (!S.pb || S.pb.length !== nb) S.pb = Array.from({ length: nb }, () => []);
+      for (const l of S.pb) l.length = 0;
+      for (const p of P) {
+        if (p.depth !== p.depth) continue;
+        const shade = Math.abs(p.nrm[0] * B.b[0] + p.nrm[1] * B.b[1] + p.nrm[2] * B.b[2]);
+        S.pb[((iso !== null && p.cat !== iso) ? nc : p.cat) * NS + Math.min(NS - 1, (shade * NS) | 0)].push(p);
+      }
+      for (let k = 0; k < nb; k++) {
+        const list = S.pb[k]; if (!list.length) continue;
+        const c = (k / NS) | 0, col = c === nc ? C.dim : (S.cats[c].color || C.plate);
+        const fa = c === nc ? 0.5 : 0.2 + 0.25 * ((k % NS) + 0.5) / NS, sa = c === nc ? 0.6 : 0.55;
+        ctx.fillStyle = col; ctx.strokeStyle = col;
+        const paint = () => { ctx.globalAlpha = fa; ctx.fill(); ctx.globalAlpha = sa; ctx.stroke(); ctx.beginPath(); };
+        ctx.beginPath(); let cnt = 0;
+        for (const p of list) {
+          if (++cnt % 16 === 0) paint();
+          const ix = p.idx, n = ix.length; let ar = 0;
+          for (let i = 0, j = n - 1; i < n; j = i++) ar += sx[ix[j]] * sy[ix[i]] - sx[ix[i]] * sy[ix[j]];
+          if (ar >= 0) { ctx.moveTo(sx[ix[0]], sy[ix[0]]); for (let j = 1; j < n; j++) ctx.lineTo(sx[ix[j]], sy[ix[j]]); }
+          else { ctx.moveTo(sx[ix[n - 1]], sy[ix[n - 1]]); for (let j = n - 2; j >= 0; j--) ctx.lineTo(sx[ix[j]], sy[ix[j]]); }
+          ctx.closePath();
+        }
+        paint();
+      }
+    }
+    else for (const k of S.order) {
+      const p = P[k]; if (p.depth !== p.depth) continue;
+      const dimmed = iso !== null && p.cat !== iso;
+      const shade = Math.abs(p.nrm[0] * B.b[0] + p.nrm[1] * B.b[1] + p.nrm[2] * B.b[2]);
+      ctx.beginPath(); ctx.moveTo(sx[p.idx[0]], sy[p.idx[0]]);
+      for (let j = 1; j < p.idx.length; j++) ctx.lineTo(sx[p.idx[j]], sy[p.idx[j]]);
+      ctx.closePath();
+      const col = catColor(p.cat, C.plate);
+      ctx.fillStyle = col; ctx.globalAlpha = dimmed ? 0.5 : 0.16 + 0.22 * shade; ctx.fill();
+      ctx.strokeStyle = col; ctx.globalAlpha = dimmed ? 0.6 : 0.75; ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ---- members, bucketed by depth (fade) and colour
+  if (opt.members && S.mem.length) {
+    const NB = opt.fade ? 6 : 1, zr = S.zmax - S.zmin, zs = zr > 1e-9 ? NB / zr : 0, nk = NB * (nc + 1);
+    if (!S.buckets || S.buckets.length !== nk) S.buckets = Array.from({ length: nk }, () => []);
+    for (const b of S.buckets) b.length = 0;
+    const ma = S.ma, mb = S.mb, mcat = S.mcat;
+    for (let i = 0; i < ma.length; i++) {
+      const a = ma[i], b = mb[i], x1 = sx[a], x2 = sx[b];
+      if (x1 !== x1 || x2 !== x2) continue;
+      if ((x1 < 0 && x2 < 0) || (x1 > W && x2 > W) || (sy[a] < 0 && sy[b] < 0) || (sy[a] > H && sy[b] > H)) continue;
+      let bin = (((sz[a] + sz[b]) * 0.5 - S.zmin) * zs) | 0; if (bin >= NB) bin = NB - 1; if (bin < 0) bin = 0;
+      const c = (iso !== null && mcat[i] !== iso) ? nc : mcat[i];
+      S.buckets[bin * (nc + 1) + c].push(i);
+    }
+    ctx.lineWidth = S.mem.length > 20000 ? 1 : 1.6;
+    for (let k = 0; k < nk; k++) {
+      const list = S.buckets[k]; if (!list.length) continue;
+      const bin = (k / (nc + 1)) | 0, c = k % (nc + 1);
+      ctx.strokeStyle = c === nc ? C.dim : (S.cats[c].color || C.member);
+      ctx.globalAlpha = c === nc ? 1 : (NB > 1 ? 0.42 + 0.58 * (bin + 1) / NB : 1);
+      ctx.beginPath();
+      for (const i of list) { ctx.moveTo(sx[ma[i]], sy[ma[i]]); ctx.lineTo(sx[mb[i]], sy[mb[i]]); }
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    // releases: hollow circle near the released end
+    if (opt.releases) {
+      ctx.strokeStyle = C.member; ctx.fillStyle = C.canvas; ctx.lineWidth = 1.2;
+      S.mem.forEach((m, i) => {
+        if (!m.rel) return; const a = ma[i], b = mb[i]; if (sx[a] !== sx[a] || sx[b] !== sx[b]) return;
+        const dx = sx[b] - sx[a], dy = sy[b] - sy[a], l = Math.hypot(dx, dy); if (l < 40) return;
+        const off = Math.min(12, l * 0.15) / l;
+        for (const [on, f] of [[m.rel.s, off], [m.rel.e, 1 - off]]) if (on) { ctx.beginPath(); ctx.arc(sx[a] + dx * f, sy[a] + dy * f, 3, 0, 6.2832); ctx.fill(); ctx.stroke(); }
+      });
+    }
+  }
+
+  // ---- nodes
+  if (opt.nodes) {
+    const n = S.nid.length, r = n > 8000 ? 1 : 1.5;
+    ctx.fillStyle = C.node; ctx.beginPath();
+    for (let i = 0; i < n; i++) { const x = sx[i], y = sy[i]; if (x > -2 && x < W + 2 && y > -2 && y < H + 2) ctx.rect(x - r, y - r, r * 2, r * 2); }
+    ctx.fill();
+  }
+
+  // ---- supports
+  if (opt.supports && S.sup.length) {
+    ctx.strokeStyle = C.support; ctx.fillStyle = C.support; ctx.lineWidth = 1.5;
+    const s = S.sup.length > 800 ? 5 : 8;
+    for (const sp of S.sup) {
+      const x = sx[sp.i], y = sy[sp.i]; if (!(x > -20 && x < W + 20 && y > -20 && y < H + 20)) continue;
+      ctx.beginPath();
+      if (sp.kind === 'fixed') { ctx.globalAlpha = 0.9; ctx.fillRect(x - s, y + 1, 2 * s, s * 0.8); ctx.globalAlpha = 1; continue; }
+      if (sp.kind === 'partial' || sp.kind === 'other') { ctx.rect(x - s, y + 1, 2 * s, s * 0.8); ctx.stroke(); continue; }
+      if (sp.kind === 'spring') {
+        ctx.moveTo(x, y); for (let k = 1; k <= 5; k++) ctx.lineTo(x + (k % 2 ? s * 0.5 : -s * 0.5), y + k * s * 0.3);
+        ctx.lineTo(x, y + s * 1.8); ctx.moveTo(x - s, y + s * 1.8); ctx.lineTo(x + s, y + s * 1.8); ctx.stroke(); continue;
+      }
+      ctx.moveTo(x, y); ctx.lineTo(x - s * 0.85, y + s * 1.4); ctx.lineTo(x + s * 0.85, y + s * 1.4); ctx.closePath();
+      ctx.globalAlpha = 0.25; ctx.fill(); ctx.globalAlpha = 1; ctx.stroke();
+      if (sp.kind === 'roller') { ctx.beginPath(); ctx.moveTo(x - s, y + s * 1.4 + 3.5); ctx.lineTo(x + s, y + s * 1.4 + 3.5); ctx.stroke(); }
+    }
+  }
+
+  if (opt.loads && state.loadCase !== '') drawLoads();
+
+  // ---- hover / selection highlight
+  for (const [e, col, w] of [[state.hover, C.hover, 3], [state.sel, C.sel, 4]]) {
+    if (!e) continue;
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = w;
+    if (e.kind === 'node') { const i = S.nIndex.get(e.id); if (i !== undefined) { ctx.beginPath(); ctx.arc(sx[i], sy[i], w + 2, 0, 6.2832); ctx.fill(); } }
+    else if (e.kind === 'member') { const i = S.mIndex.get(e.id); if (i !== undefined) { ctx.beginPath(); ctx.moveTo(sx[S.ma[i]], sy[S.ma[i]]); ctx.lineTo(sx[S.mb[i]], sy[S.mb[i]]); ctx.stroke(); } }
+    else for (const p of S.polys) if (p.id === e.id && p.kind === e.kind && p.depth === p.depth) {
+      ctx.beginPath(); ctx.moveTo(sx[p.idx[0]], sy[p.idx[0]]); for (let j = 1; j < p.idx.length; j++) ctx.lineTo(sx[p.idx[j]], sy[p.idx[j]]); ctx.closePath();
+      ctx.globalAlpha = 0.3; ctx.fill(); ctx.globalAlpha = 1; ctx.lineWidth = 2; ctx.stroke();
+    }
+  }
+
+  // ---- labels (selected first so it always shows)
+  const sel = state.sel;
+  if (sel) {
+    ctx.textAlign = 'left';
+    if (sel.kind === 'node') { const i = S.nIndex.get(sel.id); if (i !== undefined) label(sx[i] + 8, sy[i] - 9, 'N' + sel.id, C.sel, true); }
+    else if (sel.kind === 'member') { const i = S.mIndex.get(sel.id); if (i !== undefined) label((sx[S.ma[i]] + sx[S.mb[i]]) / 2 + 6, (sy[S.ma[i]] + sy[S.mb[i]]) / 2 - 9, 'M' + sel.id, C.sel, true); }
+  }
+  if (opt.memNo && opt.members) {
+    ctx.textAlign = 'center';
+    for (let i = 0; i < S.mem.length; i++) { const a = S.ma[i], b = S.mb[i]; label((sx[a] + sx[b]) / 2, (sy[a] + sy[b]) / 2, String(S.mem[i].id), C.member); }
+  }
+  if (opt.plateNo && opt.plates) {
+    ctx.textAlign = 'center';
+    for (const p of S.polys) { if (p.kind !== 'plate' || p.depth !== p.depth) continue; let x = 0, y = 0; for (const i of p.idx) { x += sx[i]; y += sy[i]; } label(x / p.idx.length, y / p.idx.length, String(p.id), C.plate); }
+  }
+  if (opt.nodeNo) {
+    ctx.textAlign = 'left';
+    for (let i = 0; i < S.nid.length; i++) label(sx[i] + 5, sy[i] - 7, String(S.nid[i]), C.mute);
+  }
+
+  // ---- axis triad
+  if (opt.axes) {
+    const ox = 46, oy = H - 46, L = 30;
+    const ax = M.zUp ? [['X', [1, 0, 0]], ['Y', [0, 0, -1]], ['Z', [0, 1, 0]]] : [['X', [1, 0, 0]], ['Y', [0, 1, 0]], ['Z', [0, 0, 1]]];
+    const cols = { X: '#d3493d', Y: '#2e9d63', Z: '#2f7fd8' };
+    ctx.textAlign = 'center'; ctx.lineWidth = 2;
+    for (const [n, v] of ax.map(a => [a[0], a[1], a[1][0] * B.b[0] + a[1][1] * B.b[1] + a[1][2] * B.b[2]]).sort((p, q) => p[2] - q[2])) {
+      const ex = ox + (v[0] * B.r[0] + v[1] * B.r[1] + v[2] * B.r[2]) * L, ey = oy - (v[0] * B.u[0] + v[1] * B.u[1] + v[2] * B.u[2]) * L;
+      ctx.strokeStyle = cols[n]; ctx.beginPath(); arrow(ox, oy, ex, ey, 7); ctx.stroke();
+      ctx.fillStyle = cols[n]; ctx.fillText(n, ox + (ex - ox) * 1.28, oy + (ey - oy) * 1.28);
+    }
+  }
+}
+
+/* ---- member local axes (STAAD convention, incl. BETA and SET Z UP), in viewer space ---- */
+function localAxes(M, m) {
+  const A = M.nodes.get(m.a), Bn = M.nodes.get(m.b);
+  const x = unit([Bn.x - A.x, Bn.y - A.y, Bn.z - A.z]), up = M.zUp ? [0, 0, 1] : [0, 1, 0];
+  const c = cross(x, up); let y, z;
+  if (Math.hypot(c[0], c[1], c[2]) < 1e-6) { if (M.zUp) { y = [0, 1, 0]; z = cross(x, y); } else { z = [0, 0, 1]; y = cross(z, x); } }
+  else if (M.zUp) { y = unit(cross(up, x)); z = cross(x, y); }
+  else { z = unit(c); y = cross(z, x); }
+  const b = (m.beta || 0) * Math.PI / 180, cb = Math.cos(b), sb = Math.sin(b);
+  const y2 = [y[0] * cb + z[0] * sb, y[1] * cb + z[1] * sb, y[2] * cb + z[2] * sb], z2 = [-y[0] * sb + z[0] * cb, -y[1] * sb + z[1] * cb, -y[2] * sb + z[2] * cb];
+  return { x: toV(M, ...x), y: toV(M, ...y2), z: toV(M, ...z2) };
+}
+function globalDir(M, axis) { return toV(M, axis === 'X' ? 1 : 0, axis === 'Y' ? 1 : 0, axis === 'Z' ? 1 : 0); }
+
+function drawLoads() {
+  const { M, S, opt } = state, lc = M.loads.find(l => String(l.id) === state.loadCase); if (!lc) return;
+  if (!lc.scale) {      // largest magnitudes per kind, in SI, for arrow scaling
+    const s = { f: 0, w: 0, p: 0 };
+    for (const it of lc.items) {
+      if (it.kind === 'joint') for (const k of ['FX', 'FY', 'FZ']) s.f = Math.max(s.f, Math.abs(it.f[k] || 0) * it.fF);
+      else if (it.kind === 'member') { const v = Math.max(...it.vals.slice(0, /^(LIN|TRAP)/.test(it.type) ? 2 : 1).map(Math.abs), 0); if (/^C/.test(it.type)) s.f = Math.max(s.f, v * it.fF); else s.w = Math.max(s.w, v * it.fF / it.lF); }
+      else if (it.kind === 'elem') s.p = Math.max(s.p, Math.abs(it.vals[0] || 0) * it.fF / (it.lF * it.lF));
+    }
+    lc.scale = s;
+  }
+  const Lmax = S.diag * 0.09, sc = lc.scale, sx = S.sx, sy = S.sy;
+  ctx.strokeStyle = C.load; ctx.fillStyle = C.load; ctx.lineWidth = 1.3; ctx.textAlign = 'left';
+  const texts = []; let chunk = 0;
+  const flush = () => { if (++chunk % 300 === 0) { ctx.stroke(); ctx.beginPath(); } };
+  const onScreen = (a, b) => sx[a] === sx[a] && sx[b] === sx[b] && !((sx[a] < -60 && sx[b] < -60) || (sx[a] > W + 60 && sx[b] > W + 60) || (sy[a] < -60 && sy[b] < -60) || (sy[a] > H + 60 && sy[b] > H + 60));
+  // level of detail: when thousands of loaded entities are in view, draw every n-th until the user zooms in
+  let vis = 0, seen = 0;
+  for (const it of lc.items) {
+    if (it.kind === 'member') { for (const id of it.ids) { const mi = S.mIndex.get(id); if (mi !== undefined && onScreen(S.ma[mi], S.mb[mi])) vis++; } }
+    else if (it.ids) vis += it.ids.length;
+  }
+  const stride = Math.max(1, Math.ceil(vis / 2500)), take = () => seen++ % stride === 0;
+  S.loadStride = stride;
+  ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
+  const vec = (p, d, l) => { const a = proj(p[0] - d[0] * l, p[1] - d[1] * l, p[2] - d[2] * l), b = proj(p[0], p[1], p[2]); return a && b ? [a, b] : null; };
+  ctx.beginPath();
+  for (const it of lc.items) {
+    if (it.kind === 'joint') {
+      for (const id of it.ids) {
+        const i = S.nIndex.get(id); if (i === undefined || !take()) continue; const p = [S.X[i], S.Y[i], S.Z[i]]; flush();
+        for (const k of DOFS_ALL) {
+          const v = it.f[k]; if (!v) continue;
+          const d = globalDir(M, k[1]).map(c => c * Math.sign(v));
+          if (k[0] === 'F') { const l = Lmax * (0.35 + 0.65 * Math.abs(v) * it.fF / (sc.f || 1)), s = vec(p, d, l); if (s) { arrow(s[0][0], s[0][1], s[1][0], s[1][1], 7); texts.push([s[0][0] + 4, s[0][1] - 6, `${fmt(v)} ${it.fN}`]); } }
+          else { const a = proj(p[0], p[1], p[2]), b = proj(p[0] + d[0] * Lmax * 0.6, p[1] + d[1] * Lmax * 0.6, p[2] + d[2] * Lmax * 0.6); if (a && b) { arrow(a[0], a[1], b[0], b[1], 7); arrow(a[0], a[1], a[0] + (b[0] - a[0]) * 0.8, a[1] + (b[1] - a[1]) * 0.8, 7); texts.push([b[0] + 4, b[1] - 6, `${k} ${fmt(v)} ${it.fN}·${it.lN}`]); } }
+        }
+      }
+    } else if (it.kind === 'member') {
+      const few = vis > 1500;
+      for (const id of it.ids) {
+        const mi = S.mIndex.get(id); if (mi === undefined) continue;
+        const m = S.mem[mi], a = S.ma[mi], b = S.mb[mi]; if (!onScreen(a, b) || !take()) continue;
+        flush();
+        const A = [S.X[a], S.Y[a], S.Z[a]], Bp = [S.X[b], S.Y[b], S.Z[b]], Lm = m.len || 1;
+        const dir = it.dir.length === 1 ? localAxes(M, m)[it.dir.toLowerCase()] : globalDir(M, it.dir[1]);
+        const at = f => [A[0] + (Bp[0] - A[0]) * f, A[1] + (Bp[1] - A[1]) * f, A[2] + (Bp[2] - A[2]) * f];
+        const k = it.lF / M.lenF, v = it.vals, moment = /MOM/.test(it.type);
+        if (/^C/.test(it.type)) {
+          const f = v[1] !== undefined ? Math.min(1, Math.max(0, v[1] * k / Lm)) : 0.5, d = dir.map(c => c * Math.sign(v[0] || 1));
+          const s = vec(at(f), d, Lmax * (0.35 + 0.65 * Math.abs(v[0] || 0) * it.fF / (sc.f || 1)));
+          if (s) { arrow(s[0][0], s[0][1], s[1][0], s[1][1], 7); texts.push([s[0][0] + 4, s[0][1] - 6, `${moment ? 'M ' : ''}${fmt(v[0])} ${it.fN}${moment ? '·' + it.lN : ''}`]); }
+          continue;
+        }
+        let w1 = v[0] || 0, w2 = w1, f1 = 0, f2 = 1, tri = false;
+        if (/^LIN/.test(it.type)) { w2 = v[1] || 0; if (v[2] !== undefined && v[2] !== 0) { tri = true; w1 = 0; w2 = v[2]; } }
+        else if (/^TRAP/.test(it.type)) { w2 = v[1] || 0; if (v[3]) { f1 = v[2] * k / Lm; f2 = v[3] * k / Lm; } }
+        else if (v[2]) { f1 = (v[1] || 0) * k / Lm; f2 = v[2] * k / Lm; }
+        f1 = Math.max(0, Math.min(1, f1)); f2 = Math.max(f1, Math.min(1, f2));
+        const px = Math.hypot(sx[b] - sx[a], sy[b] - sy[a]) * (f2 - f1), n = few ? 2 : Math.max(2, Math.min(14, Math.round(px / 20)));
+        const uniform = /^U/.test(it.type); let prev = null, mid = null;
+        for (let j = 0; j <= n; j++) {
+          const g = j / n, w = tri ? w2 * (1 - Math.abs(2 * g - 1)) : w1 + (w2 - w1) * g, r = Math.abs(w) * it.fF / it.lF / (sc.w || 1);
+          const p = at(f1 + (f2 - f1) * g), d = dir.map(c => c * (Math.sign(w) || Math.sign(w1 || w2) || 1));
+          const s = vec(p, d, Lmax * 0.7 * (uniform ? 0.35 + 0.65 * r : r)); if (!s) { prev = null; continue; }
+          if (Math.abs(w) > 0) arrow(s[0][0], s[0][1], s[1][0], s[1][1], 5);
+          if (prev) { ctx.moveTo(prev[0], prev[1]); ctx.lineTo(s[0][0], s[0][1]); }
+          prev = s[0]; if (j === (n >> 1)) mid = s[0];
+        }
+        if (mid) texts.push([mid[0] + 4, mid[1] - 6, (uniform ? fmt(w1) : tri ? '0 / ' + fmt(w2) + ' / 0' : fmt(w1) + ' → ' + fmt(w2)) + ` ${it.fN}${moment ? '' : '/' + it.lN}`]);
+      }
+    } else if (it.kind === 'elem') {
+      const v = it.vals[0] || 0, r = Math.abs(v) * it.fF / (it.lF * it.lF) / (sc.p || 1);
+      for (const id of it.ids) {
+        const pi = S.pIndex.get(id); if (pi === undefined || !take()) continue; const p = S.polys[pi]; flush();
+        const c = [0, 0, 0]; for (const i of p.idx) { c[0] += S.X[i]; c[1] += S.Y[i]; c[2] += S.Z[i]; } for (let k = 0; k < 3; k++) c[k] /= p.idx.length;
+        const base = it.dir[0] === 'G' ? globalDir(M, it.dir[1]) : p.nrm, d = base.map(q => q * (Math.sign(v) || 1));
+        const pts = vis > 1500 ? [c] : [c, ...p.idx.map(i => [(S.X[i] + c[0]) / 2, (S.Y[i] + c[1]) / 2, (S.Z[i] + c[2]) / 2])];
+        pts.forEach((q, j) => { const s = vec(q, d, Lmax * 0.6 * (0.35 + 0.65 * r)); if (s) { arrow(s[0][0], s[0][1], s[1][0], s[1][1], 5); if (j === 0) texts.push([s[0][0] + 4, s[0][1] - 6, `${fmt(v)} ${it.fN}/${it.lN}²`]); } });
+      }
+    }
+  }
+  ctx.stroke(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  if (opt.loadVals) {      // in dense views, repeat an identical value only a few times
+    const seenText = new Map(), cap = vis > 200 ? 6 : Infinity;
+    for (const t of texts) { const c = seenText.get(t[2]) || 0; if (c >= cap) continue; seenText.set(t[2], c + 1); label(t[0], t[1], t[2], C.load); }
+  }
+}
+const DOFS_ALL = ['FX', 'FY', 'FZ', 'MX', 'MY', 'MZ'];
+
+/* =====================================================================================
+   Picking + pointer interaction
+   ===================================================================================== */
+function pick(mx, my) {
+  const S = state.S; if (!S) return null;
+  const sx = S.sx, sy = S.sy, sz = S.sz, opt = state.opt;
+  let best = null, bd = 49;
+  for (let i = 0; i < S.nid.length; i++) { const dx = sx[i] - mx, dy = sy[i] - my, d = dx * dx + dy * dy; if (d < bd) { bd = d; best = { kind: 'node', id: S.nid[i] }; } }
+  if (best) return best;
+  if (opt.members) {
+    bd = 36; let bz = -Infinity;
+    for (let i = 0; i < S.ma.length; i++) {
+      const x1 = sx[S.ma[i]], y1 = sy[S.ma[i]], x2 = sx[S.mb[i]], y2 = sy[S.mb[i]];
+      if (x1 !== x1 || x2 !== x2) continue;
+      if ((mx < x1 - 6 && mx < x2 - 6) || (mx > x1 + 6 && mx > x2 + 6) || (my < y1 - 6 && my < y2 - 6) || (my > y1 + 6 && my > y2 + 6)) continue;
+      const dx = x2 - x1, dy = y2 - y1, l2 = dx * dx + dy * dy;
+      let t = l2 ? ((mx - x1) * dx + (my - y1) * dy) / l2 : 0; t = t < 0 ? 0 : t > 1 ? 1 : t;
+      const ex = x1 + dx * t - mx, ey = y1 + dy * t - my, d = ex * ex + ey * ey, z = sz[S.ma[i]] + (sz[S.mb[i]] - sz[S.ma[i]]) * t;
+      if (d < bd - 4 || (d < bd + 4 && d < 36 && z > bz)) { bd = d; bz = z; best = { kind: 'member', id: S.mem[i].id }; }
+    }
+    if (best) return best;
+  }
+  if (opt.plates) {
+    let bz = -Infinity;
+    for (const p of S.polys) {
+      if (p.depth !== p.depth || p.depth <= bz) continue;
+      let inside = false; const n = p.idx.length;
+      for (let i = 0, j = n - 1; i < n; j = i++) {
+        const xi = sx[p.idx[i]], yi = sy[p.idx[i]], xj = sx[p.idx[j]], yj = sy[p.idx[j]];
+        if ((yi > my) !== (yj > my) && mx < (xj - xi) * (my - yi) / (yj - yi) + xi) inside = !inside;
+      }
+      if (inside) { bz = p.depth; best = { kind: p.kind, id: p.id }; }
+    }
+  }
+  return best;
+}
+function describe(e) {
+  const { M } = state, u = M.lenUnit;
+  if (e.kind === 'node') { const n = M.nodes.get(e.id); return `Node ${e.id} · (${fmt(n.x, 3)}, ${fmt(n.y, 3)}, ${fmt(n.z, 3)})${u ? ' ' + u : ''}`; }
+  if (e.kind === 'member') { const m = M.members.get(e.id); return `Member ${e.id}${m.sec >= 0 ? ' · ' + M.sections[m.sec].label : ''} · ${fmt(m.len, 3)}${u ? ' ' + u : ''}`; }
+  if (e.kind === 'plate') { const p = M.plates.get(e.id); return `Plate ${e.id}${p.thk !== null ? ' · t = ' + fmt(p.thk) + ' ' + p.thkUnit : ''}`; }
+  return `Solid ${e.id}`;
+}
+
+const pointers = new Map(); let dragMode = null, moved = 0, lastPinch = null, hoverPending = null;
+const tip = $('#tip');
+function local(ev) { const r = cv.getBoundingClientRect(); return [ev.clientX - r.left, ev.clientY - r.top]; }
+function panBy(dx, dy) { const k = 1 / view.scale; for (let i = 0; i < 3; i++) view.t[i] += (-dx * B.r[i] + dy * B.u[i]) * k; }
+function zoomAt(mx, my, f) {
+  setupProj();
+  const ns = Math.max(1e-6, Math.min(1e9, view.scale * f)), k = (1 / view.scale - 1 / ns), ox = mx - W / 2, oy = H / 2 - my;
+  for (let i = 0; i < 3; i++) view.t[i] += (ox * B.r[i] + oy * B.u[i]) * k;
+  view.scale = ns; requestDraw();
+}
+cv.addEventListener('pointerdown', ev => {
+  cv.setPointerCapture(ev.pointerId); pointers.set(ev.pointerId, local(ev)); moved = 0; tip.style.display = 'none';
+  dragMode = (ev.button === 2 || ev.button === 1 || ev.shiftKey) ? 'pan' : 'orbit';
+  if (pointers.size === 2) { dragMode = 'pinch'; lastPinch = null; }
+  cv.classList.add('drag'); interacting = true;
+});
+cv.addEventListener('pointermove', ev => {
+  const p = local(ev);
+  if (!pointers.has(ev.pointerId)) {            // hover
+    if (ev.pointerType !== 'mouse' || !state.S) return;
+    hoverPending = p;
+    requestAnimationFrame(() => {
+      if (!hoverPending || pointers.size) return; const q = hoverPending; hoverPending = null;
+      const e = pick(q[0], q[1]), old = state.hover;
+      if ((e && e.kind) !== (old && old.kind) || (e && e.id) !== (old && old.id)) { state.hover = e; requestDraw(); }
+      if (e) { tip.textContent = describe(e); tip.style.display = 'block'; tip.style.left = Math.min(q[0] + 14, W - tip.offsetWidth - 6) + 'px'; tip.style.top = Math.max(4, q[1] - 30) + 'px'; }
+      else tip.style.display = 'none';
+    });
+    return;
+  }
+  const prev = pointers.get(ev.pointerId), dx = p[0] - prev[0], dy = p[1] - prev[1];
+  pointers.set(ev.pointerId, p); moved += Math.abs(dx) + Math.abs(dy);
+  if (dragMode === 'pinch' && pointers.size === 2) {
+    const [a, b] = [...pointers.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]), c = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+    if (lastPinch) { setupProj(); panBy(c[0] - lastPinch.c[0], c[1] - lastPinch.c[1]); zoomAt(c[0], c[1], d / (lastPinch.d || d)); }
+    lastPinch = { d, c };
+  } else if (dragMode === 'pan') { setupProj(); panBy(dx, dy); }
+  else if (dragMode === 'orbit') { view.yaw -= dx * 0.008; view.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, view.pitch + dy * 0.008)); }
+  requestDraw();
+});
+function pointerEnd(ev) {
+  if (!pointers.has(ev.pointerId)) return;
+  const p = pointers.get(ev.pointerId); pointers.delete(ev.pointerId);
+  if (!pointers.size) {
+    cv.classList.remove('drag'); interacting = false;
+    if (moved < 5 && dragMode !== 'pinch' && ev.type === 'pointerup') select(pick(p[0], p[1]), { fromCanvas: true });
+    dragMode = null; requestDraw();
+  } else { dragMode = 'orbit'; lastPinch = null; }
+}
+cv.addEventListener('pointerup', pointerEnd); cv.addEventListener('pointercancel', pointerEnd);
+cv.addEventListener('pointerleave', () => { tip.style.display = 'none'; hoverPending = null; if (state.hover) { state.hover = null; requestDraw(); } });
+cv.addEventListener('contextmenu', ev => ev.preventDefault());
+cv.addEventListener('wheel', ev => { ev.preventDefault(); const p = local(ev); zoomAt(p[0], p[1], Math.exp(-ev.deltaY * (ev.deltaMode ? 0.05 : 0.0015))); }, { passive: false });
+cv.addEventListener('dblclick', ev => { const p = local(ev), e = pick(p[0], p[1]); if (e) { const pts = entityPoints(e); if (pts.length) { const c = [0, 0, 0]; for (const q of pts) for (let k = 0; k < 3; k++) c[k] += q[k] / pts.length; view.t = c; requestDraw(); } } });
+
+function entityPoints(e) {
+  const { M, S } = state, P = id => { const i = S.nIndex.get(id); return i === undefined ? null : [S.X[i], S.Y[i], S.Z[i]]; };
+  let ids = [];
+  if (e.kind === 'node') ids = [e.id];
+  else if (e.kind === 'member') { const m = M.members.get(e.id); if (m) ids = [m.a, m.b]; }
+  else { const p = (e.kind === 'plate' ? M.plates : M.solids).get(e.id); if (p) ids = p.n; }
+  return ids.map(P).filter(Boolean);
+}
+function zoomTo(e) {
+  const pts = entityPoints(e); if (!pts.length) return;
+  if (pts.length === 1) { view.t = pts[0].slice(); view.scale = Math.max(view.scale, 4 * Math.min(W, H) / state.S.diag); requestDraw(); }
+  else fit(pts);
+}
+
+/* =====================================================================================
+   Side panels
+   ===================================================================================== */
+function setTab(name) {
+  state.tab = name;
+  document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.id === 'p-' + name));
+  if (name === 'tables') renderTable();
+  if (name === 'source') renderSource(true);
+}
+document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+
+function entityLine(e) {
+  const { M } = state; if (!e) return 0;
+  const o = e.kind === 'node' ? M.nodes.get(e.id) : e.kind === 'member' ? M.members.get(e.id) : e.kind === 'plate' ? M.plates.get(e.id) : M.solids.get(e.id);
+  return o ? o.line : 0;
+}
+function select(e, o = {}) {
+  const { M } = state; if (!M) return;
+  if (e) { const map = { node: M.nodes, member: M.members, plate: M.plates, solid: M.solids }[e.kind]; if (!map || !map.has(e.id)) e = null; }
+  state.sel = e; renderSel();
+  if (e) {
+    state.srcLine = entityLine(e);
+    if (o.zoom) zoomTo(e);
+    if (state.tab === 'source') renderSource(true);
+    else if (state.tab === 'model' && o.fromCanvas) setTab('sel');
+    else if (state.tab === 'tables') markTableRow();
+  }
+  requestDraw();
+}
+const chip = (kind, id) => `<span class="chip mono" data-go="${kind}:${id}" tabindex="0" role="button">${kind[0].toUpperCase()}${id}</span>`;
+function renderSel() {
+  const { M, sel } = state, el = $('#p-sel');
+  if (!M || !sel) { el.innerHTML = '<div class="empty">Click a node, member or plate in the view to see its details.</div>'; return; }
+  const u = M.lenUnit ? ' ' + M.lenUnit : '', rows = [];
+  const row = (k, v) => rows.push(`<dt>${k}</dt><dd class="mono">${v}</dd>`);
+  let title = '', sub = '';
+  if (sel.kind === 'node') {
+    const n = M.nodes.get(sel.id); title = 'Node ' + n.id;
+    row('X', fmt(n.x) + u); row('Y', fmt(n.y) + u); row('Z', fmt(n.z) + u);
+    const s = M.supports.get(n.id); if (s) row('Support', esc(s.spec));
+    const mem = []; for (const m of M.members.values()) if (m.a === n.id || m.b === n.id) mem.push(m.id);
+    const pl = []; for (const p of M.plates.values()) if (p.n.includes(n.id)) pl.push(p.id);
+    if (mem.length) row(`Members (${mem.length})`, `<div class="chips">${mem.slice(0, 60).map(i => chip('member', i)).join('')}${mem.length > 60 ? '…' : ''}</div>`);
+    if (pl.length) row(`Plates (${pl.length})`, `<div class="chips">${pl.slice(0, 60).map(i => chip('plate', i)).join('')}${pl.length > 60 ? '…' : ''}</div>`);
+  } else if (sel.kind === 'member') {
+    const m = M.members.get(sel.id); title = 'Member ' + m.id; sub = m.sec >= 0 ? M.sections[m.sec].label : 'No section assigned';
+    row('Start node', chip('node', m.a)); row('End node', chip('node', m.b));
+    if (m.len !== undefined) row('Length', fmt(m.len) + u);
+    if (m.sec >= 0) { const s = M.sections[m.sec]; row('Section', esc(s.spec)); if (s.country) row('Table', esc(s.country)); }
+    if (m.mat) row('Material', esc(m.mat));
+    row('Beta angle', fmt(m.beta) + '°');
+    if (m.attr) row('Type', esc(m.attr));
+    if (m.rel) { if (m.rel.s) row('Release at start', esc(m.rel.s)); if (m.rel.e) row('Release at end', esc(m.rel.e)); }
+    const A = M.nodes.get(m.a), Bn = M.nodes.get(m.b);
+    if (A && Bn) row('Δx, Δy, Δz', `${fmt(Bn.x - A.x, 3)}, ${fmt(Bn.y - A.y, 3)}, ${fmt(Bn.z - A.z, 3)}`);
+  } else {
+    const p = (sel.kind === 'plate' ? M.plates : M.solids).get(sel.id); title = (sel.kind === 'plate' ? 'Plate ' : 'Solid ') + p.id;
+    row('Nodes', `<div class="chips">${p.n.map(i => chip('node', i)).join('')}</div>`);
+    if (p.thk !== null) row('Thickness', fmt(p.thk) + ' ' + p.thkUnit);
+    if (p.mat) row('Material', esc(p.mat));
+    if (sel.kind === 'plate') {
+      const q = p.n.map(i => M.nodes.get(i)).filter(Boolean); let ar = 0;
+      for (let i = 1; i + 1 < q.length; i++) { const c = cross([q[i].x - q[0].x, q[i].y - q[0].y, q[i].z - q[0].z], [q[i + 1].x - q[0].x, q[i + 1].y - q[0].y, q[i + 1].z - q[0].z]); ar += Math.hypot(c[0], c[1], c[2]) / 2; }
+      row('Area', fmt(ar) + (M.lenUnit ? ' ' + M.lenUnit + '²' : ''));
+    }
+  }
+  const groups = [...M.groups.values()].filter(g => (g.kind === 'JOINT') === (sel.kind === 'node') && g.ids.includes(sel.id)).map(g => g.name);
+  if (groups.length) row('Groups', esc(groups.join(', ')));
+  const lc = M.loads.find(l => String(l.id) === state.loadCase);
+  if (lc) {
+    const ls = lc.items.filter(it => it.ids && it.ids.includes(sel.id) && (it.kind === 'joint') === (sel.kind === 'node'))
+      .map(it => it.kind === 'joint' ? Object.entries(it.f).map(([k, v]) => `${k} ${fmt(v)}`).join(' ') : `${it.type} ${it.dir} ${it.vals.map(v => fmt(v)).join(' ')}`);
+    if (ls.length) row(`Load case ${esc(lc.id)}`, ls.map(esc).join('<br>'));
+  }
+  el.innerHTML = `<h3>${title}</h3><p class="sub">${esc(sub)}</p>
+    <div class="actions"><button data-act="zoom">Zoom to</button><button data-act="src">Show in source</button><button data-act="clear">Clear</button></div>
+    <dl class="kv">${rows.join('')}</dl>`;
+}
+$('#p-sel').addEventListener('click', ev => {
+  const go = ev.target.closest('[data-go]'), act = ev.target.closest('[data-act]');
+  if (go) { const [k, id] = go.dataset.go.split(':'); select({ kind: k, id: +id }); }
+  else if (act) { const a = act.dataset.act; if (a === 'zoom') zoomTo(state.sel); else if (a === 'src') { state.srcLine = entityLine(state.sel); setTab('source'); } else select(null); }
+});
+$('#p-sel').addEventListener('keydown', ev => { if (ev.key === 'Enter' && ev.target.dataset.go) ev.target.click(); });
+
+function renderModel() {
+  const { M, S, opt } = state, el = $('#p-model'); if (!M) { el.innerHTML = ''; return; }
+  const u = M.lenUnit ? ' ' + M.lenUnit : '', ext = M.zUp ? [S.hi[0] - S.lo[0], S.hi[2] - S.lo[2], S.hi[1] - S.lo[1]] : [S.hi[0] - S.lo[0], S.hi[1] - S.lo[1], S.hi[2] - S.lo[2]];
+  let total = 0; for (const m of M.members.values()) total += m.len || 0;
+  const kv = [['Structure type', esc(M.type || '–')], ['Length unit', M.lenUnit || 'not stated'], ['Vertical axis', M.zUp ? 'Z' : 'Y'],
+    ['Nodes', M.nodes.size], ['Members', M.members.size]];
+  if (M.plates.size) kv.push(['Plates', M.plates.size]); if (M.solids.size) kv.push(['Solids', M.solids.size]);
+  kv.push(['Supports', M.supports.size], ['Sections', M.sections.length]);
+  if (M.materials.size) kv.push(['Materials', esc([...M.materials.keys()].join(', '))]);
+  if (M.groups.size) kv.push(['Groups', M.groups.size]);
+  kv.push(['Load cases', M.loads.length], ['Combinations', M.combos.length], ['Extent X × Y × Z', ext.map(v => fmt(v, 2)).join(' × ') + u], ['Total member length', fmt(total, 2) + u]);
+  const chk = (k, t) => `<label><input type="checkbox" data-opt="${k}" ${opt[k] ? 'checked' : ''}>${t}</label>`;
+  const lcOpts = M.loads.map(l => `<option value="${esc(l.id)}" ${String(l.id) === state.loadCase ? 'selected' : ''}>${esc(l.id)} · ${esc(l.title || l.type || 'Load case')}</option>`).join('')
+    + (M.combos.length ? '<optgroup label="Combinations">' + M.combos.map(c => `<option value="c:${esc(c.id)}" ${'c:' + c.id === state.loadCase ? 'selected' : ''}>${esc(c.id)} · ${esc(c.title || 'Combination')}</option>`).join('') + '</optgroup>' : '');
+  el.innerHTML = `
+    <h3>${esc(M.title || state.fileName || 'Untitled model')}</h3>
+    <p class="sub">${esc(M.job.filter(j => /^JOB\s+NAME/i.test(j)).map(j => j.replace(/^JOB\s+NAME\s*/i, '')).join(' ') || state.fileName)}</p>
+    ${M.warnings.length ? '<h2>Checks</h2>' + M.warnings.slice(0, 12).map(w => `<div class="warn">${esc(w.msg)}${w.line ? ` <a data-line="${w.line}">line ${w.line}</a>` : ''}</div>`).join('') + (M.warnings.length > 12 ? `<div class="sub">…and ${M.warnings.length - 12} more</div>` : '') : ''}
+    <h2>Summary</h2><dl class="kv">${kv.map(r => `<dt>${r[0]}</dt><dd class="mono">${r[1]}</dd>`).join('')}</dl>
+    <h2>Show</h2><div class="checks">
+      ${chk('members', 'Members')}${chk('plates', 'Plates / solids')}${chk('nodes', 'Nodes')}${chk('supports', 'Supports')}
+      ${chk('releases', 'Releases')}${chk('loads', 'Loads')}${chk('nodeNo', 'Node numbers')}${chk('memNo', 'Member numbers')}
+      ${chk('plateNo', 'Plate numbers')}${chk('loadVals', 'Load values')}${chk('fade', 'Depth fade')}${chk('axes', 'Axis triad')}</div>
+    <h2>Colour by</h2><div class="row"><select id="colorBy" aria-label="Colour by">
+      ${[['none', 'Single colour'], ['section', 'Section'], ['material', 'Material'], ['group', 'Group'], ['type', 'Member type']].map(o => `<option value="${o[0]}" ${state.colorBy === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select></div>
+    <div class="legend" id="legend"></div>
+    <h2>Loads</h2><div class="row"><select id="loadCase" aria-label="Load case"><option value="">None</option>${lcOpts}</select></div>
+    <div id="loadInfo"></div>`;
+  renderLegend(); renderLoadInfo();
+}
+function renderLegend() {
+  const { S } = state, el = $('#legend'); if (!el) return;
+  if (state.colorBy === 'none') { el.innerHTML = ''; return; }
+  el.innerHTML = S.cats.map((c, i) => `<button data-cat="${i}" aria-pressed="${state.isolate === i}" title="Click to isolate"><span class="sw" style="background:${c.color}"></span><span class="lb">${esc(c.label)}</span><span class="ct mono">${c.count}</span></button>`).join('');
+}
+function renderLoadInfo() {
+  const { M } = state, el = $('#loadInfo'); if (!el) return;
+  const v = state.loadCase; if (!v) { el.innerHTML = ''; return; }
+  if (v.startsWith('c:')) {
+    const c = M.combos.find(c => 'c:' + c.id === v); if (!c) return;
+    el.innerHTML = `<p class="sub">Combination — the factored cases are listed below; pick a primary case to see its loads drawn.</p><pre class="raw mono">${c.factors.map(f => `${fmt(f.f)} × case ${esc(f.id)}`).join('\n') || 'no factors found'}</pre>`; return;
+  }
+  const l = M.loads.find(l => String(l.id) === v); if (!l) return;
+  const drawn = l.items.filter(i => i.kind !== 'self').length, sw = l.items.filter(i => i.kind === 'self');
+  el.innerHTML = `<p class="sub">${esc(l.type || 'Primary case')}${sw.length ? ` · self-weight ${sw.map(s => s.dir + ' ' + fmt(s.f)).join(', ')}` : ''}${drawn ? '' : ' · nothing to draw for this case'}</p><pre class="raw mono">${esc(l.raw.join('\n')) || 'empty'}</pre>`;
+}
+$('#p-model').addEventListener('change', ev => {
+  const t = ev.target;
+  if (t.dataset.opt) { state.opt[t.dataset.opt] = t.checked; store('opt', state.opt); requestDraw(); }
+  else if (t.id === 'colorBy') { state.colorBy = t.value; applyColorBy(); renderLegend(); requestDraw(); }
+  else if (t.id === 'loadCase') { state.loadCase = t.value; renderLoadInfo(); renderSel(); requestDraw(); }
+});
+$('#p-model').addEventListener('click', ev => {
+  const c = ev.target.closest('[data-cat]'), l = ev.target.closest('[data-line]');
+  if (c) { const i = +c.dataset.cat; state.isolate = state.isolate === i ? null : i; renderLegend(); requestDraw(); }
+  else if (l) { state.srcLine = +l.dataset.line; setTab('source'); }
+});
+
+/* ---- tables ---- */
+function tableData() {
+  const { M } = state, u = M.lenUnit ? ` (${M.lenUnit})` : '', kind = $('#tblKind').value;
+  if (kind === 'nodes') return { kind: 'node', head: ['Node', 'X' + u, 'Y' + u, 'Z' + u, 'Support'], rows: [...M.nodes.values()].map(n => [n.id, fmt(n.x, 3), fmt(n.y, 3), fmt(n.z, 3), (M.supports.get(n.id) || { spec: '' }).spec]) };
+  if (kind === 'members') return { kind: 'member', head: ['Member', 'Start', 'End', 'Length' + u, 'Section'], rows: [...M.members.values()].map(m => [m.id, m.a, m.b, m.len === undefined ? '–' : fmt(m.len, 3), m.sec >= 0 ? M.sections[m.sec].label : '']) };
+  if (kind === 'plates') return { kind: 'plate', head: ['Plate', 'Thickness', 'Nodes'], rows: [...M.plates.values()].map(p => [p.id, p.thk === null ? '–' : fmt(p.thk) + ' ' + p.thkUnit, p.n.join(' ')]) };
+  if (kind === 'supports') return { kind: 'node', head: ['Node', 'Type', 'Specification'], rows: [...M.supports.values()].map(s => [s.id, s.kind, s.spec]) };
+  return { kind: null, head: ['#', 'Members', 'Section'], rows: M.sections.map((s, i) => [i + 1, s.count, s.label + (s.country ? '  · ' + s.country : '')]) };
+}
+function renderTable() {
+  if (!state.M) return;
+  const d = tableData(), f = $('#tblFilter').value.trim().toUpperCase();
+  const rows = f ? d.rows.filter(r => r.some(c => String(c).toUpperCase().includes(f))) : d.rows, shown = rows.slice(0, state.tblLimit);
+  $('#tblWrap').innerHTML = `<table class="mono"><thead><tr>${d.head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${shown.map(r => `<tr ${d.kind ? `data-go="${d.kind}:${r[0]}"` : ''}>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`
+    + (rows.length > shown.length ? `<div class="more"><button id="tblMore">Show more (${shown.length} of ${rows.length})</button></div>` : rows.length ? '' : '<div class="empty">Nothing to list.</div>');
+  markTableRow();
+}
+function markTableRow() {
+  const s = state.sel, key = s ? `${s.kind}:${s.id}` : '';
+  document.querySelectorAll('#tblWrap tbody tr').forEach(tr => tr.classList.toggle('on', !!key && tr.dataset.go === key));
+}
+$('#tblKind').addEventListener('change', () => { state.tblLimit = 300; renderTable(); });
+$('#tblFilter').addEventListener('input', () => { state.tblLimit = 300; renderTable(); });
+$('#tblWrap').addEventListener('click', ev => {
+  if (ev.target.id === 'tblMore') { state.tblLimit += 1000; renderTable(); return; }
+  const tr = ev.target.closest('tr[data-go]'); if (tr) { const [k, id] = tr.dataset.go.split(':'); select({ kind: k, id: +id }, { zoom: true }); }
+});
+
+/* ---- source (virtualised) ---- */
+const LH = 18, srcEl = $('#src');
+function renderSource(scrollToLine) {
+  const { M } = state; if (!M) return;
+  $('#srcPad').style.height = M.lines.length * LH + 'px';
+  if (scrollToLine && state.srcLine) srcEl.scrollTop = Math.max(0, (state.srcLine - 1) * LH - srcEl.clientHeight / 3);
+  const a = Math.max(0, Math.floor(srcEl.scrollTop / LH) - 15), b = Math.min(M.lines.length, a + Math.ceil((srcEl.clientHeight || 400) / LH) + 30);
+  let h = '';
+  for (let i = a; i < b; i++) { const t = M.lines[i]; h += `<div class="ln${i + 1 === state.srcLine ? ' hl' : ''}${/^\s*\*/.test(t) ? ' cm' : ''}"><span class="no">${i + 1}</span><span class="tx">${esc(t) || ' '}</span></div>`; }
+  const win = $('#srcWin'); win.style.transform = `translateY(${a * LH}px)`; win.innerHTML = h;
+}
+srcEl.addEventListener('scroll', () => renderSource(false));
+
+/* =====================================================================================
+   Loading files
+   ===================================================================================== */
+function banner(msg, ms) { const b = $('#banner'); b.textContent = msg; b.style.display = msg ? 'block' : 'none'; clearTimeout(banner.t); if (msg && ms) banner.t = setTimeout(() => b.style.display = 'none', ms); }
+function loadText(text, name) {
+  let M;
+  try { M = parseStaad(text); } catch (e) { banner('Could not read ' + name + ': ' + e.message); return false; }
+  if (!M.nodes.size) {
+    banner(/\u0000/.test(text.slice(0, 4000)) ? `${name} looks like a binary file. This viewer reads the text input file (.std).` : `No joint coordinates found in ${name}. Is it a STAAD input (.std) file?`);
+    return false;
+  }
+  state.M = M; state.fileName = name; state.S = buildScene(M);
+  state.sel = null; state.hover = null; state.loadCase = ''; state.srcLine = 0; state.tblLimit = 300;
+  applyColorBy();
+  $('#fname').textContent = name; $('#fname').title = name; document.title = name + ' – STAAD Viewer';
+  view.yaw = 0.6; view.pitch = M.type === 'PLANE' || M.type === 'TRUSS' ? 0 : 0.42; if (M.type === 'PLANE' || M.type === 'TRUSS') view.yaw = 0;
+  if (M.type === 'FLOOR') { view.yaw = 0; view.pitch = Math.PI / 2; }
+  renderModel(); renderSel(); if (state.tab === 'tables') renderTable(); if (state.tab === 'source') renderSource(true);
+  fit();
+  return true;
+}
+function decode(buf) {
+  try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); } catch (e) { return new TextDecoder('windows-1252').decode(buf); }
+}
+function openFile(file) {
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = () => { if (loadText(decode(r.result), file.name)) banner('', 0); };
+  r.onerror = () => banner('Could not read ' + file.name);
+  r.readAsArrayBuffer(file);
+}
+$('#openBtn').addEventListener('click', () => $('#file').click());
+$('#file').addEventListener('change', ev => { openFile(ev.target.files[0]); ev.target.value = ''; });
+let dragDepth = 0;
+window.addEventListener('dragenter', ev => { ev.preventDefault(); dragDepth++; document.body.classList.add('dragover'); });
+window.addEventListener('dragleave', () => { if (--dragDepth <= 0) { dragDepth = 0; document.body.classList.remove('dragover'); } });
+window.addEventListener('dragover', ev => ev.preventDefault());
+window.addEventListener('drop', ev => { ev.preventDefault(); dragDepth = 0; document.body.classList.remove('dragover'); if (ev.dataTransfer.files.length) openFile(ev.dataTransfer.files[0]); });
+
+/* ---- toolbar + keyboard ---- */
+document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+$('#fitBtn').addEventListener('click', () => fit());
+function toggleProj() { state.persp = !state.persp; $('#projBtn').setAttribute('aria-pressed', state.persp); fit(); }
+$('#projBtn').addEventListener('click', toggleProj);
+$('#themeBtn').addEventListener('click', () => {
+  const dark = getComputedStyle(document.documentElement).getPropertyValue('--canvas').trim() === '#12171b';
+  document.documentElement.dataset.theme = dark ? 'light' : 'dark'; store('theme', document.documentElement.dataset.theme); readTheme(); requestDraw();
+});
+$('#find').addEventListener('keydown', ev => {
+  if (ev.key !== 'Enter' || !state.M) return;
+  const m = /^\s*([a-z]*)\s*(\d+)\s*$/i.exec(ev.target.value); if (!m) { banner('Type something like n12, m7 or p3.', 2500); return; }
+  const id = +m[2], k = m[1].toLowerCase()[0], M = state.M;
+  const order = k === 'n' || k === 'j' ? ['node'] : k === 'm' || k === 'b' ? ['member'] : k === 'p' || k === 'e' ? ['plate'] : k === 's' ? ['solid'] : ['member', 'node', 'plate', 'solid'];
+  const maps = { node: M.nodes, member: M.members, plate: M.plates, solid: M.solids }, kind = order.find(o => maps[o].has(id));
+  if (!kind) { banner(`Nothing numbered ${id} found.`, 2500); return; }
+  select({ kind, id }, { zoom: true }); if (state.tab === 'model') setTab('sel');
+});
+window.addEventListener('keydown', ev => {
+  if (/^(INPUT|SELECT|TEXTAREA)$/.test(ev.target.tagName) || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+  const k = ev.key.toLowerCase();
+  if (k === 'f') fit(); else if (k === 'p') toggleProj(); else if (k === 'escape') select(null);
+  else if ('1234'.includes(k)) setView(['iso', 'front', 'side', 'top'][+k - 1]);
+});
+
+/* ---- start-up ---- */
+{
+  const th = recall('theme', null); if (th) document.documentElement.dataset.theme = th;
+  Object.assign(state.opt, recall('opt', {}));
+  readTheme();
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { readTheme(); requestDraw(); });
+  new ResizeObserver(resize).observe(cv);
+  resize();
+  loadText(SAMPLE, 'sample.std');
+  banner('Showing a built-in sample. Open or drop your own .std file to view it.', 9000);
+}
+</script>
+</body>
+</html>
