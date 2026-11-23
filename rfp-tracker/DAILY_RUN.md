@@ -47,12 +47,24 @@ finish it, or report plainly what stopped you.
 7. **Save.** Commit everything changed under `rfp-tracker/` with the message `RFP tracker: daily update YYYY-MM-DD`
    and push to the task's branch.
 
-8. **Brief.** End with the update itself, short enough to read on a phone:
-   - **Approach today:** up to five rows: who, which opportunity, why now, what to offer;
-   - **New on the market:** each new opportunity in one line: client, package, stage, value, firms named, source link;
-   - **Moved:** stage changes and newly named bidders or winners;
-   - **Hiring signals:** firms advertising bid or engineering roles for ADNOC work;
-   - **Coming up:** forward-look items;
-   - **Problems:** any source that failed, and anything left undone.
+8. **Write the report.** Create a new Claude Doc titled `ADNOC Enquiry Report — <day month year>`, modelled on the
+   first report (https://claude.ai/artifact/Rx7o3oywdwyQ8RnS6SZisb). Seven sections, in this order:
+   - **Summary:** what is new or has moved since yesterday, then the two or three things to do. If nothing changed,
+     say so in the first sentence.
+   - **Who to approach:** a table: when, who, for which opportunity, why now, what to offer, a people-search link.
+     Most urgent first, at most ten rows.
+   - **Live tenders and bids:** a table of every package out to tender or under evaluation: client, where it stands,
+     value, bidders known, source link.
+   - **Recent awards:** a table of awards in the last 30 days: winner, package, client, value, source, the opening for us.
+   - **Hiring signals:** a table of this week's adverts that name ADNOC work, with a link to each advert.
+   - **Forward look:** a table of plans and tender programmes that come before an enquiry.
+   - **Sources, confidence and gaps:** what was read, what failed today, which entries are weakest, and the link to
+     `rfp-tracker/digests/latest.md` on the branch.
 
-   If nothing changed, say so in one line. Close with the link to `rfp-tracker/digests/latest.md` on the branch.
+   Mark rows that are new or changed today with "New" at the start of the first cell. Every row carries its source:
+   a link where the register holds a direct one, otherwise the publisher and date. Write for a reader deciding who
+   to call: names, dates and values, no padding.
+
+9. **Notify.** Send one push notification under 200 characters that leads with the day's top action, for example
+   "ADNOC report: Bab Gas Cap bidders named, approach Saipem this week. 1 new tender." Then end with a two-line
+   message: the report's title as a link, and anything that failed.
