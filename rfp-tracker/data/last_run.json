@@ -1,0 +1,169 @@
+{
+ "date": "2026-11-23",
+ "digest": "digests/2026-11-23.md",
+ "new_opportunities": [
+  {
+   "filed": true,
+   "id": "p-bab-gas-cap-development",
+   "name": "Bab Gas Cap development",
+   "stage": "bid_evaluation"
+  },
+  {
+   "filed": true,
+   "id": "p-rumaitha-shanayel-rums-field-facilities",
+   "name": "Rumaitha & Shanayel (RUMS) field facilities",
+   "stage": "tender"
+  },
+  {
+   "filed": true,
+   "id": "p-borouge-ethane-cracker-expansion-eu2-eu3",
+   "name": "Borouge ethane cracker expansion (EU2 / EU3)",
+   "stage": "tender"
+  },
+  {
+   "filed": true,
+   "id": "p-bu-hasa-enhanced-oil-recovery-eor",
+   "name": "Bu Hasa enhanced oil recovery (EOR)",
+   "stage": "bid_evaluation"
+  },
+  {
+   "filed": true,
+   "id": "p-north-east-bab-neb-facilities-upgrade",
+   "name": "North East Bab (NEB) facilities upgrade",
+   "stage": "awarded"
+  },
+  {
+   "filed": true,
+   "id": "p-ruwais-diyab-unconventional-gas-development",
+   "name": "Ruwais Diyab unconventional gas development",
+   "stage": "awarded"
+  },
+  {
+   "filed": true,
+   "id": "p-sarb-umm-lulu",
+   "name": "SARB & Umm Lulu",
+   "stage": "tender"
+  },
+  {
+   "filed": true,
+   "id": "p-habshan-gas-complex-incl-carbon-capture",
+   "name": "Habshan gas complex (incl. carbon capture)",
+   "stage": "execution"
+  },
+  {
+   "filed": true,
+   "id": "p-bab-gas-cap-well-tie-ins",
+   "name": "Bab Gas Cap well tie-ins",
+   "stage": "tender"
+  },
+  {
+   "filed": false,
+   "id": "s-b9df893a0aa1",
+   "name": "$8 billion-plus Adnoc Gas project reaches key bid milestone",
+   "stage": "tender"
+  },
+  {
+   "filed": false,
+   "id": "s-72f4370f5f9d",
+   "name": "Local firm wins Adnoc Gas project detailed engineering works",
+   "stage": "awarded"
+  },
+  {
+   "filed": true,
+   "id": "p-bu-hasa-field-development",
+   "name": "Bu Hasa field development",
+   "stage": "awarded"
+  },
+  {
+   "filed": false,
+   "id": "s-599ea85ff274",
+   "name": "Adnoc poised to launch multiple tenders for offshore megaproject",
+   "stage": "tender"
+  },
+  {
+   "filed": false,
+   "id": "s-8db0752df847",
+   "name": "Adnoc prepares new wave of oil and gas tenders for 2027",
+   "stage": "tender"
+  },
+  {
+   "filed": true,
+   "id": "p-umm-shaif-field-development",
+   "name": "Umm Shaif field development",
+   "stage": ""
+  },
+  {
+   "filed": false,
+   "id": "s-e4755dd249f0",
+   "name": "ADNOC LNG: 3 teams vie for UAE plant",
+   "stage": "tender"
+  },
+  {
+   "filed": false,
+   "id": "s-c14f9d1f3f09",
+   "name": "ADNOC promises 40 percent shorter tenders and reveals what it will buy in 2027 and 2028",
+   "stage": "tender"
+  },
+  {
+   "filed": false,
+   "id": "s-70f74145d929",
+   "name": "Adnoc Onshore to upgrade existing oil fields",
+   "stage": "planned"
+  },
+  {
+   "filed": false,
+   "id": "s-48b809a704c4",
+   "name": "Mannesmann Energy plans ADNOC facility upgrade project, two UAE representation agreements",
+   "stage": "planned"
+  },
+  {
+   "filed": false,
+   "id": "s-146ad6ceb4f8",
+   "name": "ADNOC Approves Major UAE Gas Development to Boost Domestic Supply",
+   "stage": "planned"
+  },
+  {
+   "filed": false,
+   "id": "s-cfc6bf42c4be",
+   "name": "Mannesmann Energy unveils new ADNOC project, planned agreements at ADIPEC 2026 | Emirates News Agency",
+   "stage": "planned"
+  }
+ ],
+ "newly_named_firms": [],
+ "opportunities_active": 21,
+ "signals_new": 75,
+ "signals_total": 75,
+ "source_health": {
+  "bing-news": {
+   "errors": [],
+   "items": 87,
+   "kept": 17,
+   "ok": 8,
+   "requests": 8
+  },
+  "google-news": {
+   "errors": [],
+   "items": 545,
+   "kept": 47,
+   "ok": 18,
+   "requests": 18
+  },
+  "inbox": {
+   "errors": [],
+   "items": 4,
+   "kept": 4,
+   "ok": 1,
+   "requests": 1
+  },
+  "linkedin-jobs": {
+   "adverts_listed": 92,
+   "adverts_read": 30,
+   "errors": [],
+   "items": 9,
+   "kept": 9,
+   "ok": 42,
+   "requests": 42
+  }
+ },
+ "stage_changes": []
+}

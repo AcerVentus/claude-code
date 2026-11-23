@@ -1,0 +1,52 @@
+[
+  {
+    "kind": "research",
+    "title": "Bab Gas Cap main plant (EPC package 1): technical bids in on 16 November, four consortiums reported",
+    "project": "Bab Gas Cap development",
+    "client": "ADNOC Gas",
+    "stage": "bid_evaluation",
+    "contract_type": "EPC",
+    "value_usd": 8000000000,
+    "publisher": "MEED / Construction Review (read from search summaries)",
+    "url": "https://www.meed.com/contractors-submit-technical-bids-for-bab-gas-cap-project",
+    "published": "2026-11-17",
+    "note": "Research 23 Nov: the bid deadline was extended four months to 16 Nov 2026. Package 1 is the largest of four EPC packages. Construction Review reports four consortiums bidding but the names are not in free sources; MEED reported a Tecnimont and CPECC team forming earlier (unconfirmed for this package). The named list is in MEED's paid article."
+  },
+  {
+    "kind": "research",
+    "title": "Rumaitha and Shanayel field facilities: about $1.2bn EPC, contractors preparing commercial bids",
+    "project": "Rumaitha & Shanayel (RUMS) field facilities",
+    "client": "ADNOC Onshore",
+    "stage": "tender",
+    "contract_type": "EPC",
+    "value_usd": 1200000000,
+    "publisher": "MEED / Construction Review (read from search summaries)",
+    "url": "https://www.meed.com/contractors-prepare-bids-for-adnoc-onshore-field-facilities-project",
+    "published": "2026-11-18",
+    "note": "Research 23 Nov: main EPC tender issued 19 June 2026, technical bids in August, commercial bids being prepared since October and extended again in November. Scope is on-plot and off-plot facilities to hold output at 45,000 b/d. Bidders are not named in free sources."
+  },
+  {
+    "kind": "research",
+    "title": "Bu Hasa-Shuaiba EOR unit 1: hybrid lump-sum EPC tender, technical bids reported submitted",
+    "project": "Bu Hasa enhanced oil recovery (EOR)",
+    "client": "ADNOC Onshore",
+    "stage": "bid_evaluation",
+    "contract_type": "EPC",
+    "publisher": "MEED / Construction Review (read from search summaries)",
+    "url": "https://www.meed.com/adnoc-onshore-seeks-bids-for-bu-hasa-field-eor-project",
+    "published": "2026-11-11",
+    "note": "Research 23 Nov: MEED confirms the tender (October 2026). Technical-bid status comes from one secondary source. Scope includes a turnkey pipeline package (East Hub) plus call-off water-alternating-gas work. No bidders named in free sources. Separate from Jereh's $392m Bu Hasa facilities award."
+  },
+  {
+    "kind": "research",
+    "title": "Borouge EU2 cracker expansion: FEED by Linde complete, EPC tender being prepared; EU3 at pre-FEED",
+    "project": "Borouge ethane cracker expansion (EU2 / EU3)",
+    "client": "Borouge",
+    "stage": "tender",
+    "contract_type": "EPC",
+    "publisher": "MEED / Zawya / SaudiGulf Projects (read from search summaries)",
+    "url": "https://www.meed.com/borouge-prepares-to-tender-ethane-cracker-construction-works",
+    "published": "2026-11-13",
+    "note": "Research 23 Nov: Linde did the EU2 FEED and holds a letter of award for EU3 pre-FEED, so an EU3 FEED enquiry should follow. No EPC bidders named yet. For reference, Borouge's shelved butene-1 EPC tender drew Descon, Galfar and Target Engineering."
+  }
+]

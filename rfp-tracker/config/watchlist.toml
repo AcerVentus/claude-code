@@ -1,0 +1,630 @@
+# Watchlist: who and what the tracker recognises in a headline, snippet or job advert.
+#
+# Alias syntax
+#   "Plain text"   matched as a whole word or phrase, ignoring case
+#   "cs:Wood"      the same, but case-sensitive (for short or ambiguous names)
+#   "re:<regex>"   a raw Python regular expression (ignoring case)
+#
+# After editing, run:  python3 -m rfp_tracker rebuild
+# The register is rebuilt from data/signals.jsonl, so new aliases also apply to past signals.
+
+# ---------------------------------------------------------------------------
+# Clients: the ADNOC group. `weight` is added to a signal's relevance score.
+# ---------------------------------------------------------------------------
+
+[[client]]
+name = "ADNOC Onshore"
+aliases = ["ADNOC Onshore", "cs:ADCO"]
+weight = 10
+
+[[client]]
+name = "ADNOC Offshore"
+aliases = ["ADNOC Offshore", "cs:ADMA-OPCO", "cs:ZADCO"]
+weight = 10
+
+[[client]]
+name = "ADNOC Gas"
+aliases = ["ADNOC Gas", "ADNOC Gas Processing", "cs:GASCO"]
+weight = 10
+
+[[client]]
+name = "ADNOC LNG"
+aliases = ["ADNOC LNG", "Ruwais LNG"]
+weight = 8
+
+[[client]]
+name = "ADNOC Sour Gas"
+aliases = ["ADNOC Sour Gas", "Al Hosn Gas"]
+weight = 10
+
+[[client]]
+name = "ADNOC Refining"
+aliases = ["ADNOC Refining", "cs:Takreer"]
+weight = 10
+
+[[client]]
+name = "Borouge"
+aliases = ["Borouge", "Borouge Group International", "cs:BGI"]
+weight = 8
+
+[[client]]
+name = "TA'ZIZ"
+aliases = ["TA'ZIZ", "Taziz", "Ta'ziz"]
+weight = 8
+
+[[client]]
+name = "Fertiglobe"
+aliases = ["Fertiglobe", "Fertil"]
+weight = 4
+
+[[client]]
+name = "Al Yasat Petroleum"
+aliases = ["Al Yasat"]
+weight = 8
+
+[[client]]
+name = "Al Dhafra Petroleum"
+aliases = ["Al Dhafra Petroleum"]
+weight = 8
+
+[[client]]
+name = "ADNOC Drilling"
+aliases = ["ADNOC Drilling"]
+weight = -10
+
+[[client]]
+name = "ADNOC Logistics & Services"
+aliases = ["ADNOC L&S", "ADNOC Logistics", "ADNOC Logistics & Services", "ADNOC Logistics and Services"]
+weight = -5
+
+[[client]]
+name = "ADNOC Distribution"
+aliases = ["ADNOC Distribution"]
+weight = -25
+
+[[client]]
+name = "XRG"
+aliases = ["cs:XRG"]
+weight = -10
+
+# Matched last: any other mention of the group.
+[[client]]
+name = "ADNOC (Group)"
+aliases = ["ADNOC", "Abu Dhabi National Oil Company", "Abu Dhabi National Oil Co"]
+weight = 0
+generic = true
+
+# ---------------------------------------------------------------------------
+# Projects: named developments. A signal that matches an alias is filed under
+# the project, whatever the headline wording. Add one whenever a new name shows
+# up in the digest's "Unfiled" opportunities.
+# ---------------------------------------------------------------------------
+
+# List a specific package above its parent project: the first match wins.
+[[project]]
+name = "Bab Gas Cap well tie-ins"
+client = "ADNOC Onshore"
+aliases = ["re:Bab gas cap well tie-?ins?", "re:well tie-?ins? (project|package|bids)"]
+
+[[project]]
+name = "Bu Hasa enhanced oil recovery (EOR)"
+client = "ADNOC Onshore"
+aliases = ["Bu Hasa EOR", "Bu Hasa oil recovery", "re:Bu Hasa.Shuaiba", "re:Bu Hasa .{0,20}EOR"]
+
+[[project]]
+name = "Ruwais Diyab unconventional gas development"
+client = "ADNOC Onshore"
+aliases = ["Diyab"]
+
+[[project]]
+name = "Borouge ethane cracker expansion (EU2 / EU3)"
+client = "Borouge"
+aliases = ["ethane cracker", "cs:EU2", "cs:EU3"]
+
+[[project]]
+name = "West-East pipeline"
+client = "ADNOC Onshore"
+aliases = ["West-East Pipeline", "West East Pipeline", "re:west.to.east (crude |oil )?pipeline"]
+
+[[project]]
+name = "Bab Gas Cap development"
+client = "ADNOC Gas"
+aliases = ["Bab Gas Cap"]
+
+[[project]]
+name = "North East Bab (NEB) facilities upgrade"
+client = "ADNOC Onshore"
+aliases = ["cs:NEB", "North East Bab", "Northeast Bab", "North-East Bab"]
+
+[[project]]
+name = "Rumaitha & Shanayel (RUMS) field facilities"
+client = "ADNOC Onshore"
+aliases = ["Rumaitha", "Shanayel", "cs:RUMS"]
+
+[[project]]
+name = "Hail & Ghasha sour gas development"
+client = "ADNOC Offshore"
+aliases = ["Hail and Ghasha", "Hail & Ghasha", "Hail-Ghasha", "Ghasha concession", "Ghasha"]
+
+[[project]]
+name = "Ruwais LNG"
+client = "ADNOC LNG"
+aliases = ["Ruwais LNG"]
+
+[[project]]
+name = "Upper Zakum expansion"
+client = "ADNOC Offshore"
+aliases = ["Upper Zakum", "cs:UZ750", "re:UZ\\s?1(\\.2|\\.5)?\\s?MM"]
+
+[[project]]
+name = "Lower Zakum long-term development"
+client = "ADNOC Offshore"
+aliases = ["Lower Zakum", "cs:LZ LTDP", "cs:LTDP-1"]
+
+[[project]]
+name = "Umm Shaif field development"
+client = "ADNOC Offshore"
+aliases = ["Umm Shaif"]
+
+[[project]]
+name = "Dalma gas development"
+client = "ADNOC Offshore"
+aliases = ["Dalma gas", "Dalma field", "Dalma development"]
+
+[[project]]
+name = "SARB & Umm Lulu"
+client = "ADNOC Offshore"
+aliases = ["Satah Al Razboot", "cs:SARB", "Umm Lulu"]
+
+[[project]]
+name = "Nasr field development"
+client = "ADNOC Offshore"
+aliases = ["Nasr field", "Nasr full field", "Nasr-115", "Nasr 115"]
+
+[[project]]
+name = "Belbazem development"
+client = "Al Yasat Petroleum"
+aliases = ["Belbazem"]
+
+[[project]]
+name = "Bu Hasa field development"
+client = "ADNOC Onshore"
+aliases = ["Bu Hasa"]
+
+[[project]]
+name = "Asab / Sahil / Shah (SAS) fields"
+client = "ADNOC Onshore"
+aliases = ["Asab field", "Sahil field", "Shah field", "Asab full field"]
+
+[[project]]
+name = "Shah gas expansion"
+client = "ADNOC Sour Gas"
+aliases = ["Shah gas", "Shah sour gas", "Optimum Shah Gas Expansion", "cs:OSGE"]
+
+[[project]]
+name = "Habshan gas complex (incl. carbon capture)"
+client = "ADNOC Gas"
+aliases = ["Habshan"]
+
+[[project]]
+name = "MERAM (maximising ethane recovery)"
+client = "ADNOC Gas"
+aliases = ["cs:MERAM", "Maximising Ethane Recovery", "Maximizing Ethane Recovery"]
+
+[[project]]
+name = "Rich Gas Development (RGD)"
+client = "ADNOC Gas"
+aliases = ["Rich Gas Development", "cs:RGD"]
+
+[[project]]
+name = "Estidama gas pipeline network"
+client = "ADNOC Gas"
+aliases = ["Estidama", "sales gas pipeline network"]
+
+[[project]]
+name = "Das Island facilities"
+client = "ADNOC Offshore"
+aliases = ["Das Island"]
+
+[[project]]
+name = "Zirku Island facilities"
+client = "ADNOC Offshore"
+aliases = ["Zirku"]
+
+[[project]]
+name = "Ruwais refinery projects"
+client = "ADNOC Refining"
+aliases = ["Ruwais refinery", "Ruwais Refinery West", "Crude Flexibility Project"]
+
+[[project]]
+name = "Borouge 4 / Borouge expansion"
+client = "Borouge"
+aliases = ["Borouge 4", "Borouge 5", "Borouge-4"]
+
+[[project]]
+name = "TA'ZIZ chemicals complex"
+client = "TA'ZIZ"
+aliases = ["TA'ZIZ", "Taziz", "Ta'ziz"]
+
+[[project]]
+name = "Project Lightning (offshore power, HVDC)"
+client = "ADNOC Offshore"
+aliases = ["Project Lightning", "re:subsea (HVDC|transmission)"]
+
+[[project]]
+name = "Jebel Dhanna / Fujairah terminals and crude pipelines"
+client = "ADNOC Onshore"
+aliases = ["Jebel Dhanna", "Fujairah terminal", "cs:ADCOP", "Habshan-Fujairah"]
+
+[[project]]
+name = "Al Nouf seawater treatment"
+client = "ADNOC Onshore"
+aliases = ["Al Nouf", "Mirfa seawater"]
+
+[[project]]
+name = "Qusahwira / Mender / south-east fields"
+client = "ADNOC Onshore"
+aliases = ["Qusahwira", "Mender field"]
+
+[[project]]
+name = "Al Dabb'iya / Rumaitha north-west fields"
+client = "ADNOC Onshore"
+aliases = ["Dabb'iya", "Dabbiya", "Al Dabbiya"]
+
+[[project]]
+name = "Bu Haseer / Al Yasat offshore"
+client = "Al Yasat Petroleum"
+aliases = ["Bu Haseer"]
+
+[[project]]
+name = "Haliba field"
+client = "Al Dhafra Petroleum"
+aliases = ["Haliba"]
+
+# ---------------------------------------------------------------------------
+# Contractors and consultants. `type` drives the approach advice:
+#   epc         main contractors that bid ADNOC EPC packages -> potential clients for us
+#   consultant  international engineering houses (FEED / PMC) -> teaming partners or rivals
+#   peer        local engineering consultancies -> direct competitors
+#   vendor      equipment and service suppliers -> low relevance, kept for context
+# ---------------------------------------------------------------------------
+
+[[contractor]]
+name = "NMDC Energy (NPCC)"
+type = "epc"
+aliases = ["NMDC Energy", "cs:NPCC", "National Petroleum Construction Company", "cs:NMDC"]
+
+[[contractor]]
+name = "Petrofac"
+type = "epc"
+aliases = ["Petrofac"]
+
+[[contractor]]
+name = "Saipem"
+type = "epc"
+aliases = ["Saipem"]
+
+[[contractor]]
+name = "Technip Energies"
+type = "epc"
+aliases = ["Technip Energies"]
+
+[[contractor]]
+name = "TechnipFMC"
+type = "epc"
+aliases = ["TechnipFMC"]
+
+[[contractor]]
+name = "Tecnicas Reunidas"
+type = "epc"
+aliases = ["Tecnicas Reunidas", "Técnicas Reunidas"]
+
+[[contractor]]
+name = "Larsen & Toubro"
+type = "epc"
+aliases = ["Larsen & Toubro", "Larsen and Toubro", "cs:L&T", "cs:LTEH"]
+
+[[contractor]]
+name = "Samsung E&A"
+type = "epc"
+aliases = ["Samsung E&A", "Samsung Engineering"]
+
+[[contractor]]
+name = "Hyundai E&C"
+type = "epc"
+aliases = ["Hyundai E&C", "Hyundai Engineering", "Hyundai Engineering & Construction"]
+
+[[contractor]]
+name = "JGC"
+type = "epc"
+aliases = ["cs:JGC"]
+
+[[contractor]]
+name = "McDermott"
+type = "epc"
+aliases = ["McDermott"]
+
+[[contractor]]
+name = "Maire Tecnimont"
+type = "epc"
+aliases = ["Tecnimont", "cs:Maire", "cs:MAIRE", "cs:NextChem", "cs:KT - Kinetics"]
+
+[[contractor]]
+name = "Target Engineering"
+type = "epc"
+aliases = ["Target Engineering"]
+
+[[contractor]]
+name = "Galfar"
+type = "epc"
+aliases = ["Galfar"]
+
+[[contractor]]
+name = "CPECC"
+type = "epc"
+aliases = ["cs:CPECC", "China Petroleum Engineering"]
+
+[[contractor]]
+name = "Sinopec Engineering"
+type = "epc"
+aliases = ["Sinopec Engineering", "cs:SEG", "Sinopec"]
+
+[[contractor]]
+name = "Wison Engineering"
+type = "epc"
+aliases = ["Wison"]
+
+[[contractor]]
+name = "COOEC"
+type = "epc"
+aliases = ["cs:COOEC", "China Offshore Oil Engineering"]
+
+[[contractor]]
+name = "Consolidated Contractors Company (CCC)"
+type = "epc"
+aliases = ["Consolidated Contractors", "cs:CCC"]
+
+[[contractor]]
+name = "Archirodon"
+type = "epc"
+aliases = ["Archirodon"]
+
+[[contractor]]
+name = "Lamprell"
+type = "epc"
+aliases = ["Lamprell"]
+
+[[contractor]]
+name = "Kentech"
+type = "epc"
+aliases = ["Kentech", "Kent plc"]
+
+[[contractor]]
+name = "Dodsal"
+type = "epc"
+aliases = ["Dodsal"]
+
+[[contractor]]
+name = "Robt Stone"
+type = "epc"
+aliases = ["Robt Stone", "Robert Stone", "Robt. Stone"]
+
+[[contractor]]
+name = "Al Asab General Contracting"
+type = "epc"
+aliases = ["Al Asab General", "Al Asab Contracting"]
+
+[[contractor]]
+name = "Mannesmann Energy"
+type = "epc"
+aliases = ["Mannesmann"]
+
+[[contractor]]
+name = "Jereh"
+type = "epc"
+aliases = ["Jereh"]
+
+[[contractor]]
+name = "Linde Engineering"
+type = "epc"
+aliases = ["Linde"]
+
+[[contractor]]
+name = "ENPPI"
+type = "epc"
+aliases = ["cs:ENPPI", "cs:Enppi"]
+
+[[contractor]]
+name = "Petrojet"
+type = "epc"
+aliases = ["Petrojet"]
+
+[[contractor]]
+name = "Daewoo E&C"
+type = "epc"
+aliases = ["Daewoo E&C", "Daewoo Engineering"]
+
+[[contractor]]
+name = "GS E&C"
+type = "epc"
+aliases = ["GS E&C", "GS Engineering"]
+
+[[contractor]]
+name = "Kalpataru"
+type = "epc"
+aliases = ["Kalpataru"]
+
+[[contractor]]
+name = "Subsea7"
+type = "epc"
+aliases = ["Subsea7", "Subsea 7"]
+
+[[contractor]]
+name = "Descon"
+type = "epc"
+aliases = ["Descon"]
+
+[[contractor]]
+name = "Al Jaber Group"
+type = "epc"
+aliases = ["Al Jaber Energy", "Al Jaber Group", "cs:AJES"]
+
+[[contractor]]
+name = "Trojan Construction"
+type = "epc"
+aliases = ["Trojan Construction", "Trojan General Contracting"]
+
+[[contractor]]
+name = "Chiyoda"
+type = "epc"
+aliases = ["Chiyoda"]
+
+[[contractor]]
+name = "Elsewedy Electric"
+type = "epc"
+aliases = ["Elsewedy", "El Sewedy"]
+
+[[contractor]]
+name = "Gulf Marine / Seatrium"
+type = "epc"
+aliases = ["Seatrium"]
+
+[[contractor]]
+name = "Altrad / Sparrows"
+type = "vendor"
+aliases = ["Altrad"]
+
+[[contractor]]
+name = "Worley"
+type = "consultant"
+aliases = ["Worley", "WorleyParsons"]
+
+[[contractor]]
+name = "Wood"
+type = "consultant"
+aliases = ["re:(?-i:\\bWood\\b(?! Mackenzie)(?=\\s+(plc|Group|wins|secures|awarded|lands|bags|to |has |is |and ADNOC)|['’]s))", "John Wood Group", "Wood plc"]
+
+[[contractor]]
+name = "KBR"
+type = "consultant"
+aliases = ["cs:KBR"]
+
+[[contractor]]
+name = "Kent"
+type = "consultant"
+aliases = ["re:(?-i:\\bKent\\b(?=\\s+(plc|wins|secures|awarded|lands|bags|to |has |is )))"]
+
+[[contractor]]
+name = "Penspen"
+type = "consultant"
+aliases = ["Penspen"]
+
+[[contractor]]
+name = "Mott MacDonald"
+type = "consultant"
+aliases = ["Mott MacDonald"]
+
+[[contractor]]
+name = "Fluor"
+type = "consultant"
+aliases = ["Fluor"]
+
+[[contractor]]
+name = "Bechtel"
+type = "consultant"
+aliases = ["Bechtel"]
+
+[[contractor]]
+name = "AtkinsRéalis"
+type = "consultant"
+aliases = ["AtkinsRéalis", "AtkinsRealis", "SNC-Lavalin", "cs:Atkins"]
+
+[[contractor]]
+name = "ILF Consulting Engineers"
+type = "consultant"
+aliases = ["cs:ILF"]
+
+[[contractor]]
+name = "Genesis"
+type = "consultant"
+aliases = ["Genesis Oil and Gas", "Genesis Energies"]
+
+[[contractor]]
+name = "Bilfinger Tebodin"
+type = "consultant"
+aliases = ["Tebodin", "Bilfinger"]
+
+[[contractor]]
+name = "Rejlers"
+type = "consultant"
+aliases = ["Rejlers"]
+
+[[contractor]]
+name = "Jacobs"
+type = "consultant"
+aliases = ["Jacobs Engineering", "Jacobs Solutions"]
+
+[[contractor]]
+name = "AECOM"
+type = "consultant"
+aliases = ["cs:AECOM"]
+
+[[contractor]]
+name = "Xodus"
+type = "consultant"
+aliases = ["Xodus"]
+
+[[contractor]]
+name = "DNV"
+type = "consultant"
+aliases = ["cs:DNV"]
+
+[[contractor]]
+name = "Ramboll"
+type = "consultant"
+aliases = ["Ramboll"]
+
+[[contractor]]
+name = "Makamin"
+type = "peer"
+aliases = ["Makamin"]
+
+[[contractor]]
+name = "Velimor"
+type = "peer"
+aliases = ["Velimor"]
+
+[[contractor]]
+name = "Petroka"
+type = "peer"
+aliases = ["Petroka"]
+
+[[contractor]]
+name = "Avenir International Engineers & Consultants"
+type = "peer"
+aliases = ["Avenir International", "Avenir Engineering"]
+
+[[contractor]]
+name = "Bridgers Consultants & Engineers"
+type = "peer"
+aliases = ["Bridgers"]
+
+[[contractor]]
+name = "Baker Hughes"
+type = "vendor"
+aliases = ["Baker Hughes"]
+
+[[contractor]]
+name = "SLB"
+type = "vendor"
+aliases = ["cs:SLB", "Schlumberger"]
+
+[[contractor]]
+name = "Halliburton"
+type = "vendor"
+aliases = ["Halliburton"]
+
+[[contractor]]
+name = "Siemens Energy"
+type = "vendor"
+aliases = ["Siemens Energy"]

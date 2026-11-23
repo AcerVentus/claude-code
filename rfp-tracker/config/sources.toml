@@ -1,0 +1,72 @@
+# Where the tracker looks each day. Every source is public and read without signing in.
+
+[news]
+enabled = true
+# How many days back each daily run asks for. Overlap is harmless: seen items are skipped.
+lookback_days = 3
+# Seconds to wait between requests to the same aggregator.
+delay_seconds = 2
+
+# Google News search feeds. `when:<N>d` is appended automatically.
+google_queries = [
+  'ADNOC (tender OR tenders OR bids OR bidders OR bid OR prequalification)',
+  'ADNOC (EPC OR FEED OR "pre-FEED" OR PMC) contract',
+  'ADNOC (awards OR awarded OR wins OR secures OR "letter of award") contract',
+  '"ADNOC Onshore" (contract OR tender OR bids OR project)',
+  '"ADNOC Offshore" (contract OR tender OR bids OR project)',
+  '"ADNOC Gas" (contract OR tender OR bids OR project)',
+  '("ADNOC Refining" OR Borouge OR Taziz OR "ADNOC Sour Gas") (contract OR tender OR EPC OR FEED)',
+  '("Al Yasat" OR "Al Dhafra Petroleum" OR "ADNOC LNG" OR "Ruwais LNG") (contract OR tender OR EPC OR FEED)',
+  'ADNOC (Petrofac OR Saipem OR NMDC OR NPCC OR "Technip Energies" OR "Tecnicas Reunidas" OR "Larsen" OR "Samsung E&A" OR McDermott) contract',
+  'ADNOC (Worley OR "Wood plc" OR KBR OR Kent OR Penspen OR Fluor OR "Mott MacDonald") (FEED OR PMC OR engineering OR consultancy)',
+  '"Abu Dhabi" (FEED OR "pre-FEED" OR PMC OR "detailed engineering") (oil OR gas OR petrochemical) contract',
+  'ADNOC site:meed.com',
+  'ADNOC site:oilandgasmiddleeast.com',
+  'ADNOC site:upstreamonline.com',
+  'ADNOC contract site:zawya.com',
+  'ADNOC site:agbi.com',
+  'ADNOC contract site:tradearabia.com',
+  'ADNOC site:energyvoice.com',
+]
+
+# Bing News search feeds. These carry a short summary, which often names bidders.
+bing_queries = [
+  'ADNOC EPC tender',
+  'ADNOC bids submitted contractors',
+  'ADNOC FEED contract award',
+  'ADNOC Onshore contract',
+  'ADNOC Offshore contract',
+  'ADNOC Gas contract',
+  'Borouge OR Taziz OR "ADNOC Refining" EPC contract',
+  'ADNOC PMC OR "engineering services" contract',
+]
+
+[linkedin]
+# Public job search, as shown to a signed-out visitor. No sign-in, no profiles.
+enabled = true
+location = "United Arab Emirates"
+# r86400 = past 24 hours, r604800 = past week, r2592000 = past month
+posted_within = "r604800"
+# Result pages per query (10 adverts per page).
+pages_per_query = 2
+# Adverts opened in full per run, newest first. Keeps the run short and polite.
+max_details_per_run = 30
+# The LinkedIn pass stops opening adverts after this many minutes; the rest wait for the next run.
+max_minutes = 8
+delay_seconds = 6
+# Waits (seconds) when LinkedIn answers "too many requests"; after the last one the source stops for the day.
+retry_waits = [30, 60]
+queries = [
+  '"ADNOC" (proposal OR proposals OR tendering OR estimation OR bid) engineer',
+  '"ADNOC" FEED engineer',
+  '"ADNOC" PMC engineer',
+  '"ADNOC" "detailed engineering"',
+  '"ADNOC" (lead OR principal) (process OR piping OR mechanical OR electrical OR instrument OR structural OR pipeline) engineer',
+  '"ADNOC" project engineering manager',
+]
+# Adverts posted by these employers are skipped: the client hiring its own staff is not an enquiry.
+skip_employers = ["ADNOC", "Borouge", "Fertiglobe", "TA'ZIZ", "XRG"]
+
+[inbox]
+# Leads you (or the daily research pass) drop into rfp-tracker/inbox/. See inbox/README.md.
+enabled = true

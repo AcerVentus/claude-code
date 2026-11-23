@@ -1,0 +1,26 @@
+# Your consultancy. Edit this: it shapes scoring and the wording of approach advice.
+
+company = "Our consultancy"
+base = "Abu Dhabi"
+
+# What you sell. Used in the suggested pitch for each approach.
+services = [
+  "FEED and pre-FEED",
+  "detailed engineering",
+  "bid-phase engineering support for EPC proposals",
+  "PMC and owner's engineer support",
+  "technical safety and specialist studies",
+  "seconded engineers",
+]
+
+# Sectors you want more of (+score) or do not serve (-score).
+# Tags: offshore, onshore, gas, refining_petchem, pipelines, carbon, hydrogen, power_water, brownfield
+focus_sectors = ["onshore", "offshore", "gas", "refining_petchem", "pipelines", "brownfield"]
+avoid_sectors = []
+
+# Contract types you can prime yourself (bid direct to the ADNOC company).
+# Types: pre-FEED, FEED, PMC, engineering, EPC, EPCM, framework, supply, services
+prime_types = ["pre-FEED", "FEED", "PMC", "engineering", "framework"]
+
+# Signals scoring below this are not kept. Raise it for a quieter digest.
+min_score = 45
