@@ -254,7 +254,7 @@ aliases = ["Project Lightning", "re:subsea (HVDC|transmission)"]
 [[project]]
 name = "Jebel Dhanna / Fujairah terminals and crude pipelines"
 client = "ADNOC Onshore"
-aliases = ["Jebel Dhanna", "Fujairah terminal", "cs:ADCOP", "Habshan-Fujairah"]
+aliases = ["Jebel Dhanna", "Fujairah oil terminal", "ADNOC Fujairah", "cs:ADCOP", "Habshan-Fujairah"]
 
 [[project]]
 name = "Al Nouf seawater treatment"

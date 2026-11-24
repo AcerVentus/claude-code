@@ -1,0 +1,1035 @@
+[
+ {
+  "also": [],
+  "approach": {
+   "notes": [
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Gas work: Wison Engineering."
+   ],
+   "targets": []
+  },
+  "client": "ADNOC Gas",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-17",
+  "headline": "Bab Gas Cap main plant (EPC package 1): technical bids in on 16 November, four consortiums reported",
+  "id": "p-bab-gas-cap-development",
+  "last_found": "2026-11-23",
+  "last_published": "2026-11-18",
+  "name": "Bab Gas Cap development",
+  "notes": [
+   "Research 23 Nov: the bid deadline was extended four months to 16 Nov 2026. Package 1 is the largest of four EPC packages. Construction Review reports four consortiums bidding but the names are not in free sources; MEED reported a Tecnimont and CPECC team forming earlier (unconfirmed for this package). The named list is in MEED's paid article."
+  ],
+  "outlook": false,
+  "parties": {},
+  "priority": "High",
+  "score": 166,
+  "sectors": [
+   "gas",
+   "onshore"
+  ],
+  "signal_ids": [
+   "m-66a78399a5f4",
+   "n-435d2ef1bf22",
+   "n-eb848404879b",
+   "n-fb9b0ba1e90b",
+   "n-ac847052907a"
+  ],
+  "stage": "bid_evaluation",
+  "status": "active",
+  "value_usd": 8000000000.0
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Onshore work: Mannesmann Energy, Jereh."
+   ],
+   "targets": []
+  },
+  "client": "ADNOC Onshore",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-17",
+  "headline": "Rumaitha and Shanayel field facilities: about $1.2bn EPC, contractors preparing commercial bids",
+  "id": "p-rumaitha-shanayel-rums-field-facilities",
+  "last_found": "2026-11-23",
+  "last_published": "2026-11-18",
+  "name": "Rumaitha & Shanayel (RUMS) field facilities",
+  "notes": [
+   "Research 23 Nov: main EPC tender issued 19 June 2026, technical bids in August, commercial bids being prepared since October and extended again in November. Scope is on-plot and off-plot facilities to hold output at 45,000 b/d. Bidders are not named in free sources."
+  ],
+  "outlook": false,
+  "parties": {},
+  "priority": "High",
+  "score": 164,
+  "sectors": [
+   "onshore"
+  ],
+  "signal_ids": [
+   "n-92a2e496ede3",
+   "m-076534b9db82",
+   "n-04ac65af68db"
+  ],
+  "stage": "tender",
+  "status": "active",
+  "value_usd": 1200000000.0
+ },
+ {
+  "also": [
+   {
+    "date": "2026-11-06",
+    "headline": "Borouge International Taps Linde for EU2 Expansion and EU3 Cracker Upgrade",
+    "stage": "awarded",
+    "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxObHJKV2taa3VkUWhqcmRSTnVucFhoVWZ4S3pxUlRIcENmTFhsYzBMR0s3dVluUDgzekZxeHlDMHBrSm5ZS0ttWG5EQjhHejgzRUpUVjlfX3dXeFlJRndDQVNhNklFTVUxak1UdjJ5TjliSjZVdXhfMWkxazVCU2x3NkhnaTIxeTl4UG1VZVBUVDR5QkRybEk5NWxnYm5FbnhCUGEwd210TQ?oc=5"
+   }
+  ],
+  "approach": {
+   "notes": [
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step.",
+    "Forward look: this is advance notice of enquiries to come. Check which packages match your prequalification."
+   ],
+   "targets": [
+    {
+     "kind": "winner",
+     "links": [
+      {
+       "role": "Project Director",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Linde%20Engineering%22%20Project%20Director%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Linde%20Engineering%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Subcontracts Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Linde%20Engineering%22%20Subcontracts%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
+     "org": "Linde Engineering",
+     "roles": [
+      "Project Director",
+      "Engineering Manager",
+      "Subcontracts Manager"
+     ],
+     "urgency": 4,
+     "why": "Named on Borouge ethane cracker expansion (EU2 / EU3)."
+    }
+   ]
+  },
+  "client": "Borouge",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-06",
+  "headline": "Borouge EU2 cracker expansion: FEED by Linde complete, EPC tender being prepared; EU3 at pre-FEED",
+  "id": "p-borouge-ethane-cracker-expansion-eu2-eu3",
+  "last_found": "2026-11-23",
+  "last_published": "2026-11-15",
+  "name": "Borouge ethane cracker expansion (EU2 / EU3)",
+  "notes": [
+   "Research 23 Nov: Linde did the EU2 FEED and holds a letter of award for EU3 pre-FEED, so an EU3 FEED enquiry should follow. No EPC bidders named yet. For reference, Borouge's shelved butene-1 EPC tender drew Descon, Galfar and Target Engineering."
+  ],
+  "outlook": true,
+  "parties": {
+   "Linde Engineering": {
+    "evidence": [
+     "n-df6574bec535",
+     "m-d43c254355f9"
+    ],
+    "first_seen": "2026-11-06",
+    "last_seen": "2026-11-13",
+    "role": "winner",
+    "type": "epc"
+   }
+  },
+  "priority": "High",
+  "score": 159,
+  "sectors": [
+   "brownfield",
+   "gas",
+   "refining_petchem"
+  ],
+  "signal_ids": [
+   "n-df6574bec535",
+   "m-d43c254355f9",
+   "n-8689a2edb4d3",
+   "n-61cefbc3a530"
+  ],
+  "stage": "tender",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [
+   {
+    "date": "2026-11-04",
+    "headline": "$2bn+ Bu Hasa EOR Project Opens Bidding as ADNOC Onshore Targets 70 Percent Output Rise",
+    "stage": "tender",
+    "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxNa0FZRmtydy00aXB5c2Zzd19GbXRLX1ltazVwRHV0M2ZxV0w4WHRhLWdKb0l5VzgtMG9zMmtCeV9TSkZIcTlZb2Vtd2Y1SkJnQ25zTlE1WF80ZHltMnlkSnljRGhHeVBRSGNUZnk5bXVxc24xZmRRb1RTd1pSQTc5X21SNjVvbmNrTW1SajNwY3hIQndvYUZRV2daVGZBV0VCREpKejJNUndhT3ViTS04RWVNNWtTMVZ5dzkydzlNYmk?oc=5"
+   }
+  ],
+  "approach": {
+   "notes": [
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Onshore work: Mannesmann Energy, Jereh.",
+    "Another package is live (tender, 2026-11-04): $2bn+ Bu Hasa EOR Project Opens Bidding as ADNOC Onshore Targets 70 Percent Output Rise"
+   ],
+   "targets": []
+  },
+  "client": "ADNOC Onshore",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-03",
+  "headline": "Bu Hasa-Shuaiba EOR unit 1: hybrid lump-sum EPC tender, technical bids reported submitted",
+  "id": "p-bu-hasa-enhanced-oil-recovery-eor",
+  "last_found": "2026-11-23",
+  "last_published": "2026-11-11",
+  "name": "Bu Hasa enhanced oil recovery (EOR)",
+  "notes": [
+   "Research 23 Nov: MEED confirms the tender (October 2026). Technical-bid status comes from one secondary source. Scope includes a turnkey pipeline package (East Hub) plus call-off water-alternating-gas work. No bidders named in free sources. Separate from Jereh's $392m Bu Hasa facilities award."
+  ],
+  "outlook": false,
+  "parties": {},
+  "priority": "High",
+  "score": 154,
+  "sectors": [
+   "onshore",
+   "pipelines"
+  ],
+  "signal_ids": [
+   "n-37341d5d3e6a",
+   "n-1eb56bae4341",
+   "m-227447a80081",
+   "n-db8ef9ee0aca"
+  ],
+  "stage": "bid_evaluation",
+  "status": "active",
+  "value_usd": 2000000000.0
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": [
+    {
+     "kind": "winner",
+     "links": [
+      {
+       "role": "Project Director",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Project%20Director%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Subcontracts Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Subcontracts%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
+     "org": "Mannesmann Energy",
+     "roles": [
+      "Project Director",
+      "Engineering Manager",
+      "Subcontracts Manager"
+     ],
+     "urgency": 2,
+     "why": "Won North East Bab (NEB) facilities upgrade."
+    }
+   ]
+  },
+  "client": "ADNOC Onshore",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-14",
+  "headline": "Adnoc Onshore hires Mannesmann for phase two of its Northeast Bab upgrade",
+  "id": "p-north-east-bab-neb-facilities-upgrade",
+  "last_found": "2026-11-23",
+  "last_published": "2026-11-23",
+  "name": "North East Bab (NEB) facilities upgrade",
+  "notes": [],
+  "outlook": false,
+  "parties": {
+   "Mannesmann Energy": {
+    "evidence": [
+     "n-2f40ae0ffc77",
+     "n-5ffa6cc269e0",
+     "n-10fee630b2f3",
+     "n-1278b98fafab",
+     "n-679d98c4f0d4",
+     "n-933a24c50ca1",
+     "n-cf2c0a2c7150",
+     "n-090a1b33f634",
+     "n-e93ac8abf47b",
+     "n-41dcdf0d798c",
+     "n-76a8b19f6611",
+     "n-681aee6d9c43"
+    ],
+    "first_seen": "2026-11-14",
+    "last_seen": "2026-11-23",
+    "role": "winner",
+    "type": "epc"
+   }
+  },
+  "priority": "High",
+  "score": 117,
+  "sectors": [
+   "brownfield",
+   "gas",
+   "hydrogen",
+   "onshore"
+  ],
+  "signal_ids": [
+   "n-2f40ae0ffc77",
+   "n-5ffa6cc269e0",
+   "n-10fee630b2f3",
+   "n-1278b98fafab",
+   "n-679d98c4f0d4",
+   "n-933a24c50ca1",
+   "n-cf2c0a2c7150",
+   "n-090a1b33f634",
+   "n-e93ac8abf47b",
+   "n-41dcdf0d798c",
+   "n-76a8b19f6611",
+   "n-681aee6d9c43"
+  ],
+  "stage": "awarded",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [
+   {
+    "date": "2026-11-04",
+    "headline": "ADNOC greenlights Ruwais Diyab unconventional gas project to drive expansion",
+    "stage": "planned",
+    "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPYnJDd1FwWmlLSERCWkpvWWhNZmoxNFJ6eVBYVnVnZUpRYWZqYmNjbWtRZERSV1VQeHUtQndCZ1JvajVENTdSSGlZYkthLTNRTl9TX2hHMkJSMmpCQVVZcF9pSU12akxvU0VnMjdndUNaV3VjcXNJd3A5TENIWUt6MTIwLUtGejB5aEE3M043Sld4N3Byb3hBdVVVVGRtMXVPMmdiOXlaeFdha2wzaEVFWWhkSzdGNXluXzB5Mg?oc=5"
+   }
+  ],
+  "approach": {
+   "notes": [],
+   "targets": [
+    {
+     "kind": "winner",
+     "links": [
+      {
+       "role": "Project Director",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Project%20Director%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Subcontracts Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Subcontracts%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
+     "org": "Jereh",
+     "roles": [
+      "Project Director",
+      "Engineering Manager",
+      "Subcontracts Manager"
+     ],
+     "urgency": 2,
+     "why": "Won Ruwais Diyab unconventional gas development."
+    }
+   ]
+  },
+  "client": "ADNOC Onshore",
+  "contract_type": "",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-02",
+  "headline": "Jereh Signs $2.7B ADNOC Onshore Contracts incl. Ruwais Diyab",
+  "id": "p-ruwais-diyab-unconventional-gas-development",
+  "last_found": "2026-11-23",
+  "last_published": "2026-11-15",
+  "name": "Ruwais Diyab unconventional gas development",
+  "notes": [],
+  "outlook": false,
+  "parties": {
+   "Jereh": {
+    "evidence": [
+     "n-9fc4765889d4",
+     "n-c889e04a8eab",
+     "n-6365bdd6e95f",
+     "n-5be7706a872b",
+     "n-97cb2b83d912"
+    ],
+    "first_seen": "2026-11-04",
+    "last_seen": "2026-11-15",
+    "role": "winner",
+    "type": "epc"
+   }
+  },
+  "priority": "High",
+  "score": 112,
+  "sectors": [
+   "brownfield",
+   "gas",
+   "onshore",
+   "refining_petchem"
+  ],
+  "signal_ids": [
+   "n-325b83d5a753",
+   "n-5693c1d22dbc",
+   "n-ab0cb3423411",
+   "n-af881f1a0d3e",
+   "n-dbce6608cbea",
+   "n-ddb4542a3ac8",
+   "n-a7d2b74e6d14",
+   "n-1951fb380fb4",
+   "n-9fc4765889d4",
+   "n-c889e04a8eab",
+   "n-6365bdd6e95f",
+   "n-5be7706a872b",
+   "n-97cb2b83d912"
+  ],
+  "stage": "awarded",
+  "status": "active",
+  "value_usd": 2700000000.0
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step."
+   ],
+   "targets": []
+  },
+  "client": "ADNOC Offshore",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-16",
+  "headline": "Competition heats up for Adnoc offshore prize",
+  "id": "p-sarb-umm-lulu",
+  "last_found": "2026-11-23",
+  "last_published": "2026-11-16",
+  "name": "SARB & Umm Lulu",
+  "notes": [],
+  "outlook": false,
+  "parties": {},
+  "priority": "High",
+  "score": 110,
+  "sectors": [
+   "offshore"
+  ],
+  "signal_ids": [
+   "n-ab6b1fd684bb"
+  ],
+  "stage": "tender",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": [
+    {
+     "kind": "contractor",
+     "links": [
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Wison%20Engineering%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Project Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Wison%20Engineering%22%20Project%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer overflow detailed design, site engineering, vendor-document review and as-built work.",
+     "org": "Wison Engineering",
+     "roles": [
+      "Engineering Manager",
+      "Project Manager"
+     ],
+     "urgency": 4,
+     "why": "Executing Habshan gas complex (incl. carbon capture)."
+    }
+   ]
+  },
+  "client": "ADNOC Gas",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-11",
+  "headline": "Wison Begins Work on ADNOC Gas Habshan Processing Train Under $3.9B EPC Contract - News and Statistics",
+  "id": "p-habshan-gas-complex-incl-carbon-capture",
+  "last_found": "2026-11-23",
+  "last_published": "2026-11-18",
+  "name": "Habshan gas complex (incl. carbon capture)",
+  "notes": [],
+  "outlook": false,
+  "parties": {
+   "Wison Engineering": {
+    "evidence": [
+     "n-51d58fcbf701",
+     "n-6157b3254a4b",
+     "n-62b7110f347b",
+     "n-213b88c39294",
+     "n-4faeca263642",
+     "n-7b3dfdc410ac",
+     "n-b5228f6fa3a4",
+     "n-aa17529a56c8"
+    ],
+    "first_seen": "2026-11-11",
+    "last_seen": "2026-11-18",
+    "role": "contractor",
+    "type": "epc"
+   }
+  },
+  "priority": "High",
+  "score": 105,
+  "sectors": [
+   "gas",
+   "onshore"
+  ],
+  "signal_ids": [
+   "n-51d58fcbf701",
+   "n-6157b3254a4b",
+   "n-62b7110f347b",
+   "n-213b88c39294",
+   "n-4faeca263642",
+   "n-7b3dfdc410ac",
+   "n-b5228f6fa3a4",
+   "n-aa17529a56c8"
+  ],
+  "stage": "execution",
+  "status": "active",
+  "value_usd": 3900000000.0
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Onshore work: Mannesmann Energy, Jereh."
+   ],
+   "targets": []
+  },
+  "client": "ADNOC Onshore",
+  "contract_type": "",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-10-27",
+  "headline": "Adnoc Onshore grants extra time for Bab gas cap well tie-in bids",
+  "id": "p-bab-gas-cap-well-tie-ins",
+  "last_found": "2026-11-23",
+  "last_published": "2026-11-18",
+  "name": "Bab Gas Cap well tie-ins",
+  "notes": [],
+  "outlook": false,
+  "parties": {},
+  "priority": "High",
+  "score": 99,
+  "sectors": [
+   "gas",
+   "onshore"
+  ],
+  "signal_ids": [
+   "n-b1a2bf48a400",
+   "n-428c07727824",
+   "n-9868af88366e"
+  ],
+  "stage": "tender",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Gas work: Wison Engineering."
+   ],
+   "targets": []
+  },
+  "client": "ADNOC Gas",
+  "contract_type": "",
+  "deadline": "",
+  "filed": false,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-17",
+  "headline": "$8 billion-plus Adnoc Gas project reaches key bid milestone",
+  "id": "s-b9df893a0aa1",
+  "last_found": "2026-11-23",
+  "last_published": "2026-11-18",
+  "name": "$8 billion-plus Adnoc Gas project reaches key bid milestone",
+  "notes": [],
+  "outlook": false,
+  "parties": {},
+  "priority": "High",
+  "score": 92,
+  "sectors": [
+   "gas"
+  ],
+  "signal_ids": [
+   "n-9a7c0c6fc732",
+   "n-4a0cc919f538"
+  ],
+  "stage": "tender",
+  "status": "active",
+  "value_usd": 8000000000.0
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": []
+  },
+  "client": "ADNOC Gas",
+  "contract_type": "engineering",
+  "deadline": "",
+  "filed": false,
+  "first_found": "2026-11-23",
+  "first_published": "2026-10-28",
+  "headline": "Local firm wins Adnoc Gas project detailed engineering works",
+  "id": "s-72f4370f5f9d",
+  "last_found": "2026-11-23",
+  "last_published": "2026-10-28",
+  "name": "Local firm wins Adnoc Gas project detailed engineering works",
+  "notes": [],
+  "outlook": false,
+  "parties": {},
+  "priority": "High",
+  "score": 92,
+  "sectors": [
+   "gas"
+  ],
+  "signal_ids": [
+   "n-9b7321c8fe46"
+  ],
+  "stage": "awarded",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": [
+    {
+     "kind": "winner",
+     "links": [
+      {
+       "role": "Project Director",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Project%20Director%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Subcontracts Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Subcontracts%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
+     "org": "Jereh",
+     "roles": [
+      "Project Director",
+      "Engineering Manager",
+      "Subcontracts Manager"
+     ],
+     "urgency": 2,
+     "why": "Won Bu Hasa field development."
+    }
+   ]
+  },
+  "client": "ADNOC Onshore",
+  "contract_type": "",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-13",
+  "headline": "Jereh wins $392m Bu Hasa oil field facilities project",
+  "id": "p-bu-hasa-field-development",
+  "last_found": "2026-11-23",
+  "last_published": "2026-11-13",
+  "name": "Bu Hasa field development",
+  "notes": [],
+  "outlook": false,
+  "parties": {
+   "Jereh": {
+    "evidence": [
+     "n-3ab5c8ede837"
+    ],
+    "first_seen": "2026-11-13",
+    "last_seen": "2026-11-13",
+    "role": "winner",
+    "type": "epc"
+   }
+  },
+  "priority": "High",
+  "score": 88,
+  "sectors": [
+   "onshore"
+  ],
+  "signal_ids": [
+   "n-3ab5c8ede837"
+  ],
+  "stage": "awarded",
+  "status": "active",
+  "value_usd": 392000000.0
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC (Group) work: Jereh.",
+    "Forward look: this is advance notice of enquiries to come. Check which packages match your prequalification."
+   ],
+   "targets": []
+  },
+  "client": "ADNOC (Group)",
+  "contract_type": "",
+  "deadline": "",
+  "filed": false,
+  "first_found": "2026-11-23",
+  "first_published": "2026-10-28",
+  "headline": "Adnoc poised to launch multiple tenders for offshore megaproject",
+  "id": "s-599ea85ff274",
+  "last_found": "2026-11-23",
+  "last_published": "2026-10-28",
+  "name": "Adnoc poised to launch multiple tenders for offshore megaproject",
+  "notes": [],
+  "outlook": true,
+  "parties": {},
+  "priority": "Medium",
+  "score": 80,
+  "sectors": [
+   "offshore"
+  ],
+  "signal_ids": [
+   "n-4cb171a7e8d3"
+  ],
+  "stage": "tender",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC (Group) work: Jereh.",
+    "Forward look: this is advance notice of enquiries to come. Check which packages match your prequalification."
+   ],
+   "targets": []
+  },
+  "client": "ADNOC (Group)",
+  "contract_type": "",
+  "deadline": "",
+  "filed": false,
+  "first_found": "2026-11-23",
+  "first_published": "2026-10-25",
+  "headline": "Adnoc prepares new wave of oil and gas tenders for 2027",
+  "id": "s-8db0752df847",
+  "last_found": "2026-11-23",
+  "last_published": "2026-10-25",
+  "name": "Adnoc prepares new wave of oil and gas tenders for 2027",
+  "notes": [],
+  "outlook": true,
+  "parties": {},
+  "priority": "Medium",
+  "score": 80,
+  "sectors": [
+   "gas"
+  ],
+  "signal_ids": [
+   "n-0c761f72e279"
+  ],
+  "stage": "tender",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": []
+  },
+  "client": "ADNOC Offshore",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-02",
+  "headline": "Umm Shaif Gas Cap Project: $6.2bn Offshore Development Advances with Major EPC Contracts",
+  "id": "p-umm-shaif-field-development",
+  "last_found": "2026-11-23",
+  "last_published": "2026-11-02",
+  "name": "Umm Shaif field development",
+  "notes": [],
+  "outlook": false,
+  "parties": {},
+  "priority": "Medium",
+  "score": 80,
+  "sectors": [
+   "gas",
+   "offshore"
+  ],
+  "signal_ids": [
+   "n-f23fc544c15a"
+  ],
+  "stage": "",
+  "status": "active",
+  "value_usd": 6200000000.0
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step."
+   ],
+   "targets": []
+  },
+  "client": "ADNOC LNG",
+  "contract_type": "",
+  "deadline": "",
+  "filed": false,
+  "first_found": "2026-11-23",
+  "first_published": "2026-10-25",
+  "headline": "ADNOC LNG: 3 teams vie for UAE plant",
+  "id": "s-e4755dd249f0",
+  "last_found": "2026-11-23",
+  "last_published": "2026-10-25",
+  "name": "ADNOC LNG: 3 teams vie for UAE plant",
+  "notes": [],
+  "outlook": false,
+  "parties": {},
+  "priority": "Medium",
+  "score": 78,
+  "sectors": [
+   "gas"
+  ],
+  "signal_ids": [
+   "n-f019e049d6bc"
+  ],
+  "stage": "tender",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC (Group) work: Jereh.",
+    "Forward look: this is advance notice of enquiries to come. Check which packages match your prequalification."
+   ],
+   "targets": []
+  },
+  "client": "ADNOC (Group)",
+  "contract_type": "",
+  "deadline": "",
+  "filed": false,
+  "first_found": "2026-11-23",
+  "first_published": "2026-10-25",
+  "headline": "ADNOC promises 40 percent shorter tenders and reveals what it will buy in 2027 and 2028",
+  "id": "s-c14f9d1f3f09",
+  "last_found": "2026-11-23",
+  "last_published": "2026-10-25",
+  "name": "ADNOC promises 40 percent shorter tenders and reveals what it will buy in 2027 and 2028",
+  "notes": [],
+  "outlook": true,
+  "parties": {},
+  "priority": "Medium",
+  "score": 75,
+  "sectors": [],
+  "signal_ids": [
+   "n-6f470d3e27e3"
+  ],
+  "stage": "tender",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": [
+    {
+     "kind": "client",
+     "links": [
+      {
+       "role": "Project Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22ADNOC%20Onshore%22%20Project%20Manager%20UAE"
+      },
+      {
+       "role": "Vice President Projects",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22ADNOC%20Onshore%22%20Vice%20President%20Projects%20UAE"
+      },
+      {
+       "role": "Senior Engineer Projects",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22ADNOC%20Onshore%22%20Senior%20Engineer%20Projects%20UAE"
+      }
+     ],
+     "offer": "Introduce your concept and FEED credentials to the project team before the enquiry is written.",
+     "org": "ADNOC Onshore",
+     "roles": [
+      "Project Manager",
+      "Vice President Projects",
+      "Senior Engineer Projects"
+     ],
+     "urgency": 3,
+     "why": "ADNOC Onshore is at the planning stage. The pre-FEED / FEED enquiry comes first, and that is yours to bid."
+    }
+   ]
+  },
+  "client": "ADNOC Onshore",
+  "contract_type": "",
+  "deadline": "",
+  "filed": false,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-18",
+  "headline": "Adnoc Onshore to upgrade existing oil fields",
+  "id": "s-70f74145d929",
+  "last_found": "2026-11-23",
+  "last_published": "2026-11-18",
+  "name": "Adnoc Onshore to upgrade existing oil fields",
+  "notes": [],
+  "outlook": false,
+  "parties": {},
+  "priority": "Medium",
+  "score": 65,
+  "sectors": [
+   "brownfield",
+   "onshore"
+  ],
+  "signal_ids": [
+   "n-b2f4db1bd853"
+  ],
+  "stage": "planned",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": []
+  },
+  "client": "ADNOC (Group)",
+  "contract_type": "",
+  "deadline": "",
+  "filed": false,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-04",
+  "headline": "Mannesmann Energy plans ADNOC facility upgrade project, two UAE representation agreements",
+  "id": "s-48b809a704c4",
+  "last_found": "2026-11-23",
+  "last_published": "2026-11-04",
+  "name": "Mannesmann Energy plans ADNOC facility upgrade project, two UAE representation agreements",
+  "notes": [],
+  "outlook": false,
+  "parties": {
+   "Mannesmann Energy": {
+    "evidence": [
+     "n-3cfe5d36fef6"
+    ],
+    "first_seen": "2026-11-04",
+    "last_seen": "2026-11-04",
+    "role": "named",
+    "type": "epc"
+   }
+  },
+  "priority": "Low",
+  "score": 50,
+  "sectors": [
+   "brownfield"
+  ],
+  "signal_ids": [
+   "n-3cfe5d36fef6"
+  ],
+  "stage": "planned",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": []
+  },
+  "client": "ADNOC (Group)",
+  "contract_type": "",
+  "deadline": "",
+  "filed": false,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-02",
+  "headline": "ADNOC Approves Major UAE Gas Development to Boost Domestic Supply",
+  "id": "s-146ad6ceb4f8",
+  "last_found": "2026-11-23",
+  "last_published": "2026-11-02",
+  "name": "ADNOC Approves Major UAE Gas Development to Boost Domestic Supply",
+  "notes": [],
+  "outlook": false,
+  "parties": {},
+  "priority": "Low",
+  "score": 45,
+  "sectors": [
+   "gas"
+  ],
+  "signal_ids": [
+   "n-3d9b27a59830"
+  ],
+  "stage": "planned",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": []
+  },
+  "client": "ADNOC (Group)",
+  "contract_type": "",
+  "deadline": "",
+  "filed": false,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-03",
+  "headline": "Mannesmann Energy unveils new ADNOC project, planned agreements at ADIPEC 2026 | Emirates News Agency",
+  "id": "s-cfc6bf42c4be",
+  "last_found": "2026-11-23",
+  "last_published": "2026-11-03",
+  "name": "Mannesmann Energy unveils new ADNOC project, planned agreements at ADIPEC 2026 | Emirates News Agency",
+  "notes": [],
+  "outlook": false,
+  "parties": {
+   "Mannesmann Energy": {
+    "evidence": [
+     "n-17c6c844bb16"
+    ],
+    "first_seen": "2026-11-03",
+    "last_seen": "2026-11-03",
+    "role": "named",
+    "type": "epc"
+   }
+  },
+  "priority": "Low",
+  "score": 45,
+  "sectors": [],
+  "signal_ids": [
+   "n-17c6c844bb16"
+  ],
+  "stage": "planned",
+  "status": "active",
+  "value_usd": null
+ }
+]
