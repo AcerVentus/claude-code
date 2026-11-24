@@ -1,0 +1,6 @@
+# Live data, backups and logs never belong in version control.
+/data/
+# Downloaded on demand by --online.
+/tools/
+__pycache__/
+*.pyc
