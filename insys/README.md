@@ -6,6 +6,9 @@ with optional access from anywhere over the internet.
 - **Projects, Enquiries and Expressions of Interest** as separate tabs. Every
   item shows its current status, the **last known action** and the **next
   action with its due date**. Overdue actions are flagged everywhere.
+- **Subcontractor directory**: keep every subcontractor's details in one place,
+  put one or several on any project, enquiry or expression of interest, and see
+  who is working on what, most urgent action first.
 - **Finance** and **Office Admin** sections, private to those teams.
 - **Overview** of current status across every section, with pilot KPIs.
 - **Cross-references**: link any record to any other (an enquiry to the project
@@ -116,7 +119,7 @@ their own password at first sign-in.
 
 | Role | Can open |
 |---|---|
-| Staff | Overview, My Work, Tasks, Projects, Enquiries, Expressions of Interest |
+| Staff | Overview, My Work, Tasks, Projects, Enquiries, Expressions of Interest, Subcontractors |
 | Finance | Everything Staff can, plus **Finance** |
 | Office Administrator | Everything Staff can, plus **Office Admin** |
 | Administrator | Everything, plus **Admin** |
@@ -171,6 +174,17 @@ from the host computer only.
   in the history as "Status: New → In Review" and so on.
 - **Next action due** dates drive the red "Overdue" flags, the counts in the
   sidebar, the *Overdue next actions* list on the Overview, and the KPIs.
+- **Subcontractors** live in a directory of their own (the *Subcontractors*
+  page). On a project, enquiry or expression of interest, **Add subcontractor**
+  opens a searchable list: type part of a name, discipline or contact and click
+  to add. Several can be on the same item in parallel, each with a note of
+  their scope. A subcontractor not yet in the directory can be added from the
+  same pop-up. The directory shows, for each subcontractor, the open work they
+  are on across all three sections and their most urgent action; *Work by
+  priority* lists every subcontractor's open work in one list, soonest next
+  action first (overdue first; on the same date, higher priority first; items
+  with no next-action date last). Marking a subcontractor *Inactive* keeps
+  their history but stops them being added to new work.
 - **Tasks** are jobs for a named person, optionally attached to a record. Each
   person sees theirs under **My Work**; only the assignee, the creator or an
   administrator can change a task.
@@ -184,6 +198,36 @@ from the host computer only.
 - If two people edit the same record at once, the second save is refused with a
   message rather than silently overwriting the first.
 
+## Upgrading to a new version
+
+Your work is kept. To upgrade:
+
+1. Close InSys (close its window).
+2. Replace the old `InSys.exe` with the new one **in the same folder**, so it
+   sits next to your existing `InSys-data` folder. (Rename the old one first,
+   for example to `InSys-old.exe`, if you would like to keep it.) (Running from the source
+   folder instead: replace `insys.py` and the `web` folder, keep `data`.)
+3. Start it as usual.
+
+On the first start, the new version makes a copy of your data exactly as the
+old version left it — `backups\before-upgrade-from-v1-(date).db` inside the data
+folder — and only then adds what it needs. Existing records, history, links,
+tasks, people and passwords are not altered. The window tells you this has
+happened, and it is noted in Admin → Security log. These copies are never
+deleted automatically.
+
+To go back to how things were before an upgrade: close InSys, replace
+`insys.db` in the data folder with that copy (renamed to `insys.db`), and start
+the older `InSys.exe`.
+
+If you use the office-network choice, Windows may ask again whether to allow
+"Python" through the firewall after an upgrade — choose Allow.
+
+| Version | What changed |
+|---|---|
+| 1.1.0 | Subcontractor directory; subcontractors on projects, enquiries and expressions of interest. |
+| 1.0.0 | First version. |
+
 ## Your data and backups
 
 Everything is stored in the `data` folder next to `insys.py`:
@@ -191,7 +235,7 @@ Everything is stored in the `data` folder next to `insys.py`:
 | File | What it is |
 |---|---|
 | `insys.db` | The database (SQLite). All records, tasks, people and history. |
-| `backups\` | Automatic daily backups; the latest 20 are kept. |
+| `backups\` | Automatic daily backups (the latest 20 are kept) and the copies made before each upgrade (kept for good). |
 | `insys.log` | Error log, if anything goes wrong. |
 | `tunnel.log` | Output of the online-access tool. |
 

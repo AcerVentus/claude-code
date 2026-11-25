@@ -42,7 +42,12 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
+
+# The database layout this version reads and writes. Version 1 is InSys 1.0.0;
+# version 2 (InSys 1.1.0) adds the subcontractor directory. An older database
+# is upgraded in place on start-up, after a backup copy has been made.
+SCHEMA_VERSION = 2
 MIN_PYTHON = (3, 9)
 
 # PACKAGED is true when InSys runs as the single-file program, InSys.exe. Its
@@ -195,6 +200,9 @@ ROLES = {
     "staff": "Staff",
 }
 
+# Sections whose records can have subcontractors assigned.
+SUBCON_MODULES = ("project", "enquiry", "eoi")
+
 PRIORITIES = ["Low", "Normal", "High", "Urgent"]
 TASK_STATUSES = ["To Do", "In Progress", "Done"]
 
@@ -244,6 +252,8 @@ class Runtime:
         self.tunnel_status = "off"
         self.lan = False
         self.kept_awake = False
+        self.upgraded_from = None
+        self.upgrade_backup = None
 
     @property
     def db_path(self):
@@ -598,6 +608,35 @@ CREATE TABLE IF NOT EXISTS tasks (
     updated_at TEXT NOT NULL,
     version INTEGER NOT NULL DEFAULT 1
 );
+CREATE TABLE IF NOT EXISTS subcons (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ref TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    discipline TEXT NOT NULL DEFAULT '',
+    services TEXT NOT NULL DEFAULT '',
+    contact_name TEXT NOT NULL DEFAULT '',
+    email TEXT NOT NULL DEFAULT '',
+    phone TEXT NOT NULL DEFAULT '',
+    address TEXT NOT NULL DEFAULT '',
+    website TEXT NOT NULL DEFAULT '',
+    registration TEXT NOT NULL DEFAULT '',
+    notes TEXT NOT NULL DEFAULT '',
+    active INTEGER NOT NULL DEFAULT 1,
+    created_by INTEGER REFERENCES users(id),
+    created_at TEXT NOT NULL,
+    updated_by INTEGER REFERENCES users(id),
+    updated_at TEXT NOT NULL,
+    version INTEGER NOT NULL DEFAULT 1
+);
+CREATE TABLE IF NOT EXISTS record_subcons (
+    record_id INTEGER NOT NULL REFERENCES records(id) ON DELETE CASCADE,
+    subcon_id INTEGER NOT NULL REFERENCES subcons(id) ON DELETE CASCADE,
+    scope TEXT NOT NULL DEFAULT '',
+    added_by INTEGER REFERENCES users(id),
+    added_at TEXT NOT NULL,
+    PRIMARY KEY (record_id, subcon_id)
+);
+CREATE INDEX IF NOT EXISTS idx_record_subcons_subcon ON record_subcons(subcon_id);
 CREATE TABLE IF NOT EXISTS audit (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     at TEXT NOT NULL,
@@ -680,22 +719,72 @@ def audit(conn, event, detail="", user=None, username="", ip=""):
          user["username"] if user else username, ip or "", event, detail[:500]))
 
 
+class DatabaseTooNew(Exception):
+    """The database was last written by a newer InSys than this one."""
+
+
+def stored_schema_version():
+    """Layout version of the existing database; None if there is no database yet."""
+    if not os.path.exists(RT.db_path):
+        return None
+    conn = connect()
+    try:
+        has_meta = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'meta'").fetchone()
+        if not has_meta:
+            return None
+        value = meta_get(conn, "schema_version")
+    finally:
+        conn.close()
+    try:
+        return int(value) if value is not None else None
+    except ValueError:
+        return None
+
+
+def backup_before_upgrade(from_version):
+    """A copy of the database exactly as the older version left it. These files
+    are never deleted automatically."""
+    stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    dest = os.path.join(RT.backup_dir, "before-upgrade-from-v%d-%s.db" % (from_version, stamp))
+    tmp = dest + ".tmp"
+    make_backup(tmp)
+    os.replace(tmp, dest)
+    return dest
+
+
 def init_db():
-    """Create the schema and, on the very first run, the administrator account.
+    """Create the schema, upgrade an older database, and on the very first run
+    create the administrator account.
 
     Returns the administrator's initial password if one was just created.
+    Sets RT.upgraded_from / RT.upgrade_backup when an older database was upgraded.
     """
     os.makedirs(RT.data_dir, exist_ok=True)
     os.makedirs(RT.backup_dir, exist_ok=True)
+    existing = stored_schema_version()
+    if existing is not None and existing > SCHEMA_VERSION:
+        raise DatabaseTooNew(existing)
+    if existing is not None and existing < SCHEMA_VERSION:
+        RT.upgrade_backup = backup_before_upgrade(existing)
+        RT.upgraded_from = existing
     created_password = None
     with write_db(bump=False) as conn:
+        # Every table is created only if it is missing, so this both builds a new
+        # database and adds the tables a newer version introduced. Nothing that
+        # already exists is altered or removed.
         for statement in SCHEMA.split(";"):
             if statement.strip():
                 conn.execute(statement)
         if meta_get(conn, "schema_version") is None:
-            meta_set(conn, "schema_version", "1")
+            meta_set(conn, "schema_version", SCHEMA_VERSION)
             meta_set(conn, "org_name", "")
             meta_set(conn, "currency", "")
+        elif existing is not None and existing < SCHEMA_VERSION:
+            meta_set(conn, "schema_version", SCHEMA_VERSION)
+            audit(conn, "upgraded", "Data upgraded from layout v%d to v%d by InSys %s; "
+                                    "a copy from before the upgrade was kept in the backups folder"
+                  % (existing, SCHEMA_VERSION, VERSION))
         if conn.execute("SELECT COUNT(*) AS n FROM users").fetchone()["n"] == 0:
             created_password = generate_password(groups=4)
             conn.execute(
@@ -1110,6 +1199,12 @@ def h_state(ctx):
                 tasks.append(dict(t))
                 if t["record_id"] is not None:
                     stub(t["record_id"])
+        subcons = [subcon_json(r) for r in
+                   conn.execute("SELECT * FROM subcons ORDER BY name COLLATE NOCASE")]
+        record_subcons = [{"record_id": r["record_id"], "subcon_id": r["subcon_id"], "scope": r["scope"]}
+                          for r in conn.execute("SELECT record_id, subcon_id, scope FROM record_subcons "
+                                                "ORDER BY rowid")  # the order they were added in
+                          if r["record_id"] in visible_ids]
         org_name = meta_get(conn, "org_name", "")
         currency = meta_get(conn, "currency", "")
     return {
@@ -1120,6 +1215,8 @@ def h_state(ctx):
         "links": links,
         "restricted": stubs,
         "tasks": tasks,
+        "subcons": subcons,
+        "record_subcons": record_subcons,
         "meta": {
             "app_version": VERSION,
             "modules": module_meta(),
@@ -1127,6 +1224,7 @@ def h_state(ctx):
             "roles": ROLES,
             "priorities": PRIORITIES,
             "task_statuses": TASK_STATUSES,
+            "subcon_modules": list(SUBCON_MODULES),
             "org_name": org_name,
             "currency": currency,
             "min_password_length": MIN_PASSWORD_LENGTH,
@@ -1312,6 +1410,171 @@ def h_xref_delete(ctx):
             conn.execute("DELETE FROM xrefs WHERE id = ?", (xref["id"],))
             add_activity(conn, row["id"], ctx.user, "xref",
                          "External reference removed: %s %s" % (xref["system"], xref["ref"]))
+    return {"ok": True}
+
+
+# ---- Subcontractors ----------------------------------------------------------
+
+SUBCON_FIELDS = ["name", "discipline", "services", "contact_name", "email", "phone",
+                 "address", "website", "registration", "notes", "active"]
+
+
+def parse_subcon_fields(body, existing=None):
+    creating = existing is None
+    out = {}
+
+    def present(key):
+        return creating or key in body
+
+    if present("name"):
+        out["name"] = text_field(body, "name", "Subcontractor name", 150, required=True)
+    if present("discipline"):
+        out["discipline"] = text_field(body, "discipline", "Discipline", 100)
+    if present("services"):
+        out["services"] = text_field(body, "services", "Services", 2000, multiline=True)
+    if present("contact_name"):
+        out["contact_name"] = text_field(body, "contact_name", "Contact person", 150)
+    if present("email"):
+        email = text_field(body, "email", "Email", 200)
+        if email and not re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email):
+            raise ApiError(400, "Email does not look like an email address.")
+        out["email"] = email
+    if present("phone"):
+        out["phone"] = text_field(body, "phone", "Phone", 60)
+    if present("address"):
+        out["address"] = text_field(body, "address", "Address", 500, multiline=True)
+    if present("website"):
+        website = text_field(body, "website", "Website", 300)
+        if website and not re.match(r"^https?://", website, re.I):
+            website = "https://" + website
+        if website and not re.match(r"^https?://[^\s/]+\.[^\s]+$", website, re.I):
+            raise ApiError(400, "Website does not look like a web address.")
+        out["website"] = website
+    if present("registration"):
+        out["registration"] = text_field(body, "registration", "Registration / licence number", 100)
+    if present("notes"):
+        out["notes"] = text_field(body, "notes", "Notes", 5000, multiline=True)
+    if present("active"):
+        active = body.get("active", True)
+        if not isinstance(active, bool):
+            raise ApiError(400, "Status must be active or inactive.")
+        out["active"] = 1 if active else 0
+    return out
+
+
+def check_subcon_name_free(conn, name, own_id=None):
+    row = conn.execute("SELECT id, ref FROM subcons WHERE name = ?", (name,)).fetchone()
+    if row is not None and row["id"] != own_id:
+        raise ApiError(400, "'%s' is already in the directory as %s." % (name, row["ref"]))
+
+
+def get_subcon(conn, subcon_id):
+    row = conn.execute("SELECT * FROM subcons WHERE id = ?", (subcon_id,)).fetchone()
+    if row is None:
+        raise ApiError(404, "That subcontractor is no longer in the directory.")
+    return row
+
+
+def subcon_json(row):
+    data = dict(row)
+    data["active"] = bool(data["active"])
+    return data
+
+
+def h_subcon_create(ctx):
+    with write_db() as conn:
+        fields = parse_subcon_fields(ctx.body)
+        check_subcon_name_free(conn, fields["name"])
+        number = int(meta_get(conn, "seq_subcon", "0")) + 1
+        meta_set(conn, "seq_subcon", number)
+        now = now_iso()
+        fields.update({"ref": "SUB-%04d" % number, "created_by": ctx.user["id"], "created_at": now,
+                       "updated_by": ctx.user["id"], "updated_at": now})
+        cur = conn.execute("INSERT INTO subcons (%s) VALUES (%s)"
+                           % (",".join(fields), ",".join("?" * len(fields))), list(fields.values()))
+        return {"subcon": subcon_json(get_subcon(conn, cur.lastrowid))}
+
+
+def h_subcon_update(ctx):
+    with write_db() as conn:
+        row = get_subcon(conn, ctx.arg())
+        check_version(ctx.body, row, what="subcontractor")
+        fields = parse_subcon_fields(ctx.body, existing=row)
+        changed = {k: v for k, v in fields.items() if v != row[k]}
+        if "name" in changed:
+            check_subcon_name_free(conn, changed["name"], own_id=row["id"])
+        if changed:
+            sets = ", ".join("%s = ?" % k for k in changed)
+            conn.execute("UPDATE subcons SET %s, updated_by = ?, updated_at = ?, version = version + 1 "
+                         "WHERE id = ?" % sets, list(changed.values()) + [ctx.user["id"], now_iso(), row["id"]])
+        return {"subcon": subcon_json(get_subcon(conn, row["id"])), "changed": bool(changed)}
+
+
+def h_subcon_delete(ctx):
+    with write_db() as conn:
+        row = get_subcon(conn, ctx.arg())
+        used = conn.execute("SELECT record_id FROM record_subcons WHERE subcon_id = ?", (row["id"],)).fetchall()
+        for link in used:
+            add_activity(conn, link["record_id"], ctx.user, "subcon",
+                         "Subcontractor removed (deleted from the directory): %s" % row["name"])
+        conn.execute("DELETE FROM subcons WHERE id = ?", (row["id"],))
+        audit(conn, "subcon_deleted", "%s %s (was on %d record(s))" % (row["ref"], row["name"], len(used)),
+              user=ctx.user, ip=ctx.ip)
+    return {"ok": True}
+
+
+def subcon_record(conn, ctx):
+    """The record in the URL, which must be in a section that uses subcontractors."""
+    row = get_record(conn, ctx.arg(1), ctx.user)
+    if row["module"] not in SUBCON_MODULES:
+        raise ApiError(400, "Subcontractors can be added to projects, enquiries and "
+                            "expressions of interest only.")
+    return row
+
+
+def h_record_subcon_add(ctx):
+    with write_db() as conn:
+        row = subcon_record(conn, ctx)
+        subcon = get_subcon(conn, int_field(ctx.body, "subcon_id", "Subcontractor", required=True))
+        scope = text_field(ctx.body, "scope", "Scope of work", 300)
+        if not subcon["active"]:
+            raise ApiError(400, "%s is marked inactive in the directory, so cannot be added to new work."
+                           % subcon["name"])
+        if conn.execute("SELECT 1 FROM record_subcons WHERE record_id = ? AND subcon_id = ?",
+                        (row["id"], subcon["id"])).fetchone():
+            raise ApiError(400, "%s is already on %s." % (subcon["name"], row["ref"]))
+        conn.execute("INSERT INTO record_subcons (record_id, subcon_id, scope, added_by, added_at) "
+                     "VALUES (?,?,?,?,?)", (row["id"], subcon["id"], scope, ctx.user["id"], now_iso()))
+        add_activity(conn, row["id"], ctx.user, "subcon", "Subcontractor added: %s%s"
+                     % (subcon["name"], " (%s)" % scope if scope else ""))
+    return {"ok": True}
+
+
+def h_record_subcon_update(ctx):
+    with write_db() as conn:
+        row = subcon_record(conn, ctx)
+        subcon = get_subcon(conn, ctx.arg(2))
+        link = conn.execute("SELECT * FROM record_subcons WHERE record_id = ? AND subcon_id = ?",
+                            (row["id"], subcon["id"])).fetchone()
+        if link is None:
+            raise ApiError(404, "%s is not on %s." % (subcon["name"], row["ref"]))
+        scope = text_field(ctx.body, "scope", "Scope of work", 300)
+        if scope != link["scope"]:
+            conn.execute("UPDATE record_subcons SET scope = ? WHERE record_id = ? AND subcon_id = ?",
+                         (scope, row["id"], subcon["id"]))
+            add_activity(conn, row["id"], ctx.user, "subcon", "Subcontractor scope for %s: %s"
+                         % (subcon["name"], scope or "-"))
+    return {"ok": True}
+
+
+def h_record_subcon_remove(ctx):
+    with write_db() as conn:
+        row = subcon_record(conn, ctx)
+        subcon = get_subcon(conn, ctx.arg(2))
+        cur = conn.execute("DELETE FROM record_subcons WHERE record_id = ? AND subcon_id = ?",
+                           (row["id"], subcon["id"]))
+        if cur.rowcount:
+            add_activity(conn, row["id"], ctx.user, "subcon", "Subcontractor removed: %s" % subcon["name"])
     return {"ok": True}
 
 
@@ -1595,6 +1858,12 @@ ROUTES = [
     ("DELETE", r"/api/records/(\d{1,12})/links/(\d{1,12})", h_link_delete, "user"),
     ("POST", r"/api/records/(\d{1,12})/xrefs", h_xref_create, "user"),
     ("DELETE", r"/api/records/(\d{1,12})/xrefs/(\d{1,12})", h_xref_delete, "user"),
+    ("POST", r"/api/subcons", h_subcon_create, "user"),
+    ("PUT", r"/api/subcons/(\d{1,12})", h_subcon_update, "user"),
+    ("DELETE", r"/api/subcons/(\d{1,12})", h_subcon_delete, "admin"),
+    ("POST", r"/api/records/(\d{1,12})/subcons", h_record_subcon_add, "user"),
+    ("PUT", r"/api/records/(\d{1,12})/subcons/(\d{1,12})", h_record_subcon_update, "user"),
+    ("DELETE", r"/api/records/(\d{1,12})/subcons/(\d{1,12})", h_record_subcon_remove, "user"),
     ("POST", r"/api/tasks", h_task_create, "user"),
     ("PUT", r"/api/tasks/(\d{1,12})", h_task_update, "user"),
     ("DELETE", r"/api/tasks/(\d{1,12})", h_task_delete, "user"),
@@ -2341,6 +2610,12 @@ def banner(first_password):
         say("  " + "-" * 66)
         say("")
     say("  Your data is stored in:  %s" % RT.data_dir)
+    if RT.upgraded_from is not None:
+        say("")
+        say("  Your existing data has been brought forward to this version of InSys.")
+        say("  Everything you entered before is still here. A copy of the data as it")
+        say("  was before the upgrade has been kept in:")
+        say("      %s" % RT.upgrade_backup)
     say("")
     say("  Keep this window open while InSys is in use.")
     say("  To stop InSys, close this window or press Ctrl+C.")
@@ -2469,6 +2744,14 @@ def run(argv=None):
 
     try:
         first_password = init_db()
+    except DatabaseTooNew:
+        say("")
+        say("  This data was last used with a newer version of InSys than this one")
+        say("  (this is version %s)." % VERSION)
+        say("")
+        say("  Please start the newer InSys instead. Nothing has been changed.")
+        say("      Data folder: %s" % RT.data_dir)
+        return 1
     except sqlite3.Error as exc:
         say("InSys could not open its database (%s): %s" % (RT.db_path, exc))
         return 1

@@ -478,6 +478,127 @@ class InSysTest(unittest.TestCase):
         self.assertEqual(sam.delete("%s/%d" % (base, xrefs[0]["id"]))[0], 200)
         self.assertEqual(len(self.find(self.state(sam), rec["id"])["xrefs"]), 1)
 
+    # -- subcontractors ---------------------------------------------------------
+
+    def new_subcon(self, client, name, **extra):
+        body = {"name": name}
+        body.update(extra)
+        status, data = client.post("/api/subcons", body)
+        self.assertEqual(status, 200, data)
+        return data["subcon"]
+
+    def test_subcontractor_directory(self):
+        sam, tina = self.people["sam"], self.people["tina"]
+        sub = self.new_subcon(sam, "Apex Structural Engineers", discipline="Structural",
+                              contact_name="Ravi Menon", email="ravi@apex.example", phone="+61 400 000 111",
+                              website="apex.example/engineering", registration="RPEQ 12345",
+                              address="1 Bridge St\nBrisbane", services="Design\nCertification", notes="Preferred")
+        self.assertRegex(sub["ref"], r"^SUB-\d{4}$")
+        self.assertTrue(sub["active"])
+        self.assertEqual(sub["website"], "https://apex.example/engineering")
+        self.assertEqual(sub["address"], "1 Bridge St\nBrisbane")
+        # Everyone sees the directory.
+        listed = [x for x in self.state(tina)["subcons"] if x["id"] == sub["id"]]
+        self.assertEqual(listed[0]["contact_name"], "Ravi Menon")
+
+        # The same company cannot be entered twice, whatever the capitals.
+        status, data = tina.post("/api/subcons", {"name": "APEX structural engineers"})
+        self.assertEqual(status, 400)
+        self.assertIn(sub["ref"], data["error"])
+        for bad in [{"name": ""}, {"name": "x" * 151}, {"name": "A", "email": "not-an-email"},
+                    {"name": "B", "website": "nonsense"}, {"name": "C", "active": "yes"}]:
+            self.assertEqual(sam.post("/api/subcons", bad)[0], 400, bad)
+
+        # Anyone can correct the details; stale edits are refused.
+        status, data = tina.put("/api/subcons/%d" % sub["id"], {"version": 1, "phone": "+61 400 999 000"})
+        self.assertEqual(status, 200, data)
+        self.assertEqual(data["subcon"]["phone"], "+61 400 999 000")
+        self.assertEqual(data["subcon"]["contact_name"], "Ravi Menon")
+        self.assertEqual(sam.put("/api/subcons/%d" % sub["id"], {"version": 1, "phone": "1"})[0], 409)
+        other = self.new_subcon(sam, "Delta Surveying")
+        self.assertEqual(sam.put("/api/subcons/%d" % other["id"],
+                                 {"version": 1, "name": "apex structural engineers"})[0], 400)
+        self.assertEqual(sam.put("/api/subcons/99999999", {"version": 1, "name": "x"})[0], 404)
+
+        # Only an administrator deletes from the directory.
+        self.assertEqual(sam.delete("/api/subcons/%d" % other["id"])[0], 403)
+        self.assertEqual(self.admin.delete("/api/subcons/%d" % other["id"])[0], 200)
+        self.assertFalse([x for x in self.state(sam)["subcons"] if x["id"] == other["id"]])
+        again = self.new_subcon(sam, "Delta Surveying")
+        self.assertNotEqual(again["ref"], other["ref"])  # references are never reused
+
+    def test_subcontractors_on_projects_enquiries_and_eois(self):
+        sam, tina, fiona = self.people["sam"], self.people["tina"], self.people["fiona"]
+        struct = self.new_subcon(sam, "Northbank Structures", discipline="Structural")
+        mech = self.new_subcon(sam, "Coolflow Mechanical", discipline="HVAC")
+        fire = self.new_subcon(sam, "Ember Fire Engineering", discipline="Fire protection")
+        project = self.new_record(sam, "project", "Depot upgrade")
+        enquiry = self.new_record(sam, "enquiry", "Depot enquiry")
+        eoi = self.new_record(sam, "eoi", "Depot EOI")
+
+        def on(client, record):
+            return sorted((x["subcon_id"], x["scope"]) for x in self.state(client)["record_subcons"]
+                          if x["record_id"] == record["id"])
+
+        # Several subcontractors in parallel on one project.
+        base = "/api/records/%d/subcons" % project["id"]
+        self.assertEqual(sam.post(base, {"subcon_id": struct["id"], "scope": "Structural design"})[0], 200)
+        self.assertEqual(tina.post(base, {"subcon_id": mech["id"]})[0], 200)
+        self.assertEqual(sam.post(base, {"subcon_id": fire["id"]})[0], 200)
+        self.assertEqual(on(tina, project), sorted([(struct["id"], "Structural design"), (mech["id"], ""), (fire["id"], "")]))
+        status, data = sam.post(base, {"subcon_id": struct["id"]})
+        self.assertEqual(status, 400)
+        self.assertIn("already on", data["error"])
+        # The same subcontractor on an enquiry and an EOI as well.
+        for record in (enquiry, eoi):
+            self.assertEqual(sam.post("/api/records/%d/subcons" % record["id"], {"subcon_id": struct["id"]})[0], 200)
+        mine = [x["record_id"] for x in self.state(sam)["record_subcons"] if x["subcon_id"] == struct["id"]]
+        self.assertEqual(sorted(mine), sorted([project["id"], enquiry["id"], eoi["id"]]))
+
+        # Scope can be changed; removal takes one subcontractor off and leaves the rest.
+        self.assertEqual(sam.put("%s/%d" % (base, mech["id"]), {"scope": "Ventilation"})[0], 200)
+        self.assertEqual(sam.delete("%s/%d" % (base, fire["id"]))[0], 200)
+        self.assertEqual(on(sam, project), sorted([(struct["id"], "Structural design"), (mech["id"], "Ventilation")]))
+        self.assertEqual(sam.put("%s/%d" % (base, fire["id"]), {"scope": "x"})[0], 404)
+
+        # It is all in the record's history, with who did it.
+        history = sam.get("/api/records/%d/history" % project["id"])[1]["history"]
+        texts = [x["text"] for x in history if x["kind"] == "subcon"]
+        self.assertIn("Subcontractor added: Northbank Structures (Structural design)", texts)
+        self.assertIn("Subcontractor added: Coolflow Mechanical", texts)
+        self.assertIn("Subcontractor scope for Coolflow Mechanical: Ventilation", texts)
+        self.assertIn("Subcontractor removed: Ember Fire Engineering", texts)
+        added_by_tina = [x for x in history if x["text"] == "Subcontractor added: Coolflow Mechanical"][0]
+        self.assertEqual(added_by_tina["user_id"], tina.user_id)
+
+        # Rules: real subcontractor, real record, the three work sections only.
+        self.assertEqual(sam.post(base, {"subcon_id": 99999999})[0], 404)
+        self.assertEqual(sam.post(base, {})[0], 400)
+        self.assertEqual(sam.post("/api/records/99999999/subcons", {"subcon_id": struct["id"]})[0], 404)
+        invoice = self.new_record(fiona, "finance", "Subcontractor invoice")
+        status, data = fiona.post("/api/records/%d/subcons" % invoice["id"], {"subcon_id": struct["id"]})
+        self.assertEqual(status, 400)
+        self.assertEqual(sam.post("/api/records/%d/subcons" % invoice["id"], {"subcon_id": struct["id"]})[0], 404)
+
+        # An inactive subcontractor stays on existing work but cannot be put on new work.
+        current = [x for x in self.state(sam)["subcons"] if x["id"] == mech["id"]][0]
+        self.assertEqual(sam.put("/api/subcons/%d" % mech["id"], {"version": current["version"], "active": False})[0], 200)
+        self.assertIn((mech["id"], "Ventilation"), on(sam, project))
+        status, data = sam.post("/api/records/%d/subcons" % enquiry["id"], {"subcon_id": mech["id"]})
+        self.assertEqual(status, 400)
+        self.assertIn("inactive", data["error"])
+
+        # Deleting a record removes its assignments; deleting a subcontractor removes theirs everywhere.
+        self.admin.delete("/api/records/%d" % eoi["id"])
+        self.assertFalse([x for x in self.state(sam)["record_subcons"] if x["record_id"] == eoi["id"]])
+        self.assertEqual(self.admin.delete("/api/subcons/%d" % struct["id"])[0], 200)
+        self.assertFalse([x for x in self.state(sam)["record_subcons"] if x["subcon_id"] == struct["id"]])
+        self.assertEqual(on(sam, project), [(mech["id"], "Ventilation")])
+        history = sam.get("/api/records/%d/history" % project["id"])[1]["history"]
+        self.assertTrue(any("deleted from the directory" in x["text"] for x in history))
+        events = [a["event"] for a in self.admin.get("/api/admin/audit")[1]["audit"]]
+        self.assertIn("subcon_deleted", events)
+
     # -- tasks ------------------------------------------------------------------
 
     def test_tasks_belong_to_people(self):
@@ -699,6 +820,107 @@ class InSysTest(unittest.TestCase):
         refs = [r["ref"] for r in self.state(sam)["records"]]
         self.assertEqual(len(refs), len(set(refs)))
         self.assertEqual(len([r for r in self.state(sam)["records"] if r["title"].startswith("Burst")]), 25)
+
+
+class UpgradeTest(unittest.TestCase):
+    """Data written by InSys 1.0.0 must open, unchanged, in this version."""
+
+    V1_TABLES = ("meta", "users", "sessions", "records", "activity", "links", "xrefs", "tasks", "audit")
+
+    def setUp(self):
+        self.saved = (insys.RT.data_dir, insys.RT.upgraded_from, insys.RT.upgrade_backup)
+        insys.RT.data_dir = tempfile.mkdtemp(prefix="insys-upgrade-")
+        insys.RT.upgraded_from = insys.RT.upgrade_backup = None
+
+    def tearDown(self):
+        shutil.rmtree(insys.RT.data_dir, ignore_errors=True)
+        insys.RT.data_dir, insys.RT.upgraded_from, insys.RT.upgrade_backup = self.saved
+
+    def make_version_1_database(self):
+        """A database exactly as 1.0.0 laid it out: no subcontractor tables, layout version 1."""
+        insys.init_db()
+        with insys.write_db(bump=False) as conn:
+            conn.execute("INSERT INTO records (module, ref, title, status, created_at, updated_at, "
+                         "last_action, last_action_date, next_action, next_action_date) "
+                         "VALUES ('project', 'PRJ-0001', 'Work from 1.0.0', 'In Progress', ?, ?, "
+                         "'Did the survey', '2026-11-01', 'Send the quote', '2026-12-01')",
+                         (insys.now_iso(), insys.now_iso()))
+            conn.execute("INSERT INTO activity (record_id, user_id, at, kind, text) VALUES (1, 1, ?, 'action', 'Did the survey')",
+                         (insys.now_iso(),))
+            insys.meta_set(conn, "seq_project", 1)
+            conn.execute("DROP TABLE record_subcons")
+            conn.execute("DROP TABLE subcons")
+            insys.meta_set(conn, "schema_version", 1)
+        shutil.rmtree(insys.RT.backup_dir, ignore_errors=True)
+        insys.RT.upgraded_from = insys.RT.upgrade_backup = None
+
+    def dump(self, path):
+        conn = sqlite3.connect(path)
+        try:
+            return {t: conn.execute("SELECT * FROM %s ORDER BY 1" % t).fetchall()
+                    for t in self.V1_TABLES if t not in ("meta", "sessions", "audit")}
+        finally:
+            conn.close()
+
+    def test_version_1_data_is_upgraded_in_place_and_kept(self):
+        self.make_version_1_database()
+        before = self.dump(insys.RT.db_path)
+        self.assertEqual(insys.stored_schema_version(), 1)
+
+        self.assertIsNone(insys.init_db())  # no new administrator: the existing one is kept
+        self.assertEqual(insys.stored_schema_version(), insys.SCHEMA_VERSION)
+        self.assertEqual(insys.RT.upgraded_from, 1)
+        self.assertEqual(self.dump(insys.RT.db_path), before)  # every existing row untouched
+
+        # A copy from before the upgrade exists, is still a version-1 database, and has the data.
+        backup = insys.RT.upgrade_backup
+        self.assertTrue(os.path.basename(backup).startswith("before-upgrade-from-v1-"))
+        conn = sqlite3.connect(backup)
+        self.assertEqual(conn.execute("SELECT value FROM meta WHERE key = 'schema_version'").fetchone()[0], "1")
+        self.assertEqual(conn.execute("SELECT title FROM records").fetchall(), [("Work from 1.0.0",)])
+        self.assertFalse(conn.execute("SELECT 1 FROM sqlite_master WHERE name = 'subcons'").fetchone())
+        conn.close()
+
+        # The new tables are there and usable; old reference numbering carries on.
+        with insys.write_db(bump=False) as conn:
+            self.assertEqual(insys.next_ref(conn, "project"), "PRJ-0002")
+            conn.execute("INSERT INTO subcons (ref, name, created_at, updated_at) VALUES ('SUB-0001', 'New Co', 'x', 'x')")
+            conn.execute("INSERT INTO record_subcons (record_id, subcon_id, added_at) VALUES (1, 1, 'x')")
+            events = [r["event"] for r in conn.execute("SELECT event FROM audit")]
+        self.assertIn("upgraded", events)
+
+        # Starting again does nothing further: no second upgrade, no second copy.
+        insys.RT.upgraded_from = insys.RT.upgrade_backup = None
+        insys.init_db()
+        self.assertIsNone(insys.RT.upgraded_from)
+        copies = [f for f in os.listdir(insys.RT.backup_dir) if f.startswith("before-upgrade")]
+        self.assertEqual(len(copies), 1)
+
+    def test_upgrade_copies_are_not_rotated_away(self):
+        self.make_version_1_database()
+        insys.init_db()
+        for index in range(insys.BACKUP_KEEP + 5):
+            shutil.copy(insys.RT.upgrade_backup, os.path.join(insys.RT.backup_dir, "insys-20200101-0000%02d.db" % index))
+        insys.auto_backup(force=True)
+        self.assertTrue(os.path.exists(insys.RT.upgrade_backup))
+
+    def test_data_from_a_newer_version_is_refused_untouched(self):
+        insys.init_db()
+        with insys.write_db(bump=False) as conn:
+            insys.meta_set(conn, "schema_version", insys.SCHEMA_VERSION + 1)
+        with open(insys.RT.db_path, "rb") as fh:
+            before = fh.read()
+        with self.assertRaises(insys.DatabaseTooNew):
+            insys.init_db()
+        with open(insys.RT.db_path, "rb") as fh:
+            self.assertEqual(fh.read(), before)
+
+    def test_new_installation_starts_at_the_current_layout(self):
+        self.assertIsNone(insys.stored_schema_version())
+        self.assertTrue(insys.init_db())  # administrator password generated
+        self.assertEqual(insys.stored_schema_version(), insys.SCHEMA_VERSION)
+        self.assertIsNone(insys.RT.upgraded_from)
+        self.assertFalse([f for f in os.listdir(insys.RT.backup_dir) if f.startswith("before-upgrade")])
 
 
 class ToolingTest(unittest.TestCase):

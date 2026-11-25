@@ -376,6 +376,26 @@ dialog.dlg::backdrop { background: rgba(11, 11, 11, .45); }
 }
 .secret input { font: 600 16px/1.2 ui-monospace, Consolas, "Courier New", monospace; letter-spacing: .5px; }
 
+.dlg-form { display: flex; flex-direction: column; max-height: calc(100vh - 26px); }
+.dlg-foot.split { justify-content: space-between; }
+.pick-list {
+  display: flex; flex-direction: column; margin-top: 10px; max-height: 46vh; overflow-y: auto;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--raised);
+}
+.pick {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  width: 100%; padding: 9px 12px; text-align: left;
+  border: 0; border-bottom: 1px solid var(--line); background: none; color: var(--ink);
+  font: inherit; cursor: pointer;
+}
+.pick:last-child { border-bottom: 0; }
+.pick:hover:not(:disabled), .pick:focus-visible { background: var(--accent-soft); }
+.pick:disabled { cursor: default; }
+.pick-main { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
+.pick-side { flex: none; font-weight: 600; color: var(--accent); }
+.pick.added .pick-side { color: var(--good-ink); }
+.pick-empty { padding: 18px 12px; color: var(--ink2); text-align: center; }
+
 /* ---------- Tabs, toasts ---------- */
 
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 16px; overflow-x: auto; }

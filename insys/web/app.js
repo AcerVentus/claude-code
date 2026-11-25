@@ -116,6 +116,7 @@
     { id: 'projects', module: 'project', group: 'Work' },
     { id: 'enquiries', module: 'enquiry', group: 'Work' },
     { id: 'eois', module: 'eoi', group: 'Work' },
+    { id: 'subcons', label: 'Subcontractors', group: 'Work' },
     { id: 'finance', module: 'finance', group: 'Teams' },
     { id: 'office', module: 'office', group: 'Teams' },
     { id: 'admin', label: 'Admin', admin: true, group: 'Administration' },
@@ -146,7 +147,10 @@
   const defaultView = () => (isAdmin() ? 'overview' : 'my');
 
   function buildIndex(data) {
-    const I = { users: new Map(), recs: new Map(), byRef: new Map(), links: new Map(), tasksByRec: new Map(), tone: {} };
+    const I = {
+      users: new Map(), recs: new Map(), byRef: new Map(), links: new Map(), tasksByRec: new Map(), tone: {},
+      subs: new Map(), subByRef: new Map(), subsByRec: new Map(), recsBySub: new Map(),
+    };
     data.users.forEach((u) => I.users.set(u.id, u));
     data.records.forEach((r) => { I.recs.set(r.id, r); I.byRef.set(r.ref, r); });
     data.links.forEach((pair) => { pushMap(I.links, pair[0], pair[1]); pushMap(I.links, pair[1], pair[0]); });
@@ -154,6 +158,14 @@
     Object.keys(data.meta.modules).forEach((key) => {
       I.tone[key] = {};
       data.meta.modules[key].statuses.forEach((s) => { I.tone[key][s[0]] = s[1]; });
+    });
+    (data.subcons || []).forEach((sub) => { I.subs.set(sub.id, sub); I.subByRef.set(sub.ref, sub); });
+    (data.record_subcons || []).forEach((x) => {
+      const sub = I.subs.get(x.subcon_id);
+      const rec = I.recs.get(x.record_id);
+      if (!sub || !rec) return;
+      pushMap(I.subsByRec, rec.id, { sub: sub, scope: x.scope });
+      pushMap(I.recsBySub, sub.id, { rec: rec, scope: x.scope });
     });
     S.I = I;
   }
@@ -578,6 +590,13 @@
           class: 'count' + (late ? ' alert' : ''), text: open,
           title: plural(open, 'open item') + (late ? ', ' + late + ' with an overdue action' : ''),
         });
+      } else if (v.id === 'subcons') {
+        const busy = S.data.subcons.filter((sub) => subconWork(sub).open.length);
+        const late = busy.filter((sub) => subconWork(sub).open.some((x) => x.rec.next_action_date && x.rec.next_action_date < t)).length;
+        count = h('span', {
+          class: 'count' + (late ? ' alert' : ''), text: busy.length,
+          title: plural(busy.length, 'subcontractor') + ' on open work' + (late ? ', ' + late + ' with an overdue action' : ''),
+        });
       } else if (v.id === 'my') {
         const mine = S.data.tasks.filter((x) => x.assignee_id === S.me.id && taskOpen(x));
         const late = mine.filter((x) => x.due_date && x.due_date < t).length;
@@ -610,6 +629,7 @@
     else if (v.id === 'overview') node = viewOverview();
     else if (v.id === 'my') node = viewMy();
     else if (v.id === 'tasks') node = viewTasks();
+    else if (v.id === 'subcons') node = viewSubcons();
     else node = viewAdmin();
     main.replaceChildren(node);
     if (focusId) {
@@ -682,6 +702,49 @@
   }
 
   const refKey = (r) => r.ref.slice(0, 3) + String(r.id).padStart(12, '0');
+
+  // Most pressing work first: open items by next-action date (overdue ones are
+  // simply the earliest dates), then open items with no date, then closed items.
+  // On the same date the higher priority wins.
+  const PRIORITY_RANK = { Urgent: 0, High: 1, Normal: 2, Low: 3 };
+  function urgencyKey(r) {
+    const rank = PRIORITY_RANK[r.priority] === undefined ? 2 : PRIORITY_RANK[r.priority];
+    if (!isOpen(r)) return '3';
+    if (!r.next_action_date) return '2' + rank;
+    return '1' + r.next_action_date + rank;
+  }
+  function byUrgency(a, b) {
+    const x = urgencyKey(a); const y = urgencyKey(b);
+    if (x !== y) return x < y ? -1 : 1;
+    return refKey(a) < refKey(b) ? -1 : 1;
+  }
+
+  const usesSubcons = (module) => (S.data.meta.subcon_modules || []).includes(module);
+  const subconNames = (r) => (S.I.subsByRec.get(r.id) || []).map((x) => x.sub.name).join(', ');
+
+  /** A subcontractor's work, most urgent first. */
+  function subconWork(sub) {
+    const all = (S.I.recsBySub.get(sub.id) || []).slice().sort((a, b) => byUrgency(a.rec, b.rec));
+    const open = all.filter((x) => isOpen(x.rec));
+    return { all: all, open: open, closed: all.filter((x) => !isOpen(x.rec)), top: open[0] || null };
+  }
+
+  function csvCell(v) {
+    let text = (v === null || v === undefined) ? '' : String(v);
+    if (/^[=+\-@\t\r]/.test(text)) text = "'" + text;  // stop spreadsheets treating text as a formula
+    return '"' + text.replace(/"/g, '""') + '"';
+  }
+
+  function saveCsv(filename, lines) {
+    const blob = new Blob([String.fromCharCode(0xFEFF) + lines.join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = h('a', { href: url, download: filename });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    toast('Exported ' + plural(lines.length - 1, 'row') + '.');
+  }
   const SORTERS = {
     ref: refKey,
     module: (r) => r.module,
@@ -741,6 +804,7 @@
           case 'title': return h('td', { class: 'cell-text' },
             h('div', { class: 'cell-title', text: r.title }),
             r.organisation ? h('div', { class: 'cell-sub', text: r.organisation }) : null,
+            subconNames(r) ? h('div', { class: 'cell-sub', text: 'Subcon: ' + subconNames(r) }) : null,
             prioChip(r.priority));
           case 'status': return h('td', null, statusPill(r));
           case 'last': return h('td', { class: 'cell-text' }, r.last_action
@@ -1008,7 +1072,7 @@
       if (f.owner && f.owner !== 'me' && f.owner !== 'none' && String(r.owner_id) !== f.owner) return false;
       if (q) {
         const hay = [r.ref, r.title, r.organisation, r.contact_name, r.contact_info, r.category, r.last_action, r.next_action, r.description]
-          .concat(r.xrefs.map((x) => x.system + ' ' + x.ref)).join(' ').toLowerCase();
+          .concat(r.xrefs.map((x) => x.system + ' ' + x.ref), subconNames(r)).join(' ').toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
@@ -1063,30 +1127,23 @@
   function exportCsv(module) {
     const m = mods()[module];
     const rows = sortRows(filteredRecords(module), S.sort[module]);
-    const cell = (v) => {
-      let s = (v === null || v === undefined) ? '' : String(v);
-      if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;  // stop spreadsheets treating text as a formula
-      return '"' + s.replace(/"/g, '""') + '"';
-    };
+    const cell = csvCell;
+    const withSubcons = usesSubcons(module);
     const header = ['Reference', 'Title', m.org_label, 'Contact name', 'Contact details', m.category_label, 'Status', 'Priority', 'Owner',
       m.amount_label, m.start_label, m.due_label, 'Last action', 'Last action date', 'Next action', 'Next action due',
       'Linked records', 'External references', 'Created', 'Last updated'];
+    if (withSubcons) header.push('Subcontractors');
     const lines = [header.map(cell).join(',')];
     rows.forEach((r) => {
       const linked = (S.I.links.get(r.id) || []).map((id) => (S.I.recs.get(id) || S.data.restricted[String(id)] || {}).ref || '').filter(Boolean).join('; ');
-      lines.push([r.ref, r.title, r.organisation, r.contact_name, r.contact_info, r.category, r.status, r.priority,
+      const values = [r.ref, r.title, r.organisation, r.contact_name, r.contact_info, r.category, r.status, r.priority,
         r.owner_id === null ? '' : userName(r.owner_id), r.amount === null ? '' : Number(r.amount).toFixed(2), r.start_date, r.due_date,
         r.last_action, r.last_action_date, r.next_action, r.next_action_date, linked,
-        r.xrefs.map((x) => x.system + ': ' + x.ref).join('; '), r.created_at, r.updated_at].map(cell).join(','));
+        r.xrefs.map((x) => x.system + ': ' + x.ref).join('; '), r.created_at, r.updated_at];
+      if (withSubcons) values.push((S.I.subsByRec.get(r.id) || []).map((x) => x.sub.name + (x.scope ? ' (' + x.scope + ')' : '')).join('; '));
+      lines.push(values.map(cell).join(','));
     });
-    const blob = new Blob(['﻿' + lines.join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = h('a', { href: url, download: 'insys-' + viewForModule(module) + '-' + today() + '.csv' });
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 5000);
-    toast('Exported ' + plural(rows.length, 'row') + '.');
+    saveCsv('insys-' + viewForModule(module) + '-' + today() + '.csv', lines);
   }
 
   // ------------------------------------------------------------------
@@ -1354,6 +1411,13 @@
       h('div', null, h('div', { class: 'kicker', text: kicker }), h('h1', { text: title })),
       h('button', { type: 'button', class: 'btn small', text: 'Close', onclick: close }));
 
+    if (S.openRef.slice(0, 4) === 'SUB-') {
+      const panel = subconDrawer(top);
+      host.replaceChildren(h('div', { class: 'backdrop', onclick: close }), panel);
+      panel.scrollTop = scroll;
+      return;
+    }
+
     if (!rec) {
       host.replaceChildren(
         h('div', { class: 'backdrop', onclick: close }),
@@ -1404,7 +1468,7 @@
 
     const tasks = sortTasks(S.I.tasksByRec.get(rec.id) || []);
     const hist = S.history.id === rec.id ? S.history.items : null;
-    const kindLabel = { created: 'Created', updated: 'Edited', action: 'Action', note: 'Note', link: 'Link', xref: 'Reference', task: 'Task' };
+    const kindLabel = { created: 'Created', updated: 'Edited', action: 'Action', note: 'Note', link: 'Link', xref: 'Reference', task: 'Task', subcon: 'Subcontractor' };
 
     const drawer = h('aside', { class: 'drawer', role: 'dialog', 'aria-label': rec.ref + ' ' + rec.title },
       top(rec.ref + ' · ' + m.singular, rec.title),
@@ -1452,6 +1516,8 @@
         detail('Created', fmtDateTime(rec.created_at) + ' by ' + userName(rec.created_by)),
         detail('Last updated', fmtDateTime(rec.updated_at) + ' by ' + userName(rec.updated_by)))),
 
+      usesSubcons(rec.module) ? subconCard(rec) : null,
+
       h('section', { class: 'card' },
         h('div', { class: 'section-head' }, h('h2', { text: 'Cross-references' }),
           h('div', { class: 'actions' },
@@ -1486,6 +1552,382 @@
   }
 
   // ------------------------------------------------------------------
+  // Subcontractors: directory, picker, and their place on a record
+  // ------------------------------------------------------------------
+
+  const DISCIPLINES = ['Structural', 'Civil', 'Mechanical', 'Electrical', 'HVAC', 'Plumbing / hydraulics',
+    'Fire protection', 'Geotechnical', 'Surveying', 'Architectural', 'Environmental', 'Instrumentation & controls'];
+
+  const subconHay = (sub) => [sub.ref, sub.name, sub.discipline, sub.services, sub.contact_name, sub.email,
+    sub.phone, sub.address, sub.registration, sub.notes].join(' ').toLowerCase();
+
+  const subHref = (sub) => '#/' + S.view + '/' + sub.ref;
+
+  function workSummary(open) {
+    const n = (module) => open.filter((x) => x.rec.module === module).length;
+    const parts = [];
+    if (n('project')) parts.push(plural(n('project'), 'project'));
+    if (n('enquiry')) parts.push(plural(n('enquiry'), 'enquiry', 'enquiries'));
+    if (n('eoi')) parts.push(plural(n('eoi'), 'EOI'));
+    return parts.join(' · ');
+  }
+
+  /** Next action of a record, as shown in the subcontractor lists. */
+  function nextActionCell(r) {
+    if (!isOpen(r)) return h('span', { class: 'muted', text: '—' });
+    return [r.next_action ? h('div', { text: r.next_action }) : null,
+      r.next_action_date ? dueChip(r.next_action_date) : h('span', { class: 'chip none', text: r.next_action ? 'No date set' : 'Not set' })];
+  }
+
+  function subconForm(sub, opts) {
+    const options = opts || {};
+    const known = Array.from(new Set(DISCIPLINES.concat(S.data.subcons.map((x) => x.discipline).filter(Boolean)))).sort();
+    formDialog({
+      title: sub ? 'Edit ' + sub.ref : 'Add a subcontractor to the directory',
+      intro: sub ? null : 'Once in the directory, a subcontractor can be added to any project, enquiry or expression of interest.',
+      wide: true,
+      fields: [
+        { name: 'name', label: 'Subcontractor / company name', required: true, full: true, maxlength: 150, value: sub ? sub.name : (options.name || '') },
+        { name: 'discipline', label: 'Discipline', maxlength: 100, options: known, placeholder: 'e.g. Structural', value: sub ? sub.discipline : '' },
+        { name: 'active', label: 'Status', type: 'select', value: sub && !sub.active ? 'no' : 'yes',
+          options: [{ value: 'yes', label: 'Active' }, { value: 'no', label: 'Inactive (not for new work)' }] },
+        { name: 'contact_name', label: 'Contact person', maxlength: 150, value: sub ? sub.contact_name : '' },
+        { name: 'phone', label: 'Phone', maxlength: 60, value: sub ? sub.phone : '' },
+        { name: 'email', label: 'Email', maxlength: 200, value: sub ? sub.email : '' },
+        { name: 'website', label: 'Website', maxlength: 300, value: sub ? sub.website : '' },
+        { name: 'registration', label: 'Registration / licence number', maxlength: 100, full: true, value: sub ? sub.registration : '' },
+        { name: 'address', label: 'Address', type: 'textarea', rows: 2, full: true, maxlength: 500, value: sub ? sub.address : '' },
+        { name: 'services', label: 'Engineering services provided', type: 'textarea', rows: 3, full: true, maxlength: 2000, value: sub ? sub.services : '' },
+        { name: 'notes', label: 'Notes', type: 'textarea', rows: 3, full: true, maxlength: 5000, value: sub ? sub.notes : '',
+          hint: 'For example rates, insurance and accreditation details, or past performance.' },
+      ],
+      submitLabel: sub ? 'Save changes' : 'Add to directory',
+      onSubmit: async (v) => {
+        const body = {
+          name: v.name, discipline: v.discipline, active: v.active === 'yes', contact_name: v.contact_name, phone: v.phone,
+          email: v.email, website: v.website, registration: v.registration, address: v.address, services: v.services, notes: v.notes,
+        };
+        if (sub) {
+          body.version = sub.version;
+          await api('PUT', '/api/subcons/' + sub.id, body);
+          await refresh();
+          toast(sub.ref + ' saved.');
+        } else {
+          const res = await api('POST', '/api/subcons', body);
+          await refresh();
+          toast(res.subcon.name + ' added to the directory as ' + res.subcon.ref + '.');
+          if (options.after) await options.after(res.subcon);
+          else go('subcons', res.subcon.ref);
+        }
+      },
+    });
+  }
+
+  /** The searchable pop-up for putting subcontractors on a record. Stays open so several can be added. */
+  function subconPicker(rec) {
+    const search = h('input', { id: 'subcon-search', type: 'search', autocomplete: 'off', placeholder: 'Search by name, discipline, contact…', 'aria-label': 'Search subcontractors' });
+    const list = h('div', { class: 'pick-list' });
+    const error = h('div', { class: 'form-error', role: 'alert', hidden: true });
+    const dlg = h('dialog', { class: 'dlg wide' });
+    let busy = false;
+
+    const add = async (sub) => {
+      if (busy) return;
+      busy = true;
+      error.hidden = true;
+      try {
+        await api('POST', '/api/records/' + rec.id + '/subcons', { subcon_id: sub.id });
+        await refresh();
+      } catch (e) {
+        error.textContent = e.message;
+        error.hidden = false;
+      }
+      busy = false;
+      draw();
+    };
+
+    const draw = () => {
+      const current = S.I.recs.get(rec.id);
+      if (!current) { dlg.close(); return; }
+      const on = new Set((S.I.subsByRec.get(current.id) || []).map((x) => x.sub.id));
+      const q = search.value.trim().toLowerCase();
+      const all = S.data.subcons.filter((sub) => sub.active || on.has(sub.id));
+      const shown = all.filter((sub) => !q || subconHay(sub).includes(q));
+      if (!shown.length) {
+        list.replaceChildren(h('div', { class: 'pick-empty', text: all.length
+          ? 'No subcontractor matches "' + search.value.trim() + '". Use "New subcontractor" to add them to the directory.'
+          : 'The directory is empty. Use "New subcontractor" to add the first one.' }));
+        return;
+      }
+      list.replaceChildren(...shown.map((sub) => {
+        const added = on.has(sub.id);
+        return h('button', {
+          type: 'button', class: 'pick' + (added ? ' added' : ''), disabled: added,
+          'aria-label': (added ? 'Already added: ' : 'Add ') + sub.name,
+          onclick: () => add(sub),
+        },
+        h('span', { class: 'pick-main' },
+          h('span', { class: 'cell-title', text: sub.name }),
+          h('span', { class: 'cell-sub', text: [sub.ref, sub.discipline, sub.contact_name, sub.phone].filter(Boolean).join(' · ') })),
+        h('span', { class: 'pick-side', text: added ? '✓ Added' : 'Add' }));
+      }));
+    };
+
+    search.addEventListener('input', draw);
+    search.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const first = list.querySelector('button.pick:not(:disabled)');
+        if (first) first.click();
+      }
+    });
+    dlg.appendChild(h('div', { class: 'dlg-form' },
+      h('div', { class: 'dlg-head' }, h('h2', { text: 'Add subcontractors to ' + rec.ref }),
+        h('p', { text: 'Click a subcontractor to add them. You can add as many as are working on this in parallel.' })),
+      h('div', { class: 'dlg-body' }, error, search, list),
+      h('div', { class: 'dlg-foot split' },
+        h('button', {
+          type: 'button', class: 'btn', text: '+ New subcontractor',
+          onclick: () => subconForm(null, { name: search.value.trim(), after: async (sub) => { search.value = ''; await add(sub); } }),
+        }),
+        h('button', { type: 'button', class: 'btn primary', text: 'Done', onclick: () => dlg.close() }))));
+    dlg.addEventListener('close', () => dlg.remove());
+    document.body.appendChild(dlg);
+    dlg.showModal();
+    draw();
+    search.focus();
+  }
+
+  function scopeForm(rec, entry) {
+    formDialog({
+      title: entry.sub.name + ' on ' + rec.ref,
+      intro: 'What is this subcontractor doing on this ' + mods()[rec.module].singular.toLowerCase() + '?',
+      fields: [{ name: 'scope', label: 'Scope of work', full: true, maxlength: 300, value: entry.scope, placeholder: 'e.g. Structural design and certification' }],
+      submitLabel: 'Save scope',
+      onSubmit: async (v) => {
+        await api('PUT', '/api/records/' + rec.id + '/subcons/' + entry.sub.id, { scope: v.scope });
+        await refresh();
+      },
+    });
+  }
+
+  /** The "Subcontractors" card inside a project, enquiry or EOI. */
+  function subconCard(rec) {
+    const entries = S.I.subsByRec.get(rec.id) || [];
+    return h('section', { class: 'card' },
+      h('div', { class: 'section-head' }, h('h2', { text: 'Subcontractors' }),
+        h('button', { type: 'button', class: 'btn small', text: 'Add subcontractor', onclick: () => subconPicker(rec) })),
+      entries.length ? h('ul', { class: 'list' }, entries.map((entry) => h('li', null,
+        h('div', { class: 'main' },
+          h('a', { class: 'cell-title', href: subHref(entry.sub), text: entry.sub.name }),
+          entry.sub.active ? null : [' ', h('span', { class: 'tag', text: 'Inactive' })],
+          h('div', { class: 'small muted', text: [entry.sub.discipline, entry.scope ? 'Scope: ' + entry.scope : 'No scope noted'].filter(Boolean).join(' · ') })),
+        h('div', { class: 'side' },
+          h('button', { type: 'button', class: 'btn quiet', text: 'Scope', 'aria-label': 'Edit scope of work for ' + entry.sub.name, onclick: () => scopeForm(rec, entry) }),
+          h('button', {
+            type: 'button', class: 'btn quiet dangerous', text: 'Remove', 'aria-label': 'Remove ' + entry.sub.name + ' from ' + rec.ref,
+            onclick: () => confirmDialog('Remove ' + entry.sub.name + '?', entry.sub.name + ' will be taken off ' + rec.ref + '. They stay in the directory.', 'Remove', async () => {
+              await api('DELETE', '/api/records/' + rec.id + '/subcons/' + entry.sub.id);
+              await refresh();
+            }),
+          })))))
+        : h('p', { class: 'muted small', text: 'No subcontractors on this ' + mods()[rec.module].singular.toLowerCase() + ' yet.' }));
+  }
+
+  function workList(items) {
+    return h('ul', { class: 'list' }, items.map((x) => h('li', null,
+      h('div', { class: 'main' },
+        h('a', { class: 'ref', href: recHref(x.rec), text: x.rec.ref }), ' ', h('span', { class: 'cell-title', text: x.rec.title }),
+        h('div', { class: 'small muted', text: [mods()[x.rec.module].singular, x.scope ? 'Scope: ' + x.scope : '', 'Owner: ' + userName(x.rec.owner_id)].filter(Boolean).join(' · ') }),
+        isOpen(x.rec) ? h('div', { class: 'small', text: x.rec.next_action ? 'Next: ' + x.rec.next_action : 'No next action set' }) : null),
+      h('div', { class: 'side' },
+        isOpen(x.rec) && x.rec.next_action_date ? dueChip(x.rec.next_action_date) : null,
+        prioChip(x.rec.priority), statusPill(x.rec)))));
+  }
+
+  /** The panel that opens for a subcontractor (SUB-0001). */
+  function subconDrawer(top) {
+    const sub = S.I.subByRef.get(S.openRef);
+    if (!sub) {
+      return h('aside', { class: 'drawer', role: 'dialog', 'aria-label': 'Subcontractor ' + S.openRef },
+        top(S.openRef, 'Subcontractor not available'),
+        h('p', { class: 'muted', text: 'This subcontractor has been deleted from the directory.' }));
+    }
+    const work = subconWork(sub);
+    const link = (href, text) => h('a', { href: href, target: '_blank', rel: 'noopener noreferrer', text: text });
+    return h('aside', { class: 'drawer', role: 'dialog', 'aria-label': sub.ref + ' ' + sub.name },
+      top(sub.ref + ' · Subcontractor', sub.name),
+      h('div', { class: 'badges' },
+        h('span', { class: 'pill ' + (sub.active ? 'done' : 'dead'), text: sub.active ? 'Active' : 'Inactive' }),
+        sub.discipline ? h('span', { class: 'tag', text: sub.discipline }) : null,
+        h('span', { class: 'muted small', text: work.open.length ? 'Working on ' + workSummary(work.open) : 'No current work' })),
+      h('div', { class: 'actions' },
+        h('button', { type: 'button', class: 'btn primary', text: 'Edit details', onclick: () => subconForm(sub) }),
+        isAdmin() ? h('button', {
+          type: 'button', class: 'btn quiet dangerous', text: 'Delete',
+          onclick: () => confirmDialog('Delete ' + sub.name + '?', 'This removes ' + sub.name + ' from the directory' +
+            (work.all.length ? ' and from the ' + plural(work.all.length, 'record') + ' they are on' : '') +
+            '. This cannot be undone. To keep the history, mark them Inactive instead.', 'Delete permanently', async () => {
+            await api('DELETE', '/api/subcons/' + sub.id);
+            go(S.view);
+            await refresh();
+            toast(sub.name + ' deleted from the directory.');
+          }, true),
+        }) : null),
+
+      card('Current work', work.open.length ? 'Most urgent action first' : null,
+        work.open.length ? workList(work.open) : h('p', { class: 'muted small', text: 'Not on any open project, enquiry or expression of interest. Add them from a record with "Add subcontractor".' })),
+
+      card('Details', null, h('div', { class: 'details' },
+        detail('Discipline', sub.discipline),
+        detail('Contact person', sub.contact_name),
+        detail('Phone', sub.phone ? h('a', { href: 'tel:' + sub.phone.replace(/[^0-9+]/g, ''), text: sub.phone }) : ''),
+        detail('Email', sub.email ? h('a', { href: 'mailto:' + sub.email, text: sub.email }) : ''),
+        detail('Website', sub.website ? link(sub.website, sub.website) : ''),
+        detail('Registration / licence number', sub.registration),
+        detail('Address', sub.address, true, true),
+        detail('Engineering services provided', sub.services, true, true),
+        detail('Notes', sub.notes, true, true),
+        detail('Added to directory', fmtDateTime(sub.created_at) + ' by ' + userName(sub.created_by)),
+        detail('Last updated', fmtDateTime(sub.updated_at) + ' by ' + userName(sub.updated_by)))),
+
+      work.closed.length ? card('Past work', plural(work.closed.length, 'closed item'), workList(work.closed)) : null);
+  }
+
+  function exportSubconsCsv(subs) {
+    const header = ['Reference', 'Subcontractor', 'Discipline', 'Status', 'Contact person', 'Phone', 'Email', 'Website',
+      'Registration / licence', 'Address', 'Services', 'Notes', 'Open projects', 'Open enquiries', 'Open EOIs',
+      'Current work', 'Most urgent action', 'Most urgent action due'];
+    const lines = [header.map(csvCell).join(',')];
+    subs.forEach((sub) => {
+      const work = subconWork(sub);
+      const n = (module) => work.open.filter((x) => x.rec.module === module).length;
+      lines.push([sub.ref, sub.name, sub.discipline, sub.active ? 'Active' : 'Inactive', sub.contact_name, sub.phone, sub.email, sub.website,
+        sub.registration, sub.address, sub.services, sub.notes, n('project'), n('enquiry'), n('eoi'),
+        work.open.map((x) => x.rec.ref).join('; '),
+        work.top ? work.top.rec.ref + ': ' + (work.top.rec.next_action || 'no next action set') : '',
+        work.top ? work.top.rec.next_action_date : ''].map(csvCell).join(','));
+    });
+    saveCsv('insys-subcontractors-' + today() + '.csv', lines);
+  }
+
+  function viewSubcons() {
+    const f = S.filters.subcons || (S.filters.subcons = { q: '', status: 'active', mode: 'directory', sort: 'urgent' });
+    const t = today();
+    const subs = S.data.subcons;
+    const work = new Map(subs.map((sub) => [sub.id, subconWork(sub)]));
+    const engaged = subs.filter((sub) => work.get(sub.id).open.length);
+    const late = engaged.filter((sub) => work.get(sub.id).open.some((x) => x.rec.next_action_date && x.rec.next_action_date < t));
+    const host = h('div');
+
+    const visible = () => {
+      const q = f.q.trim().toLowerCase();
+      return subs.filter((sub) => {
+        if (f.status === 'active' && !sub.active) return false;
+        if (f.status === 'inactive' && sub.active) return false;
+        if (f.status === 'engaged' && !work.get(sub.id).open.length) return false;
+        if (!q) return true;
+        // Also match on the work they are doing, so "PRJ-0003" finds its subcontractors.
+        return (subconHay(sub) + ' ' + work.get(sub.id).all.map((x) => x.rec.ref + ' ' + x.rec.title).join(' ').toLowerCase()).includes(q);
+      });
+    };
+
+    const directory = () => {
+      const rows = visible().sort((a, b) => {
+        const wa = work.get(a.id); const wb = work.get(b.id);
+        if (f.sort === 'urgent') {
+          if (wa.top && wb.top) { const c = byUrgency(wa.top.rec, wb.top.rec); if (wa.top.rec.id !== wb.top.rec.id) return c; }
+          else if (wa.top || wb.top) return wa.top ? -1 : 1;
+        } else if (f.sort === 'busy' && wa.open.length !== wb.open.length) {
+          return wb.open.length - wa.open.length;
+        }
+        return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+      });
+      if (!rows.length) {
+        return h('div', { class: 'table-wrap' }, h('div', { class: 'empty', text: subs.length
+          ? 'No subcontractor matches these filters.'
+          : 'The directory is empty. Use "+ Add subcontractor" to add the first one.' }));
+      }
+      return h('div', { class: 'table-wrap' }, h('table', null,
+        h('thead', null, h('tr', null, ['Ref', 'Subcontractor', 'Contact', 'Current work', 'Most urgent action'].map((x) => h('th', { scope: 'col', text: x })))),
+        h('tbody', null, rows.map((sub) => {
+          const w = work.get(sub.id);
+          return h('tr', { class: 'clickable', onclick: (e) => { if (!e.target.closest('a, button, input')) go('subcons', sub.ref); } },
+            h('td', null, h('a', { class: 'ref', href: subHref(sub), text: sub.ref })),
+            h('td', { class: 'cell-text' },
+              h('div', { class: 'cell-title', text: sub.name }),
+              sub.discipline ? h('div', { class: 'cell-sub', text: sub.discipline }) : null,
+              sub.active ? null : h('span', { class: 'tag', text: 'Inactive' })),
+            h('td', { class: 'cell-text' },
+              sub.contact_name ? h('div', { text: sub.contact_name }) : null,
+              h('div', { class: 'cell-sub', text: [sub.phone, sub.email].filter(Boolean).join(' · ') || (sub.contact_name ? '' : '—') })),
+            h('td', { class: 'cell-text' }, w.open.length
+              ? [h('div', { text: workSummary(w.open) }), h('div', { class: 'cell-sub' }, w.open.map((x, i) => [i ? ', ' : '', h('a', { href: recHref(x.rec), text: x.rec.ref, title: x.rec.title })]))]
+              : h('span', { class: 'muted', text: 'None' })),
+            h('td', { class: 'cell-text' }, w.top
+              ? [h('div', { class: 'cell-sub' }, h('a', { class: 'ref', href: recHref(w.top.rec), text: w.top.rec.ref }), ' ', w.top.rec.title),
+                nextActionCell(w.top.rec), ' ', prioChip(w.top.rec.priority)]
+              : h('span', { class: 'muted', text: '—' })));
+        }))));
+    };
+
+    const priorities = () => {
+      const shown = new Set(visible().map((sub) => sub.id));
+      const rows = [];
+      subs.forEach((sub) => { if (shown.has(sub.id)) work.get(sub.id).open.forEach((x) => rows.push({ sub: sub, rec: x.rec, scope: x.scope })); });
+      rows.sort((a, b) => (a.rec.id === b.rec.id ? (a.sub.name.toLowerCase() < b.sub.name.toLowerCase() ? -1 : 1) : byUrgency(a.rec, b.rec)));
+      if (!rows.length) {
+        return h('div', { class: 'table-wrap' }, h('div', { class: 'empty', text: 'No subcontractor is on any open project, enquiry or expression of interest' + (f.q || f.status !== 'active' ? ' that matches these filters.' : '.') }));
+      }
+      return h('div', { class: 'table-wrap' }, h('table', null,
+        h('thead', null, h('tr', null, ['Next action', 'Subcontractor', 'Ref', 'Section', 'Title', 'Status', 'Owner'].map((x) => h('th', { scope: 'col', text: x })))),
+        h('tbody', null, rows.map((x) => h('tr', { class: 'clickable', onclick: (e) => { if (!e.target.closest('a, button, input')) go('subcons', x.rec.ref); } },
+          h('td', { class: 'cell-text' }, nextActionCell(x.rec), ' ', prioChip(x.rec.priority)),
+          h('td', { class: 'cell-text' }, h('a', { class: 'cell-title', href: subHref(x.sub), text: x.sub.name }),
+            h('div', { class: 'cell-sub', text: [x.sub.discipline, x.scope].filter(Boolean).join(' · ') })),
+          h('td', null, h('a', { class: 'ref', href: recHref(x.rec), text: x.rec.ref })),
+          h('td', { class: 'nowrap', text: mods()[x.rec.module].singular }),
+          h('td', { class: 'cell-text' }, h('div', { class: 'cell-title', text: x.rec.title }),
+            x.rec.organisation ? h('div', { class: 'cell-sub', text: x.rec.organisation }) : null),
+          h('td', null, statusPill(x.rec)),
+          h('td', { class: x.rec.owner_id === null ? 'muted nowrap' : 'nowrap', text: userName(x.rec.owner_id) }))))));
+    };
+
+    const sortSelect = h('select', { id: 'flt-subcons-sort', 'aria-label': 'Order', value: f.sort, onchange: (e) => { f.sort = e.target.value; draw(); } },
+      h('option', { value: 'urgent', text: 'Most urgent action first' }), h('option', { value: 'busy', text: 'Most current work first' }), h('option', { value: 'name', text: 'Name A to Z' }));
+    const draw = () => {
+      sortSelect.hidden = f.mode !== 'directory';
+      host.replaceChildren(f.mode === 'work' ? priorities() : directory());
+    };
+    draw();
+
+    const modes = [['directory', 'Directory'], ['work', 'Work by priority']];
+    return h('div', { class: 'view' },
+      h('div', { class: 'view-head' },
+        h('div', null, h('h1', { text: 'Subcontractors' }),
+          h('p', { class: 'sub', text: 'Directory of subcontractors, and the projects, enquiries and expressions of interest each one is working on.' })),
+        h('div', { class: 'actions' },
+          h('button', { type: 'button', class: 'btn', text: 'Export CSV', title: 'Download the subcontractors shown below as a spreadsheet', onclick: () => exportSubconsCsv(visible()) }),
+          h('button', { type: 'button', class: 'btn primary', text: '+ Add subcontractor', onclick: () => subconForm(null) }))),
+      h('div', { class: 'tiles' },
+        tile('In the directory', subs.length, null, subs.filter((sub) => !sub.active).length ? subs.filter((sub) => !sub.active).length + ' inactive' : null),
+        tile('On open work', engaged.length, null, 'Projects, enquiries and EOIs'),
+        tile('With an overdue action', late.length, late.length ? { kind: 'crit', text: 'Needs attention' } : (engaged.length ? { kind: 'good', text: 'None overdue' } : null)),
+        tile('Not currently used', subs.filter((sub) => sub.active).length - engaged.filter((sub) => sub.active).length, null, 'Active, with no open work')),
+      h('div', { class: 'tabs', role: 'tablist' }, modes.map((x) => h('button', {
+        type: 'button', role: 'tab', 'aria-selected': String(f.mode === x[0]), class: f.mode === x[0] ? 'active' : null, text: x[1],
+        onclick: () => { f.mode = x[0]; renderMain(); },
+      }))),
+      h('div', { class: 'filters' },
+        h('input', { id: 'flt-subcons-q', type: 'search', placeholder: 'Search name, discipline, contact, or a record…', 'aria-label': 'Search subcontractors', value: f.q, oninput: (e) => { f.q = e.target.value; draw(); } }),
+        h('select', { id: 'flt-subcons-status', 'aria-label': 'Show', value: f.status, onchange: (e) => { f.status = e.target.value; draw(); } },
+          h('option', { value: 'active', text: 'Active subcontractors' }), h('option', { value: 'engaged', text: 'On open work' }),
+          h('option', { value: 'all', text: 'All, including inactive' }), h('option', { value: 'inactive', text: 'Inactive only' })),
+        sortSelect),
+      host);
+  }
+
+  // ------------------------------------------------------------------
   // Global search
   // ------------------------------------------------------------------
 
@@ -1499,10 +1941,22 @@
       const refHit = r.ref.toLowerCase().includes(q);
       const xref = r.xrefs.find((x) => (x.system + ' ' + x.ref).toLowerCase().includes(q));
       const textHit = [r.title, r.organisation, r.contact_name, r.contact_info].join(' ').toLowerCase().includes(q);
-      if (refHit || xref || textHit) hits.push({ r: r, rank: refHit ? 0 : (xref ? 1 : 2), xref: xref });
+      const subHit = !refHit && !xref && !textHit && subconNames(r).toLowerCase().includes(q);
+      if (refHit || xref || textHit || subHit) hits.push({ r: r, rank: refHit ? 0 : (xref ? 1 : (textHit ? 2 : 3)), xref: xref });
     }
     hits.sort((a, b) => a.rank - b.rank || b.r.id - a.r.id);
-    const shown = hits.slice(0, 12).map((x) => h('button', {
+    const subs = S.data.subcons.filter((sub) => [sub.ref, sub.name, sub.discipline, sub.contact_name, sub.email, sub.phone]
+      .join(' ').toLowerCase().includes(q)).slice(0, 5).map((sub) => h('button', {
+      type: 'button',
+      onclick: () => {
+        document.getElementById('global-search').value = '';
+        drawSearch('');
+        go('subcons', sub.ref);
+      },
+    },
+    h('span', { class: 'ref', text: sub.ref }), ' ', h('span', { text: sub.name }),
+    h('div', { class: 'meta', text: ['Subcontractor', sub.discipline, sub.contact_name, sub.active ? '' : 'Inactive'].filter(Boolean).join(' · ') })));
+    const shown = subs.concat(hits.slice(0, 12).map((x) => h('button', {
       type: 'button',
       onclick: () => {
         document.getElementById('global-search').value = '';
@@ -1511,8 +1965,9 @@
       },
     },
     h('span', { class: 'ref', text: x.r.ref }), ' ', h('span', { text: x.r.title }),
-    h('div', { class: 'meta', text: [mods()[x.r.module].singular, x.r.status, x.r.organisation, x.xref ? x.xref.system + ' ' + x.xref.ref : ''].filter(Boolean).join(' · ') })));
-    host.replaceChildren(...(shown.length ? shown : [h('div', { class: 'none', text: 'No records match "' + text.trim() + '".' })]));
+    h('div', { class: 'meta', text: [mods()[x.r.module].singular, x.r.status, x.r.organisation, x.xref ? x.xref.system + ' ' + x.xref.ref : '',
+      x.rank === 3 ? 'Subcon: ' + subconNames(x.r) : ''].filter(Boolean).join(' · ') }))));
+    host.replaceChildren(...(shown.length ? shown : [h('div', { class: 'none', text: 'Nothing matches "' + text.trim() + '".' })]));
     host.hidden = false;
   }
 
@@ -1657,6 +2112,7 @@
       setup: 'InSys set up', login_ok: 'Signed in', login_failed: 'Failed sign-in', password_changed: 'Password changed',
       password_reset: 'Password reset', user_created: 'Login created', user_updated: 'Login changed',
       record_deleted: 'Record deleted', backup_downloaded: 'Backup downloaded', settings_changed: 'Settings changed',
+      upgraded: 'InSys upgraded', subcon_deleted: 'Subcontractor deleted',
     };
     if (!items.length) return h('div', { class: 'table-wrap' }, h('div', { class: 'empty', text: 'Nothing logged yet.' }));
     return h('div', { class: 'table-wrap' }, h('table', null,
