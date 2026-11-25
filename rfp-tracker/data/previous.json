@@ -15,16 +15,17 @@
   "first_published": "2026-11-17",
   "headline": "Bab Gas Cap main plant (EPC package 1): technical bids in on 16 November, four consortiums reported",
   "id": "p-bab-gas-cap-development",
-  "last_found": "2026-11-23",
-  "last_published": "2026-11-18",
+  "last_found": "2026-11-24",
+  "last_published": "2026-11-24",
   "name": "Bab Gas Cap development",
   "notes": [
-   "Research 23 Nov: the bid deadline was extended four months to 16 Nov 2026. Package 1 is the largest of four EPC packages. Construction Review reports four consortiums bidding but the names are not in free sources; MEED reported a Tecnimont and CPECC team forming earlier (unconfirmed for this package). The named list is in MEED's paid article."
+   "Research 23 Nov: the bid deadline was extended four months to 16 Nov 2026. Package 1 is the largest of four EPC packages. Construction Review reports four consortiums bidding but the names are not in free sources; MEED reported a Tecnimont and CPECC team forming earlier (unconfirmed for this package). The named list is in MEED's paid article.",
+   "Research 24 Nov: per MEED, Worley was awarded the FEED for the Bab gas cap plant in the December before the EPC expressions of interest went out (10 Feb 2026). Worley is the FEED contractor, not a bidder. Bidder names still not in free sources."
   ],
   "outlook": false,
   "parties": {},
   "priority": "High",
-  "score": 166,
+  "score": 168,
   "sectors": [
    "gas",
    "onshore"
@@ -34,7 +35,8 @@
    "n-435d2ef1bf22",
    "n-eb848404879b",
    "n-fb9b0ba1e90b",
-   "n-ac847052907a"
+   "n-ac847052907a",
+   "m-e749966f4f2c"
   ],
   "stage": "bid_evaluation",
   "status": "active",
@@ -166,6 +168,46 @@
   "value_usd": null
  },
  {
+  "also": [],
+  "approach": {
+   "notes": [
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Onshore work: Mannesmann Energy, Jereh."
+   ],
+   "targets": []
+  },
+  "client": "ADNOC Onshore",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-10-27",
+  "headline": "Bab gas cap well tie-ins: 18 EPC packages, bids extended again",
+  "id": "p-bab-gas-cap-well-tie-ins",
+  "last_found": "2026-11-24",
+  "last_published": "2026-11-18",
+  "name": "Bab Gas Cap well tie-ins",
+  "notes": [
+   "Research 24 Nov: the tie-in scope is split into 18 EPC packages; MEED has put the budget at $800m-plus and, in an earlier report, $1.2bn. MEED reported on 27 Oct that contractors were selected for a 'Bab and North East Bab One' tie-in project, without naming them; it is unconfirmed whether that is the same tender. No bidders named in free sources."
+  ],
+  "outlook": false,
+  "parties": {},
+  "priority": "High",
+  "score": 156,
+  "sectors": [
+   "gas",
+   "onshore"
+  ],
+  "signal_ids": [
+   "n-b1a2bf48a400",
+   "n-428c07727824",
+   "m-8db62a3b1f85",
+   "n-9868af88366e"
+  ],
+  "stage": "tender",
+  "status": "active",
+  "value_usd": null
+ },
+ {
   "also": [
    {
     "date": "2026-11-04",
@@ -214,100 +256,6 @@
   "value_usd": 2000000000.0
  },
  {
-  "also": [],
-  "approach": {
-   "notes": [],
-   "targets": [
-    {
-     "kind": "winner",
-     "links": [
-      {
-       "role": "Project Director",
-       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Project%20Director%20UAE"
-      },
-      {
-       "role": "Engineering Manager",
-       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Engineering%20Manager%20UAE"
-      },
-      {
-       "role": "Subcontracts Manager",
-       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Subcontracts%20Manager%20UAE"
-      }
-     ],
-     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
-     "org": "Mannesmann Energy",
-     "roles": [
-      "Project Director",
-      "Engineering Manager",
-      "Subcontracts Manager"
-     ],
-     "urgency": 2,
-     "why": "Won North East Bab (NEB) facilities upgrade."
-    }
-   ]
-  },
-  "client": "ADNOC Onshore",
-  "contract_type": "EPC",
-  "deadline": "",
-  "filed": true,
-  "first_found": "2026-11-23",
-  "first_published": "2026-11-14",
-  "headline": "Adnoc Onshore hires Mannesmann for phase two of its Northeast Bab upgrade",
-  "id": "p-north-east-bab-neb-facilities-upgrade",
-  "last_found": "2026-11-23",
-  "last_published": "2026-11-23",
-  "name": "North East Bab (NEB) facilities upgrade",
-  "notes": [],
-  "outlook": false,
-  "parties": {
-   "Mannesmann Energy": {
-    "evidence": [
-     "n-2f40ae0ffc77",
-     "n-5ffa6cc269e0",
-     "n-10fee630b2f3",
-     "n-1278b98fafab",
-     "n-679d98c4f0d4",
-     "n-933a24c50ca1",
-     "n-cf2c0a2c7150",
-     "n-090a1b33f634",
-     "n-e93ac8abf47b",
-     "n-41dcdf0d798c",
-     "n-76a8b19f6611",
-     "n-681aee6d9c43"
-    ],
-    "first_seen": "2026-11-14",
-    "last_seen": "2026-11-23",
-    "role": "winner",
-    "type": "epc"
-   }
-  },
-  "priority": "High",
-  "score": 117,
-  "sectors": [
-   "brownfield",
-   "gas",
-   "hydrogen",
-   "onshore"
-  ],
-  "signal_ids": [
-   "n-2f40ae0ffc77",
-   "n-5ffa6cc269e0",
-   "n-10fee630b2f3",
-   "n-1278b98fafab",
-   "n-679d98c4f0d4",
-   "n-933a24c50ca1",
-   "n-cf2c0a2c7150",
-   "n-090a1b33f634",
-   "n-e93ac8abf47b",
-   "n-41dcdf0d798c",
-   "n-76a8b19f6611",
-   "n-681aee6d9c43"
-  ],
-  "stage": "awarded",
-  "status": "active",
-  "value_usd": null
- },
- {
   "also": [
    {
     "date": "2026-11-04",
@@ -353,18 +301,21 @@
   "filed": true,
   "first_found": "2026-11-23",
   "first_published": "2026-11-02",
-  "headline": "Jereh Signs $2.7B ADNOC Onshore Contracts incl. Ruwais Diyab",
+  "headline": "Jereh's three ADNOC Onshore awards are letters of award; formal contracts not yet signed",
   "id": "p-ruwais-diyab-unconventional-gas-development",
-  "last_found": "2026-11-23",
+  "last_found": "2026-11-24",
   "last_published": "2026-11-15",
   "name": "Ruwais Diyab unconventional gas development",
-  "notes": [],
+  "notes": [
+   "Research 24 Nov: Jereh's Shenzhen filing of 4 Nov describes letters of award for three ADNOC Onshore projects worth about $2.7bn (AED9.9bn); formal contracts were not yet signed. The three include Ruwais Diyab (a design, build and operate contract, per MEED sources; ADNOC took FID on 2-3 Nov) and Bab / North East Bab onshore facilities. MEED separately reports a $392m (AED1.44bn) EPC award to Jereh for wellhead surface facilities; whether it is one of the three is unconfirmed."
+  ],
   "outlook": false,
   "parties": {
    "Jereh": {
     "evidence": [
      "n-9fc4765889d4",
      "n-c889e04a8eab",
+     "m-8c24a1f88377",
      "n-6365bdd6e95f",
      "n-5be7706a872b",
      "n-97cb2b83d912"
@@ -376,7 +327,7 @@
    }
   },
   "priority": "High",
-  "score": 112,
+  "score": 152,
   "sectors": [
    "brownfield",
    "gas",
@@ -394,6 +345,7 @@
    "n-1951fb380fb4",
    "n-9fc4765889d4",
    "n-c889e04a8eab",
+   "m-8c24a1f88377",
    "n-6365bdd6e95f",
    "n-5be7706a872b",
    "n-97cb2b83d912"
@@ -401,6 +353,138 @@
   "stage": "awarded",
   "status": "active",
   "value_usd": 2700000000.0
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": []
+  },
+  "client": "ADNOC Gas",
+  "contract_type": "engineering",
+  "deadline": "",
+  "filed": false,
+  "first_found": "2026-11-23",
+  "first_published": "2026-10-28",
+  "headline": "Local firm wins Adnoc Gas project detailed engineering works: 56-inch, 127km gas pipeline (winner not named)",
+  "id": "s-14a1dcd4b23e",
+  "last_found": "2026-11-24",
+  "last_published": "2026-10-28",
+  "name": "Local firm wins Adnoc Gas project detailed engineering works: 56-inch, 127km gas pipeline (winner not named)",
+  "notes": [
+   "Research 24 Nov: the work is detailed engineering for a 56-inch, 127km pipeline that will supply gas to phase two of an AI data centre in Abu Dhabi and support the relocation of Ewec's power assets in Mirfa. The winning local firm is named only in MEED's paid article."
+  ],
+  "outlook": false,
+  "parties": {},
+  "priority": "High",
+  "score": 134,
+  "sectors": [
+   "gas",
+   "pipelines"
+  ],
+  "signal_ids": [
+   "m-14ff0c612cbe",
+   "n-9b7321c8fe46"
+  ],
+  "stage": "awarded",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": [
+    {
+     "kind": "winner",
+     "links": [
+      {
+       "role": "Project Director",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Project%20Director%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Subcontracts Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Subcontracts%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
+     "org": "Mannesmann Energy",
+     "roles": [
+      "Project Director",
+      "Engineering Manager",
+      "Subcontracts Manager"
+     ],
+     "urgency": 2,
+     "why": "Won North East Bab (NEB) facilities upgrade."
+    }
+   ]
+  },
+  "client": "ADNOC Onshore",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-14",
+  "headline": "Adnoc Onshore hires Mannesmann for phase two of its Northeast Bab upgrade",
+  "id": "p-north-east-bab-neb-facilities-upgrade",
+  "last_found": "2026-11-24",
+  "last_published": "2026-11-23",
+  "name": "North East Bab (NEB) facilities upgrade",
+  "notes": [],
+  "outlook": false,
+  "parties": {
+   "Mannesmann Energy": {
+    "evidence": [
+     "n-2f40ae0ffc77",
+     "n-5ffa6cc269e0",
+     "n-10fee630b2f3",
+     "n-1278b98fafab",
+     "n-225ebfb2a77a",
+     "n-679d98c4f0d4",
+     "n-933a24c50ca1",
+     "n-cf2c0a2c7150",
+     "n-090a1b33f634",
+     "n-e93ac8abf47b",
+     "n-41dcdf0d798c",
+     "n-76a8b19f6611",
+     "n-681aee6d9c43"
+    ],
+    "first_seen": "2026-11-14",
+    "last_seen": "2026-11-23",
+    "role": "winner",
+    "type": "epc"
+   }
+  },
+  "priority": "High",
+  "score": 117,
+  "sectors": [
+   "brownfield",
+   "gas",
+   "hydrogen",
+   "onshore"
+  ],
+  "signal_ids": [
+   "n-2f40ae0ffc77",
+   "n-5ffa6cc269e0",
+   "n-10fee630b2f3",
+   "n-1278b98fafab",
+   "n-225ebfb2a77a",
+   "n-679d98c4f0d4",
+   "n-933a24c50ca1",
+   "n-cf2c0a2c7150",
+   "n-090a1b33f634",
+   "n-e93ac8abf47b",
+   "n-41dcdf0d798c",
+   "n-76a8b19f6611",
+   "n-681aee6d9c43"
+  ],
+  "stage": "awarded",
+  "status": "active",
+  "value_usd": null
  },
  {
   "also": [],
@@ -519,43 +603,6 @@
   "also": [],
   "approach": {
    "notes": [
-    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Onshore work: Mannesmann Energy, Jereh."
-   ],
-   "targets": []
-  },
-  "client": "ADNOC Onshore",
-  "contract_type": "",
-  "deadline": "",
-  "filed": true,
-  "first_found": "2026-11-23",
-  "first_published": "2026-10-27",
-  "headline": "Adnoc Onshore grants extra time for Bab gas cap well tie-in bids",
-  "id": "p-bab-gas-cap-well-tie-ins",
-  "last_found": "2026-11-23",
-  "last_published": "2026-11-18",
-  "name": "Bab Gas Cap well tie-ins",
-  "notes": [],
-  "outlook": false,
-  "parties": {},
-  "priority": "High",
-  "score": 99,
-  "sectors": [
-   "gas",
-   "onshore"
-  ],
-  "signal_ids": [
-   "n-b1a2bf48a400",
-   "n-428c07727824",
-   "n-9868af88366e"
-  ],
-  "stage": "tender",
-  "status": "active",
-  "value_usd": null
- },
- {
-  "also": [],
-  "approach": {
-   "notes": [
     "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Gas work: Wison Engineering."
    ],
    "targets": []
@@ -586,38 +633,6 @@
   "stage": "tender",
   "status": "active",
   "value_usd": 8000000000.0
- },
- {
-  "also": [],
-  "approach": {
-   "notes": [],
-   "targets": []
-  },
-  "client": "ADNOC Gas",
-  "contract_type": "engineering",
-  "deadline": "",
-  "filed": false,
-  "first_found": "2026-11-23",
-  "first_published": "2026-10-28",
-  "headline": "Local firm wins Adnoc Gas project detailed engineering works",
-  "id": "s-72f4370f5f9d",
-  "last_found": "2026-11-23",
-  "last_published": "2026-10-28",
-  "name": "Local firm wins Adnoc Gas project detailed engineering works",
-  "notes": [],
-  "outlook": false,
-  "parties": {},
-  "priority": "High",
-  "score": 92,
-  "sectors": [
-   "gas"
-  ],
-  "signal_ids": [
-   "n-9b7321c8fe46"
-  ],
-  "stage": "awarded",
-  "status": "active",
-  "value_usd": null
  },
  {
   "also": [],

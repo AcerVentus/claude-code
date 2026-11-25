@@ -1,47 +1,62 @@
 {
- "date": "2026-11-24",
- "digest": "digests/2026-11-24.md",
+ "date": "2026-11-25",
+ "digest": "digests/2026-11-25.md",
  "new_opportunities": [],
- "newly_named_firms": [],
+ "newly_named_firms": [
+  {
+   "added": [
+    "Larsen & Toubro",
+    "McDermott",
+    "Technip Energies"
+   ],
+   "id": "p-umm-shaif-field-development"
+  }
+ ],
  "opportunities_active": 21,
  "signals_new": 13,
- "signals_total": 88,
+ "signals_total": 101,
  "source_health": {
   "bing-news": {
-   "errors": [
-    "ADNOC bids submitted contractors: not well-formed (invalid token): line 1, column 41"
-   ],
-   "items": 64,
-   "kept": 1,
-   "ok": 7,
+   "errors": [],
+   "items": 74,
+   "kept": 0,
+   "ok": 8,
    "requests": 8
   },
   "google-news": {
-   "errors": [],
-   "items": 177,
+   "errors": [
+    "\"ADNOC Onshore\" (contract OR tender OR bids OR project): 429 Too Many Requests: https://news.google.com/rss/search?q=%22ADNOC+Onshore%22+%28contract+OR+tender+OR+bids+OR+project%29+when%3A3d&hl=en&gl="
+   ],
+   "items": 168,
    "kept": 0,
-   "ok": 18,
+   "ok": 17,
    "requests": 18
   },
   "inbox": {
    "errors": [],
-   "items": 1,
-   "kept": 1,
+   "items": 3,
+   "kept": 3,
    "ok": 1,
    "requests": 1
   },
   "linkedin-jobs": {
-   "adverts_listed": 89,
-   "adverts_read": 26,
+   "adverts_listed": 86,
+   "adverts_read": 25,
    "errors": [
-    "25 adverts left for the next run: the daily limit on adverts or minutes was reached"
+    "5 adverts left for the next run: the daily limit on adverts or minutes was reached"
    ],
-   "items": 9,
-   "kept": 9,
-   "left_for_next_run": 25,
-   "ok": 38,
-   "requests": 38
+   "items": 10,
+   "kept": 10,
+   "left_for_next_run": 5,
+   "ok": 37,
+   "requests": 37
   }
  },
- "stage_changes": []
+ "stage_changes": [
+  {
+   "from": "",
+   "id": "p-umm-shaif-field-development",
+   "to": "execution"
+  }
+ ]
 }

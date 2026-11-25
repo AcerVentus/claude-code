@@ -1,0 +1,42 @@
+[
+ {
+  "kind": "research",
+  "title": "Umm Shaif Gas Cap and Surface Pressure Boosting: McDermott holds EPCI package 4",
+  "project": "Umm Shaif field development",
+  "client": "ADNOC Offshore",
+  "stage": "execution",
+  "contract_type": "EPC",
+  "winner": "McDermott",
+  "value_usd": 1000000000,
+  "publisher": "World Oil / Oil & Gas Journal (read from search summaries)",
+  "url": "https://worldoil.com/news/2026/8/24/adnoc-awards-mcdermott-1-billion-plus-epci-contract-for-umm-shaif-field/",
+  "published": "2026-11-25",
+  "note": "Research 25 Nov: awarded 24 Aug 2026, valued by McDermott at over $1bn. Scope is a new surface pressure boosting jacket and topside plus brownfield modifications. Engineering and project management are led from McDermott's UAE offices; fabrication is at its QMW yard in Qingdao. No separate detailed-engineering subcontractor is reported."
+ },
+ {
+  "kind": "research",
+  "title": "Umm Shaif Gas Cap package 1: Larsen & Toubro is main contractor, with detailed engineering subcontracted to Technip Energies",
+  "project": "Umm Shaif field development",
+  "client": "ADNOC Offshore",
+  "stage": "execution",
+  "contract_type": "EPC",
+  "winner": "Larsen & Toubro",
+  "publisher": "MEED / World Oil (read from search summaries)",
+  "url": "https://guest.meed.com/technip-energies-secures-role-in-umm-shaif-gas-cap-project/",
+  "published": "2026-11-25",
+  "note": "Research 25 Nov: ADNOC took a $6.2bn FID on Umm Shaif Gas Cap in July 2026 with three EPC packages worth $5.1bn; it did not disclose the contractors. MEED reports L&T Energy Hydrocarbon as main contractor on package 1, which subcontracted detailed engineering to Technip Energies (reported 26 Aug 2026). MEED earlier listed Saipem and Seatrium among bidders for package 1; they are not confirmed awardees. Winners of the remaining package are not named in free sources."
+ },
+ {
+  "kind": "research",
+  "title": "North East Bab Phase II scope: Mannesmann Energy to upgrade existing facilities at Al Nouf and Rumaitha/Shanayel",
+  "project": "North East Bab (NEB) facilities upgrade",
+  "client": "ADNOC Onshore",
+  "stage": "awarded",
+  "contract_type": "EPC",
+  "winner": "Mannesmann Energy",
+  "publisher": "Gulf News (read from search summary)",
+  "url": "https://gulfnews.com/business/adnoc-onshore-taps-mannesmann-energy-to-boost-capacity-at-north-east-bab-oil-facilities-1.500752068",
+  "published": "2026-11-25",
+  "note": "Research 25 Nov: the EPC scope is to upgrade existing oil production facilities at Al Nouf and Rumaitha/Shanayel for reliability, efficiency and capacity while they keep operating (brownfield). The 18 Nov AGBI headline 'Adnoc Onshore to upgrade existing oil fields' is probably this same award (unconfirmed)."
+ }
+]

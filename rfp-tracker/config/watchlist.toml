@@ -164,7 +164,7 @@ aliases = ["Lower Zakum", "cs:LZ LTDP", "cs:LTDP-1"]
 [[project]]
 name = "Umm Shaif field development"
 client = "ADNOC Offshore"
-aliases = ["Umm Shaif"]
+aliases = ["Umm Shaif", "Surface Pressure Boosting"]
 
 [[project]]
 name = "Dalma gas development"

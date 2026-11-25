@@ -170,6 +170,106 @@
  {
   "also": [],
   "approach": {
+   "notes": [],
+   "targets": [
+    {
+     "kind": "winner",
+     "links": [
+      {
+       "role": "Project Director",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Project%20Director%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Subcontracts Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Subcontracts%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
+     "org": "Mannesmann Energy",
+     "roles": [
+      "Project Director",
+      "Engineering Manager",
+      "Subcontracts Manager"
+     ],
+     "urgency": 2,
+     "why": "Won North East Bab (NEB) facilities upgrade."
+    }
+   ]
+  },
+  "client": "ADNOC Onshore",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-14",
+  "headline": "North East Bab Phase II scope: Mannesmann Energy to upgrade existing facilities at Al Nouf and Rumaitha/Shanayel",
+  "id": "p-north-east-bab-neb-facilities-upgrade",
+  "last_found": "2026-11-25",
+  "last_published": "2026-11-25",
+  "name": "North East Bab (NEB) facilities upgrade",
+  "notes": [
+   "Research 25 Nov: the EPC scope is to upgrade existing oil production facilities at Al Nouf and Rumaitha/Shanayel for reliability, efficiency and capacity while they keep operating (brownfield). The 18 Nov AGBI headline 'Adnoc Onshore to upgrade existing oil fields' is probably this same award (unconfirmed)."
+  ],
+  "outlook": false,
+  "parties": {
+   "Mannesmann Energy": {
+    "evidence": [
+     "n-2f40ae0ffc77",
+     "n-5ffa6cc269e0",
+     "n-10fee630b2f3",
+     "n-1278b98fafab",
+     "n-225ebfb2a77a",
+     "n-679d98c4f0d4",
+     "n-933a24c50ca1",
+     "n-cf2c0a2c7150",
+     "n-090a1b33f634",
+     "n-e93ac8abf47b",
+     "n-41dcdf0d798c",
+     "n-76a8b19f6611",
+     "n-681aee6d9c43",
+     "m-72d6a047d46a"
+    ],
+    "first_seen": "2026-11-14",
+    "last_seen": "2026-11-25",
+    "role": "winner",
+    "type": "epc"
+   }
+  },
+  "priority": "High",
+  "score": 157,
+  "sectors": [
+   "brownfield",
+   "gas",
+   "hydrogen",
+   "onshore"
+  ],
+  "signal_ids": [
+   "n-2f40ae0ffc77",
+   "n-5ffa6cc269e0",
+   "n-10fee630b2f3",
+   "n-1278b98fafab",
+   "n-225ebfb2a77a",
+   "n-679d98c4f0d4",
+   "n-933a24c50ca1",
+   "n-cf2c0a2c7150",
+   "n-090a1b33f634",
+   "n-e93ac8abf47b",
+   "n-41dcdf0d798c",
+   "n-76a8b19f6611",
+   "n-681aee6d9c43",
+   "m-72d6a047d46a"
+  ],
+  "stage": "awarded",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [],
+  "approach": {
    "notes": [
     "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Onshore work: Mannesmann Energy, Jereh."
    ],
@@ -358,6 +458,146 @@
   "also": [],
   "approach": {
    "notes": [],
+   "targets": [
+    {
+     "kind": "winner",
+     "links": [
+      {
+       "role": "Project Director",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22McDermott%22%20Project%20Director%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22McDermott%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Subcontracts Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22McDermott%22%20Subcontracts%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
+     "org": "McDermott",
+     "roles": [
+      "Project Director",
+      "Engineering Manager",
+      "Subcontracts Manager"
+     ],
+     "urgency": 4,
+     "why": "Won Umm Shaif field development."
+    },
+    {
+     "kind": "winner",
+     "links": [
+      {
+       "role": "Project Director",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Larsen%20%26%20Toubro%22%20Project%20Director%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Larsen%20%26%20Toubro%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Subcontracts Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Larsen%20%26%20Toubro%22%20Subcontracts%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
+     "org": "Larsen & Toubro",
+     "roles": [
+      "Project Director",
+      "Engineering Manager",
+      "Subcontracts Manager"
+     ],
+     "urgency": 4,
+     "why": "Won Umm Shaif field development."
+    },
+    {
+     "kind": "contractor",
+     "links": [
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Technip%20Energies%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Project Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Technip%20Energies%22%20Project%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer overflow detailed design, site engineering, vendor-document review and as-built work.",
+     "org": "Technip Energies",
+     "roles": [
+      "Engineering Manager",
+      "Project Manager"
+     ],
+     "urgency": 4,
+     "why": "Executing Umm Shaif field development."
+    }
+   ]
+  },
+  "client": "ADNOC Offshore",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-02",
+  "headline": "Umm Shaif Gas Cap and Surface Pressure Boosting: McDermott holds EPCI package 4",
+  "id": "p-umm-shaif-field-development",
+  "last_found": "2026-11-25",
+  "last_published": "2026-11-25",
+  "name": "Umm Shaif field development",
+  "notes": [
+   "Research 25 Nov: awarded 24 Aug 2026, valued by McDermott at over $1bn. Scope is a new surface pressure boosting jacket and topside plus brownfield modifications. Engineering and project management are led from McDermott's UAE offices; fabrication is at its QMW yard in Qingdao. No separate detailed-engineering subcontractor is reported.",
+   "Research 25 Nov: ADNOC took a $6.2bn FID on Umm Shaif Gas Cap in July 2026 with three EPC packages worth $5.1bn; it did not disclose the contractors. MEED reports L&T Energy Hydrocarbon as main contractor on package 1, which subcontracted detailed engineering to Technip Energies (reported 26 Aug 2026). MEED earlier listed Saipem and Seatrium among bidders for package 1; they are not confirmed awardees. Winners of the remaining package are not named in free sources."
+  ],
+  "outlook": false,
+  "parties": {
+   "Larsen & Toubro": {
+    "evidence": [
+     "m-fb266f9b4a9d"
+    ],
+    "first_seen": "2026-11-25",
+    "last_seen": "2026-11-25",
+    "role": "winner",
+    "type": "epc"
+   },
+   "McDermott": {
+    "evidence": [
+     "m-c560c319dbb7"
+    ],
+    "first_seen": "2026-11-25",
+    "last_seen": "2026-11-25",
+    "role": "winner",
+    "type": "epc"
+   },
+   "Technip Energies": {
+    "evidence": [
+     "m-fb266f9b4a9d"
+    ],
+    "first_seen": "2026-11-25",
+    "last_seen": "2026-11-25",
+    "role": "contractor",
+    "type": "epc"
+   }
+  },
+  "priority": "High",
+  "score": 147,
+  "sectors": [
+   "gas",
+   "offshore"
+  ],
+  "signal_ids": [
+   "n-f23fc544c15a",
+   "m-c560c319dbb7",
+   "m-fb266f9b4a9d"
+  ],
+  "stage": "execution",
+  "status": "active",
+  "value_usd": 1000000000.0
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
    "targets": []
   },
   "client": "ADNOC Gas",
@@ -393,104 +633,8 @@
  {
   "also": [],
   "approach": {
-   "notes": [],
-   "targets": [
-    {
-     "kind": "winner",
-     "links": [
-      {
-       "role": "Project Director",
-       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Project%20Director%20UAE"
-      },
-      {
-       "role": "Engineering Manager",
-       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Engineering%20Manager%20UAE"
-      },
-      {
-       "role": "Subcontracts Manager",
-       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Subcontracts%20Manager%20UAE"
-      }
-     ],
-     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
-     "org": "Mannesmann Energy",
-     "roles": [
-      "Project Director",
-      "Engineering Manager",
-      "Subcontracts Manager"
-     ],
-     "urgency": 2,
-     "why": "Won North East Bab (NEB) facilities upgrade."
-    }
-   ]
-  },
-  "client": "ADNOC Onshore",
-  "contract_type": "EPC",
-  "deadline": "",
-  "filed": true,
-  "first_found": "2026-11-23",
-  "first_published": "2026-11-14",
-  "headline": "Adnoc Onshore hires Mannesmann for phase two of its Northeast Bab upgrade",
-  "id": "p-north-east-bab-neb-facilities-upgrade",
-  "last_found": "2026-11-24",
-  "last_published": "2026-11-23",
-  "name": "North East Bab (NEB) facilities upgrade",
-  "notes": [],
-  "outlook": false,
-  "parties": {
-   "Mannesmann Energy": {
-    "evidence": [
-     "n-2f40ae0ffc77",
-     "n-5ffa6cc269e0",
-     "n-10fee630b2f3",
-     "n-1278b98fafab",
-     "n-225ebfb2a77a",
-     "n-679d98c4f0d4",
-     "n-933a24c50ca1",
-     "n-cf2c0a2c7150",
-     "n-090a1b33f634",
-     "n-e93ac8abf47b",
-     "n-41dcdf0d798c",
-     "n-76a8b19f6611",
-     "n-681aee6d9c43"
-    ],
-    "first_seen": "2026-11-14",
-    "last_seen": "2026-11-23",
-    "role": "winner",
-    "type": "epc"
-   }
-  },
-  "priority": "High",
-  "score": 117,
-  "sectors": [
-   "brownfield",
-   "gas",
-   "hydrogen",
-   "onshore"
-  ],
-  "signal_ids": [
-   "n-2f40ae0ffc77",
-   "n-5ffa6cc269e0",
-   "n-10fee630b2f3",
-   "n-1278b98fafab",
-   "n-225ebfb2a77a",
-   "n-679d98c4f0d4",
-   "n-933a24c50ca1",
-   "n-cf2c0a2c7150",
-   "n-090a1b33f634",
-   "n-e93ac8abf47b",
-   "n-41dcdf0d798c",
-   "n-76a8b19f6611",
-   "n-681aee6d9c43"
-  ],
-  "stage": "awarded",
-  "status": "active",
-  "value_usd": null
- },
- {
-  "also": [],
-  "approach": {
    "notes": [
-    "Bidders are not named in public sources yet. Finding the bidders list is the next step."
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Offshore work: McDermott, Technip Energies, Larsen & Toubro."
    ],
    "targets": []
   },
@@ -772,39 +916,6 @@
   "stage": "tender",
   "status": "active",
   "value_usd": null
- },
- {
-  "also": [],
-  "approach": {
-   "notes": [],
-   "targets": []
-  },
-  "client": "ADNOC Offshore",
-  "contract_type": "EPC",
-  "deadline": "",
-  "filed": true,
-  "first_found": "2026-11-23",
-  "first_published": "2026-11-02",
-  "headline": "Umm Shaif Gas Cap Project: $6.2bn Offshore Development Advances with Major EPC Contracts",
-  "id": "p-umm-shaif-field-development",
-  "last_found": "2026-11-23",
-  "last_published": "2026-11-02",
-  "name": "Umm Shaif field development",
-  "notes": [],
-  "outlook": false,
-  "parties": {},
-  "priority": "Medium",
-  "score": 80,
-  "sectors": [
-   "gas",
-   "offshore"
-  ],
-  "signal_ids": [
-   "n-f23fc544c15a"
-  ],
-  "stage": "",
-  "status": "active",
-  "value_usd": 6200000000.0
  },
  {
   "also": [],
