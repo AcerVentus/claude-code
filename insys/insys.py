@@ -42,12 +42,17 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-VERSION = "1.1.1"
+VERSION = "1.2.0"
 
 # The database layout this version reads and writes. Version 1 is InSys 1.0.0;
-# version 2 (InSys 1.1.0) adds the subcontractor directory. An older database
-# is upgraded in place on start-up, after a backup copy has been made.
-SCHEMA_VERSION = 2
+# version 2 (InSys 1.1.x) adds the subcontractor directory; version 3 (InSys
+# 1.2.0) adds the deleted-items archive, subcontractor capabilities and
+# per-subcontractor follow-up tracking. An older database is upgraded in place
+# on start-up, after a backup copy has been made. Upgrades only ever add tables
+# and columns; nothing existing is altered or removed.
+SCHEMA_VERSION = 3
+
+MAX_UPLOAD = 300 * 1024 * 1024  # a transferred database file
 MIN_PYTHON = (3, 9)
 
 # PACKAGED is true when InSys runs as the single-file program, InSys.exe. Its
@@ -193,12 +198,25 @@ MODULES = {
     },
 }
 
+# Who sees what. "staff" is the role key InSys 1.0 and 1.1 used for people who
+# see the technical sections only; it is now presented as Engineering.
 ROLES = {
     "admin": "Administrator",
+    "administration": "Administration",
+    "staff": "Engineering",
     "finance": "Finance",
     "office": "Office Administrator",
-    "staff": "Staff",
 }
+ROLE_ACCESS = {
+    "admin": "Everything, including the Admin area (logins, backups, database transfer).",
+    "administration": "Every section, including Finance and Office Admin. No Admin area.",
+    "staff": "Projects, Enquiries, Expressions of Interest and Subcontractors. "
+             "No Finance or Office Admin.",
+    "finance": "The same as Engineering, plus Finance.",
+    "office": "The same as Engineering, plus Office Admin.",
+}
+# Roles that can open every section, whichever team it belongs to.
+ALL_SECTION_ROLES = ("admin", "administration")
 
 # Sections whose records can have subcontractors assigned.
 SUBCON_MODULES = ("project", "enquiry", "eoi")
@@ -562,7 +580,9 @@ CREATE TABLE IF NOT EXISTS records (
     created_at TEXT NOT NULL,
     updated_by INTEGER REFERENCES users(id),
     updated_at TEXT NOT NULL,
-    version INTEGER NOT NULL DEFAULT 1
+    version INTEGER NOT NULL DEFAULT 1,
+    deleted_at TEXT,
+    deleted_by INTEGER
 );
 CREATE INDEX IF NOT EXISTS idx_records_module ON records(module);
 CREATE TABLE IF NOT EXISTS activity (
@@ -606,7 +626,9 @@ CREATE TABLE IF NOT EXISTS tasks (
     status TEXT NOT NULL DEFAULT 'To Do',
     completed_at TEXT,
     updated_at TEXT NOT NULL,
-    version INTEGER NOT NULL DEFAULT 1
+    version INTEGER NOT NULL DEFAULT 1,
+    deleted_at TEXT,
+    deleted_by INTEGER
 );
 CREATE TABLE IF NOT EXISTS subcons (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -621,6 +643,7 @@ CREATE TABLE IF NOT EXISTS subcons (
     website TEXT NOT NULL DEFAULT '',
     registration TEXT NOT NULL DEFAULT '',
     notes TEXT NOT NULL DEFAULT '',
+    capabilities TEXT NOT NULL DEFAULT '',
     active INTEGER NOT NULL DEFAULT 1,
     created_by INTEGER REFERENCES users(id),
     created_at TEXT NOT NULL,
@@ -634,6 +657,12 @@ CREATE TABLE IF NOT EXISTS record_subcons (
     scope TEXT NOT NULL DEFAULT '',
     added_by INTEGER REFERENCES users(id),
     added_at TEXT NOT NULL,
+    last_update TEXT NOT NULL DEFAULT '',
+    last_update_date TEXT,
+    next_action TEXT NOT NULL DEFAULT '',
+    next_action_date TEXT,
+    updated_by INTEGER,
+    updated_at TEXT,
     PRIMARY KEY (record_id, subcon_id)
 );
 CREATE INDEX IF NOT EXISTS idx_record_subcons_subcon ON record_subcons(subcon_id);
@@ -647,6 +676,23 @@ CREATE TABLE IF NOT EXISTS audit (
     detail TEXT NOT NULL DEFAULT ''
 );
 """
+
+
+# Columns introduced after a table first shipped. A database made by an older
+# version gets them added on upgrade; in a new database they already exist.
+ADDED_COLUMNS = [
+    ("records", "deleted_at", "TEXT"),
+    ("records", "deleted_by", "INTEGER"),
+    ("tasks", "deleted_at", "TEXT"),
+    ("tasks", "deleted_by", "INTEGER"),
+    ("subcons", "capabilities", "TEXT NOT NULL DEFAULT ''"),
+    ("record_subcons", "last_update", "TEXT NOT NULL DEFAULT ''"),
+    ("record_subcons", "last_update_date", "TEXT"),
+    ("record_subcons", "next_action", "TEXT NOT NULL DEFAULT ''"),
+    ("record_subcons", "next_action_date", "TEXT"),
+    ("record_subcons", "updated_by", "INTEGER"),
+    ("record_subcons", "updated_at", "TEXT"),
+]
 
 
 def connect():
@@ -753,6 +799,28 @@ def backup_before_upgrade(from_version):
     return dest
 
 
+def apply_schema(conn, existing):
+    """Bring the open database to the current layout. Every table is created
+    only if it is missing and every column added only if it is missing, so this
+    both builds a new database and upgrades an older one. Nothing that already
+    exists is altered or removed."""
+    for statement in SCHEMA.split(";"):
+        if statement.strip():
+            conn.execute(statement)
+    for table, column, declaration in ADDED_COLUMNS:
+        present = [row["name"] for row in conn.execute("PRAGMA table_info(%s)" % table)]
+        if column not in present:
+            conn.execute("ALTER TABLE %s ADD COLUMN %s %s" % (table, column, declaration))
+    if meta_get(conn, "schema_version") is None:
+        meta_set(conn, "schema_version", SCHEMA_VERSION)
+        if meta_get(conn, "org_name") is None:
+            meta_set(conn, "org_name", "")
+        if meta_get(conn, "currency") is None:
+            meta_set(conn, "currency", "")
+    elif existing is not None and existing < SCHEMA_VERSION:
+        meta_set(conn, "schema_version", SCHEMA_VERSION)
+
+
 def init_db():
     """Create the schema, upgrade an older database, and on the very first run
     create the administrator account.
@@ -770,18 +838,8 @@ def init_db():
         RT.upgraded_from = existing
     created_password = None
     with write_db(bump=False) as conn:
-        # Every table is created only if it is missing, so this both builds a new
-        # database and adds the tables a newer version introduced. Nothing that
-        # already exists is altered or removed.
-        for statement in SCHEMA.split(";"):
-            if statement.strip():
-                conn.execute(statement)
-        if meta_get(conn, "schema_version") is None:
-            meta_set(conn, "schema_version", SCHEMA_VERSION)
-            meta_set(conn, "org_name", "")
-            meta_set(conn, "currency", "")
-        elif existing is not None and existing < SCHEMA_VERSION:
-            meta_set(conn, "schema_version", SCHEMA_VERSION)
+        apply_schema(conn, existing)
+        if existing is not None and existing < SCHEMA_VERSION:
             audit(conn, "upgraded", "Data upgraded from layout v%d to v%d by InSys %s; "
                                     "a copy from before the upgrade was kept in the backups folder"
                   % (existing, SCHEMA_VERSION, VERSION))
@@ -905,7 +963,7 @@ def backup_loop():
 
 def can_view(user, module):
     team = MODULES[module]["team"]
-    return team is None or user["role"] == "admin" or user["role"] == team
+    return team is None or user["role"] in ALL_SECTION_ROLES or user["role"] == team
 
 
 def visible_modules(user):
@@ -923,10 +981,11 @@ def user_json(row):
     }
 
 
-def get_record(conn, record_id, user):
-    """Fetch a record the user may see, or raise 404 (never reveals restricted rows)."""
+def get_record(conn, record_id, user, deleted=False):
+    """Fetch a record the user may see, or raise 404 (never reveals restricted rows).
+    Deleted records are only found when asked for with deleted=True."""
     row = conn.execute("SELECT * FROM records WHERE id = ?", (record_id,)).fetchone()
-    if row is None or not can_view(user, row["module"]):
+    if row is None or not can_view(user, row["module"]) or bool(row["deleted_at"]) != deleted:
         raise ApiError(404, "That record no longer exists or you do not have access to it.")
     return row
 
@@ -1165,10 +1224,10 @@ def h_state(ctx):
                   "role": r["role"], "active": bool(r["active"])}
                  for r in conn.execute("SELECT * FROM users ORDER BY full_name COLLATE NOCASE")]
         all_refs = {r["id"]: (r["ref"], r["module"])
-                    for r in conn.execute("SELECT id, ref, module FROM records")}
+                    for r in conn.execute("SELECT id, ref, module FROM records WHERE deleted_at IS NULL")}
         marks = ",".join("?" * len(mods))
         records = [dict(r) for r in conn.execute(
-            "SELECT * FROM records WHERE module IN (%s) ORDER BY id" % marks, mods)]
+            "SELECT * FROM records WHERE module IN (%s) AND deleted_at IS NULL ORDER BY id" % marks, mods)]
         visible_ids = set(r["id"] for r in records)
         xrefs = {}
         for x in conn.execute("SELECT id, record_id, system, ref, url FROM xrefs ORDER BY id"):
@@ -1187,22 +1246,27 @@ def h_state(ctx):
         links = []
         for link in conn.execute("SELECT a_id, b_id FROM links ORDER BY a_id, b_id"):
             a, b = link["a_id"], link["b_id"]
-            if a in visible_ids or b in visible_ids:
+            if (a in visible_ids or b in visible_ids) and a in all_refs and b in all_refs:
                 links.append([a, b])
                 stub(a)
                 stub(b)
         tasks = []
-        for t in conn.execute("SELECT * FROM tasks ORDER BY id"):
+        for t in conn.execute("SELECT * FROM tasks WHERE deleted_at IS NULL ORDER BY id"):
             mine = t["assignee_id"] == user["id"] or t["created_by"] == user["id"]
             on_visible = t["record_id"] is not None and t["record_id"] in visible_ids
             if user["role"] == "admin" or mine or on_visible:
-                tasks.append(dict(t))
-                if t["record_id"] is not None:
-                    stub(t["record_id"])
+                task = dict(t)
+                if task["record_id"] is not None and task["record_id"] not in all_refs:
+                    task["record_id"] = None  # its record has been deleted
+                tasks.append(task)
+                if task["record_id"] is not None:
+                    stub(task["record_id"])
         subcons = [subcon_json(r) for r in
                    conn.execute("SELECT * FROM subcons ORDER BY name COLLATE NOCASE")]
-        record_subcons = [{"record_id": r["record_id"], "subcon_id": r["subcon_id"], "scope": r["scope"]}
-                          for r in conn.execute("SELECT record_id, subcon_id, scope FROM record_subcons "
+        record_subcons = [{"record_id": r["record_id"], "subcon_id": r["subcon_id"], "scope": r["scope"],
+                           "last_update": r["last_update"], "last_update_date": r["last_update_date"],
+                           "next_action": r["next_action"], "next_action_date": r["next_action_date"]}
+                          for r in conn.execute("SELECT * FROM record_subcons "
                                                 "ORDER BY rowid")  # the order they were added in
                           if r["record_id"] in visible_ids]
         org_name = meta_get(conn, "org_name", "")
@@ -1222,6 +1286,8 @@ def h_state(ctx):
             "modules": module_meta(),
             "visible_modules": mods,
             "roles": ROLES,
+            "role_access": ROLE_ACCESS,
+            "all_section_roles": list(ALL_SECTION_ROLES),
             "priorities": PRIORITIES,
             "task_statuses": TASK_STATUSES,
             "subcon_modules": list(SUBCON_MODULES),
@@ -1240,8 +1306,94 @@ def h_activity(ctx):
             "SELECT a.id, a.at, a.user_id, a.kind, a.text, a.action_date, "
             "r.id AS record_id, r.ref, r.title, r.module "
             "FROM activity a JOIN records r ON r.id = a.record_id "
-            "WHERE r.module IN (%s) ORDER BY a.id DESC LIMIT 40" % marks, mods).fetchall()
+            "WHERE r.module IN (%s) AND r.deleted_at IS NULL ORDER BY a.id DESC LIMIT 40" % marks,
+            mods).fetchall()
     return {"activity": [dict(r) for r in rows]}
+
+
+LOG_LIMIT = 500
+MONTH_RE = re.compile(r"^\d{4}-\d{2}$")
+
+
+def h_log(ctx):
+    """The activity log: everything that has been done, catalogued by month,
+    including work on items that have since been completed or deleted."""
+    def param(name, default):
+        return (ctx.query.get(name, [default])[0] or default).strip()
+
+    q = param("q", "").lower()[:200]
+    kind = param("kind", "actions")
+    scope = param("scope", "all")
+    month = param("month", "")
+    if kind not in ("actions", "tasks", "all") or scope not in ("all", "open", "closed", "deleted") \
+            or not (month in ("", "all") or MONTH_RE.match(month)):
+        raise ApiError(400, "That filter is not valid.")
+    user = ctx.user
+    mods = visible_modules(user)
+    closed = {key: set(s[0] for s in cfg["statuses"] if s[1] in ("done", "dead"))
+              for key, cfg in MODULES.items()}
+    marks = ",".join("?" * len(mods))
+    with read_db() as conn:
+        names = {r["id"]: r["full_name"] for r in conn.execute("SELECT id, full_name FROM users")}
+        rows = conn.execute(
+            "SELECT a.id, a.at, a.user_id, a.kind, a.text, a.action_date, r.id AS record_id, r.ref, "
+            "r.title, r.module, r.status, r.deleted_at FROM activity a JOIN records r "
+            "ON r.id = a.record_id WHERE r.module IN (%s)" % marks, mods).fetchall()
+        loose_tasks = conn.execute(
+            "SELECT * FROM tasks WHERE record_id IS NULL "
+            "AND (completed_at IS NOT NULL OR deleted_at IS NOT NULL)").fetchall()
+
+    entries = []
+    for r in rows:
+        state = "deleted" if r["deleted_at"] else ("closed" if r["status"] in closed[r["module"]] else "open")
+        day = r["action_date"] if (r["kind"] == "action" and r["action_date"]) else r["at"][:10]
+        entries.append({
+            "id": "a%d" % r["id"], "day": day, "at": r["at"], "user_id": r["user_id"], "kind": r["kind"],
+            "text": r["text"], "state": state,
+            "record": {"id": r["record_id"], "ref": r["ref"], "title": r["title"], "module": r["module"],
+                       "status": r["status"]}})
+    # Tasks that are not attached to a record have no record history to appear in.
+    for t in loose_tasks:
+        if not (user["role"] == "admin" or user["id"] in (t["assignee_id"], t["created_by"])):
+            continue
+        state = "deleted" if t["deleted_at"] else "closed"
+        if t["completed_at"]:
+            entries.append({"id": "t%dc" % t["id"], "day": t["completed_at"][:10], "at": t["completed_at"],
+                            "user_id": t["assignee_id"], "kind": "task", "state": state, "record": None,
+                            "text": "Task completed: %s" % t["title"]})
+        if t["deleted_at"]:
+            entries.append({"id": "t%dd" % t["id"], "day": t["deleted_at"][:10], "at": t["deleted_at"],
+                            "user_id": t["deleted_by"], "kind": "task", "state": state, "record": None,
+                            "text": "Task deleted: %s" % t["title"]})
+
+    def wanted(entry):
+        if kind == "actions" and entry["kind"] != "action":
+            return False
+        if kind == "tasks" and entry["kind"] != "task":
+            return False
+        if scope != "all" and entry["state"] != scope:
+            return False
+        if q:
+            record = entry["record"]
+            hay = " ".join([entry["text"], names.get(entry["user_id"], ""),
+                            record["ref"] if record else "", record["title"] if record else "",
+                            MODULES[record["module"]]["singular"] if record else "Task"]).lower()
+            if q not in hay:
+                return False
+        return True
+
+    entries = [e for e in entries if wanted(e)]
+    counts = {}
+    for entry in entries:
+        counts[entry["day"][:7]] = counts.get(entry["day"][:7], 0) + 1
+    months = [{"month": m, "count": counts[m]} for m in sorted(counts, reverse=True)]
+    if month == "":
+        month = "all" if (q or not months) else months[0]["month"]
+    if month != "all":
+        entries = [e for e in entries if e["day"][:7] == month]
+    entries.sort(key=lambda e: (e["day"], e["at"], e["id"]), reverse=True)
+    return {"months": months, "month": month, "total": len(entries),
+            "truncated": len(entries) > LOG_LIMIT, "entries": entries[:LOG_LIMIT]}
 
 
 def h_record_create(ctx):
@@ -1294,10 +1446,26 @@ def h_record_update(ctx):
 def h_record_delete(ctx):
     with write_db() as conn:
         row = get_record(conn, ctx.arg(), ctx.user)
-        conn.execute("DELETE FROM records WHERE id = ?", (row["id"],))
+        # The record leaves every list but is kept, with its whole history, so it
+        # can be looked up in the activity log and restored if it was a mistake.
+        conn.execute("UPDATE records SET deleted_at = ?, deleted_by = ? WHERE id = ?",
+                     (now_iso(), ctx.user["id"], row["id"]))
+        add_activity(conn, row["id"], ctx.user, "deleted",
+                     "%s deleted (status was %s)" % (MODULES[row["module"]]["singular"], row["status"]))
         audit(conn, "record_deleted", "%s %s" % (row["ref"], row["title"]),
               user=ctx.user, ip=ctx.ip)
     return {"ok": True}
+
+
+def h_record_restore(ctx):
+    with write_db() as conn:
+        row = get_record(conn, ctx.arg(), ctx.user, deleted=True)
+        conn.execute("UPDATE records SET deleted_at = NULL, deleted_by = NULL, version = version + 1 "
+                     "WHERE id = ?", (row["id"],))
+        add_activity(conn, row["id"], ctx.user, "restored",
+                     "%s restored from the deleted items" % MODULES[row["module"]]["singular"])
+        audit(conn, "record_restored", "%s %s" % (row["ref"], row["title"]), user=ctx.user, ip=ctx.ip)
+    return {"ok": True, "ref": row["ref"], "module": row["module"]}
 
 
 def h_record_action(ctx):
@@ -1415,7 +1583,7 @@ def h_xref_delete(ctx):
 
 # ---- Subcontractors ----------------------------------------------------------
 
-SUBCON_FIELDS = ["name", "discipline", "services", "contact_name", "email", "phone",
+SUBCON_FIELDS = ["name", "discipline", "capabilities", "services", "contact_name", "email", "phone",
                  "address", "website", "registration", "notes", "active"]
 
 
@@ -1430,6 +1598,16 @@ def parse_subcon_fields(body, existing=None):
         out["name"] = text_field(body, "name", "Subcontractor name", 150, required=True)
     if present("discipline"):
         out["discipline"] = text_field(body, "discipline", "Discipline", 100)
+    if present("capabilities"):
+        # Kept as a tidy comma-separated list: "Seismic assessment, HAZOP, Wind study".
+        raw = text_field(body, "capabilities", "Capabilities", 1500, multiline=True)
+        seen, items = set(), []
+        for part in re.split(r"[,;\n]+", raw):
+            item = " ".join(part.split())
+            if item and item.lower() not in seen:
+                seen.add(item.lower())
+                items.append(item)
+        out["capabilities"] = ", ".join(items)
     if present("services"):
         out["services"] = text_field(body, "services", "Services", 2000, multiline=True)
     if present("contact_name"):
@@ -1558,12 +1736,44 @@ def h_record_subcon_update(ctx):
                             (row["id"], subcon["id"])).fetchone()
         if link is None:
             raise ApiError(404, "%s is not on %s." % (subcon["name"], row["ref"]))
-        scope = text_field(ctx.body, "scope", "Scope of work", 300)
-        if scope != link["scope"]:
-            conn.execute("UPDATE record_subcons SET scope = ? WHERE record_id = ? AND subcon_id = ?",
-                         (scope, row["id"], subcon["id"]))
-            add_activity(conn, row["id"], ctx.user, "subcon", "Subcontractor scope for %s: %s"
-                         % (subcon["name"], scope or "-"))
+        changed, notes = {}, []
+        if "scope" in ctx.body:
+            scope = text_field(ctx.body, "scope", "Scope of work", 300)
+            if scope != link["scope"]:
+                changed["scope"] = scope
+                notes.append("Scope: %s" % (scope or "-"))
+        # Each subcontractor on a record has its own last known update and next
+        # follow-up, separate from the record's own last and next action.
+        if "last_update" in ctx.body:
+            last_update = text_field(ctx.body, "last_update", "Last known update", 500)
+            last_date = date_field(ctx.body, "last_update_date", "Date of last update")
+            if last_update and not last_date:
+                raise ApiError(400, "Please give the date of the last known update.")
+            if not last_update:
+                last_date = None
+            if last_update != link["last_update"] or last_date != link["last_update_date"]:
+                changed["last_update"] = last_update
+                changed["last_update_date"] = last_date
+                notes.append("Last update%s: %s" % (" (%s)" % last_date if last_date else "",
+                                                    last_update or "-"))
+        if "next_action" in ctx.body:
+            next_action = text_field(ctx.body, "next_action", "Next follow-up", 500)
+            if next_action != link["next_action"]:
+                changed["next_action"] = next_action
+                notes.append("Next follow-up: %s" % (next_action or "-"))
+        if "next_action_date" in ctx.body:
+            next_date = date_field(ctx.body, "next_action_date", "Expected date")
+            if next_date != link["next_action_date"]:
+                changed["next_action_date"] = next_date
+                notes.append("Follow-up expected: %s" % (next_date or "-"))
+        if changed:
+            changed["updated_by"] = ctx.user["id"]
+            changed["updated_at"] = now_iso()
+            conn.execute("UPDATE record_subcons SET %s WHERE record_id = ? AND subcon_id = ?"
+                         % ", ".join("%s = ?" % k for k in changed),
+                         list(changed.values()) + [row["id"], subcon["id"]])
+            add_activity(conn, row["id"], ctx.user, "subcon", "Subcontractor %s - %s"
+                         % (subcon["name"], "; ".join(notes)))
     return {"ok": True}
 
 
@@ -1635,7 +1845,8 @@ def h_task_create(ctx):
 
 def h_task_update(ctx):
     with write_db() as conn:
-        task = conn.execute("SELECT * FROM tasks WHERE id = ?", (ctx.arg(),)).fetchone()
+        task = conn.execute("SELECT * FROM tasks WHERE id = ? AND deleted_at IS NULL",
+                            (ctx.arg(),)).fetchone()
         if task is None:
             raise ApiError(404, "That task no longer exists.")
         if not can_edit_task(ctx.user, task):
@@ -1668,13 +1879,16 @@ def h_task_update(ctx):
 
 def h_task_delete(ctx):
     with write_db() as conn:
-        task = conn.execute("SELECT * FROM tasks WHERE id = ?", (ctx.arg(),)).fetchone()
+        task = conn.execute("SELECT * FROM tasks WHERE id = ? AND deleted_at IS NULL",
+                            (ctx.arg(),)).fetchone()
         if task is None:
             return {"ok": True}
         if not (ctx.user["role"] == "admin" or ctx.user["id"] == task["created_by"]):
             raise ApiError(403, "Only the person who created a task, or an administrator, "
                                 "can delete it.")
-        conn.execute("DELETE FROM tasks WHERE id = ?", (task["id"],))
+        # Kept for the activity log; it no longer appears in any task list.
+        conn.execute("UPDATE tasks SET deleted_at = ?, deleted_by = ? WHERE id = ?",
+                     (now_iso(), ctx.user["id"], task["id"]))
         if task["record_id"] is not None:
             add_activity(conn, task["record_id"], ctx.user, "task",
                          "Task deleted: %s" % task["title"])
@@ -1794,6 +2008,7 @@ def h_admin_system(ctx):
         "last_backup_hours": None if age is None else round(age / 3600.0, 1),
         "python": platform.python_version(),
         "platform": platform.system(),
+        "packaged": PACKAGED,
     }
 
 
@@ -1822,9 +2037,83 @@ def h_admin_backup(ctx):
             pass
     with write_db(bump=False) as conn:
         audit(conn, "backup_downloaded", "", user=ctx.user, ip=ctx.ip)
-    name = "insys-backup-%s.db" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    name = "insys-database-%s.db" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     return RawResponse(data, "application/octet-stream",
                        [("Content-Disposition", 'attachment; filename="%s"' % name)])
+
+
+def inspect_database_file(path):
+    """Check that an uploaded file is an InSys database this version can host.
+    Returns a short description of what it holds; raises ApiError if it is not usable."""
+    try:
+        with open(path, "rb") as fh:
+            header = fh.read(16)
+    except OSError:
+        raise ApiError(400, "The file could not be read.")
+    if header != b"SQLite format 3\x00":
+        raise ApiError(400, "That is not an InSys database file. Use a file made with "
+                            "'Download database' in another InSys.")
+    conn = None
+    try:
+        conn = sqlite3.connect(path)
+        conn.row_factory = sqlite3.Row
+        if conn.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+            raise ApiError(400, "The file is damaged (it may not have copied completely). "
+                                "Download it again and retry.")
+        tables = set(r["name"] for r in conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'"))
+        if not set(["meta", "users", "records", "activity", "tasks", "audit"]).issubset(tables):
+            raise ApiError(400, "That is not an InSys database file.")
+        try:
+            layout = int(meta_get(conn, "schema_version", "0"))
+        except ValueError:
+            layout = 0
+        if layout < 1:
+            raise ApiError(400, "That is not an InSys database file.")
+        if layout > SCHEMA_VERSION:
+            raise ApiError(400, "That file comes from a newer version of InSys than this one (%s). "
+                                "Update this InSys first, then load the file." % VERSION)
+        if not conn.execute("SELECT 1 FROM users WHERE role = 'admin' AND active = 1").fetchone():
+            raise ApiError(400, "That file has no active administrator, so nobody could sign in "
+                                "after loading it.")
+        return {"layout": layout,
+                "records": conn.execute("SELECT COUNT(*) AS n FROM records").fetchone()["n"],
+                "users": conn.execute("SELECT COUNT(*) AS n FROM users").fetchone()["n"]}
+    except sqlite3.Error:
+        raise ApiError(400, "That is not an InSys database file.")
+    finally:
+        if conn is not None:
+            conn.close()
+
+
+def h_admin_restore(ctx, path):
+    """Replace this InSys's data with a database file transferred from another
+    InSys. A copy of the current data is kept first."""
+    info = inspect_database_file(path)
+    stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    kept = os.path.join(RT.backup_dir, "before-loading-transfer-%s.db" % stamp)
+    with RT.db_lock:
+        os.makedirs(RT.backup_dir, exist_ok=True)
+        make_backup(kept + ".tmp")
+        os.replace(kept + ".tmp", kept)
+        source = sqlite3.connect(path)
+        target = connect()
+        try:
+            source.backup(target)
+        finally:
+            source.close()
+            target.close()
+        with write_db() as conn:
+            apply_schema(conn, info["layout"])
+            conn.execute("DELETE FROM sessions")  # everyone signs in again, with the new logins
+            audit(conn, "database_loaded",
+                  "Transferred database loaded (%d records, %d logins) by %s of the previous data; "
+                  "the previous data was kept as %s"
+                  % (info["records"], info["users"], ctx.user["username"], os.path.basename(kept)),
+                  ip=ctx.ip)
+    remove_first_login_file()
+    ctx.handler.clear_session_cookie()
+    return {"ok": True, "records": info["records"], "users": info["users"],
+            "kept": os.path.basename(kept)}
 
 
 class RawResponse:
@@ -1848,9 +2137,11 @@ ROUTES = [
     ("GET", r"/api/version", h_version, "user"),
     ("GET", r"/api/state", h_state, "user"),
     ("GET", r"/api/activity", h_activity, "user"),
+    ("GET", r"/api/log", h_log, "user"),
     ("POST", r"/api/records", h_record_create, "user"),
     ("PUT", r"/api/records/(\d{1,12})", h_record_update, "user"),
     ("DELETE", r"/api/records/(\d{1,12})", h_record_delete, "admin"),
+    ("POST", r"/api/records/(\d{1,12})/restore", h_record_restore, "admin"),
     ("POST", r"/api/records/(\d{1,12})/actions", h_record_action, "user"),
     ("POST", r"/api/records/(\d{1,12})/notes", h_record_note, "user"),
     ("GET", r"/api/records/(\d{1,12})/history", h_record_history, "user"),
@@ -1875,6 +2166,7 @@ ROUTES = [
     ("GET", r"/api/admin/system", h_admin_system, "admin"),
     ("PUT", r"/api/admin/settings", h_admin_settings, "admin"),
     ("GET", r"/api/admin/backup", h_admin_backup, "admin"),
+    # POST /api/admin/restore takes a file, not JSON; see Handler.handle_upload.
 ]
 ROUTES = [(m, re.compile(p), fn, access) for (m, p, fn, access) in ROUTES]
 
@@ -2067,6 +2359,8 @@ class Handler(BaseHTTPRequestHandler):
         if not path.startswith("/api/"):
             self.read_body("GET")  # drain anything sent, keeps the connection in sync
             return self.serve_static(method, path)
+        if path == "/api/admin/restore":
+            return self.handle_upload(method)
         body = self.read_body(method)
         allowed = False
         for route_method, pattern, func, access in ROUTES:
@@ -2101,6 +2395,50 @@ class Handler(BaseHTTPRequestHandler):
         if allowed:
             raise ApiError(405, "Method not allowed.")
         raise ApiError(404, "Not found.")
+
+    def handle_upload(self, method):
+        """Receive a transferred database file. Administrators only; the caller is
+        checked before a single byte of the file is read."""
+        self.close_connection = True  # never reuse a connection that carried an upload
+        if method != "POST":
+            raise ApiError(405, "Method not allowed.")
+        user, session = self.load_session(touch=True)
+        if user is None:
+            raise ApiError(401, "Please sign in.", code="signed_out")
+        if user["must_change"]:
+            raise ApiError(403, "Please choose a new password first.", code="password_change_required")
+        if user["role"] != "admin":
+            raise ApiError(403, "Only administrators can do that.")
+        sent = self.headers.get("X-CSRF-Token") or ""
+        if not hmac.compare_digest(sent.encode("utf-8", "replace"), session["csrf"].encode()):
+            raise ApiError(403, "Your session could not be verified. "
+                                "Please reload the page and try again.", code="csrf")
+        try:
+            length = int(self.headers.get("Content-Length") or "")
+        except ValueError:
+            raise ApiError(400, "Bad request.")
+        if length <= 0:
+            raise ApiError(400, "No file was sent.")
+        if length > MAX_UPLOAD:
+            raise ApiError(413, "That file is too large (the limit is %d MB)." % (MAX_UPLOAD // 1048576))
+        path = os.path.join(RT.data_dir, "upload-%s.tmp" % secrets.token_hex(6))
+        try:
+            remaining = length
+            with open(path, "wb") as out:
+                while remaining > 0:
+                    chunk = self.rfile.read(min(1048576, remaining))
+                    if not chunk:
+                        raise ApiError(400, "The upload was interrupted. Please try again.")
+                    out.write(chunk)
+                    remaining -= len(chunk)
+            ctx = Ctx(self, user, session, {}, {}, None)
+            result = h_admin_restore(ctx, path)
+        finally:
+            try:
+                os.remove(path)
+            except OSError:
+                pass
+        self.send_json(200, result)
 
     def serve_static(self, method, path):
         if method != "GET":

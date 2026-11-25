@@ -71,6 +71,27 @@ class Client:
     def delete(self, path):
         return self.request("DELETE", path)
 
+    def upload(self, path, data, send_csrf=True):
+        headers = {"Content-Type": "application/octet-stream"}
+        if send_csrf:
+            headers["X-CSRF-Token"] = self.csrf
+        if self.cookie:
+            headers["Cookie"] = self.cookie
+        req = urllib.request.Request(self.base + path, data=data, method="POST", headers=headers)
+        try:
+            resp = self.opener.open(req, timeout=60)
+        except urllib.error.HTTPError as exc:
+            resp = exc
+        except (urllib.error.URLError, ConnectionError):
+            return 0, None  # refused before the file was read
+        payload = resp.read()
+        if resp.headers.get("Set-Cookie"):
+            self.cookie = None
+        try:
+            return resp.status, json.loads(payload.decode("utf-8"))
+        except ValueError:
+            return resp.status, None
+
     def login(self, username, password):
         status, data = self.post("/api/login", {"username": username, "password": password})
         if status == 200:
@@ -566,7 +587,7 @@ class InSysTest(unittest.TestCase):
         texts = [x["text"] for x in history if x["kind"] == "subcon"]
         self.assertIn("Subcontractor added: Northbank Structures (Structural design)", texts)
         self.assertIn("Subcontractor added: Coolflow Mechanical", texts)
-        self.assertIn("Subcontractor scope for Coolflow Mechanical: Ventilation", texts)
+        self.assertIn("Subcontractor Coolflow Mechanical - Scope: Ventilation", texts)
         self.assertIn("Subcontractor removed: Ember Fire Engineering", texts)
         added_by_tina = [x for x in history if x["text"] == "Subcontractor added: Coolflow Mechanical"][0]
         self.assertEqual(added_by_tina["user_id"], tina.user_id)
@@ -598,6 +619,200 @@ class InSysTest(unittest.TestCase):
         self.assertTrue(any("deleted from the directory" in x["text"] for x in history))
         events = [a["event"] for a in self.admin.get("/api/admin/audit")[1]["audit"]]
         self.assertIn("subcon_deleted", events)
+
+    # -- 1.2.0: roles ------------------------------------------------------------
+
+    def test_roles_separate_financial_information_from_technical_teams(self):
+        roles = self.state(self.admin)["meta"]["roles"]
+        self.assertEqual(roles, {"admin": "Administrator", "administration": "Administration",
+                                 "staff": "Engineering", "finance": "Finance", "office": "Office Administrator"})
+        everything = ["project", "enquiry", "eoi", "finance", "office"]
+        technical = ["project", "enquiry", "eoi"]
+        engineer = self.make_user("erin", "Erin Engineer", "staff")
+        manager = self.make_user("mona", "Mona Manager", "administration")
+        self.assertEqual(self.state(engineer)["meta"]["visible_modules"], technical)
+        self.assertEqual(self.state(manager)["meta"]["visible_modules"], everything)
+        self.assertEqual(self.state(self.admin)["meta"]["visible_modules"], everything)
+
+        invoice = self.new_record(self.people["fiona"], "finance", "Fee invoice 77", amount=5000)
+        office = self.new_record(self.people["oscar"], "office", "Lease renewal")
+        # Engineering: no trace of finance or office content, by any route.
+        state = json.dumps(self.state(engineer))
+        self.assertNotIn("Fee invoice 77", state)
+        self.assertNotIn("Lease renewal", state)
+        self.assertEqual(engineer.get("/api/records/%d/history" % invoice["id"])[0], 404)
+        self.assertEqual(engineer.post("/api/records", {"module": "finance", "title": "x"})[0], 403)
+        self.assertNotIn("Fee invoice 77", json.dumps(engineer.get("/api/log?kind=all&month=all")[1]))
+        # Administration: sees and works on both, but has no Admin area.
+        state = json.dumps(self.state(manager))
+        self.assertIn("Fee invoice 77", state)
+        self.assertIn("Lease renewal", state)
+        self.assertEqual(manager.post("/api/records/%d/notes" % invoice["id"], {"text": "Checked"})[0], 200)
+        self.assertEqual(manager.put("/api/records/%d" % invoice["id"], {"version": 1, "owner_id": manager.user_id})[0], 200)
+        for path in ["/api/admin/users", "/api/admin/audit", "/api/admin/system"]:
+            self.assertEqual(manager.get(path)[0], 403, path)
+        self.assertEqual(manager.request("GET", "/api/admin/backup", raw=True)[0], 403)
+        self.assertEqual(manager.delete("/api/records/%d" % office["id"])[0], 403)
+
+    # -- 1.2.0: deleted items are kept, and the activity log ----------------------
+
+    def test_deleted_records_leave_the_lists_but_keep_their_history(self):
+        sam = self.people["sam"]
+        rec = self.new_record(sam, "project", "Bridge inspection", last_action="Site visit", last_action_date="2026-09-14")
+        other = self.new_record(sam, "enquiry", "Linked enquiry")
+        sam.post("/api/records/%d/links" % rec["id"], {"target_id": other["id"]})
+        sam.post("/api/records/%d/actions" % rec["id"], {"version": 1, "text": "Report issued", "date": "2026-10-02"})
+        task = sam.post("/api/tasks", {"title": "File the report", "assignee_id": sam.user_id, "record_id": rec["id"]})[1]["task"]
+        self.assertEqual(self.admin.delete("/api/records/%d" % rec["id"])[0], 200)
+
+        state = self.state(sam)
+        self.assertIsNone(self.find(state, rec["id"]))
+        self.assertFalse([p for p in state["links"] if rec["id"] in p])
+        self.assertNotIn(str(rec["id"]), state["restricted"])
+        kept = [t for t in state["tasks"] if t["id"] == task["id"]][0]
+        self.assertIsNone(kept["record_id"])
+        for call in [lambda: sam.get("/api/records/%d/history" % rec["id"]),
+                     lambda: sam.put("/api/records/%d" % rec["id"], {"version": 2, "title": "x"}),
+                     lambda: sam.post("/api/records/%d/notes" % rec["id"], {"text": "x"}),
+                     lambda: sam.post("/api/records/%d/links" % other["id"], {"target_id": rec["id"]})]:
+            self.assertEqual(call()[0], 404)
+        self.assertEqual(self.admin.delete("/api/records/%d" % rec["id"])[0], 404)  # already deleted
+        self.assertNotIn("Bridge inspection", json.dumps(sam.get("/api/activity")[1]))
+
+        # ...but everything done on it can still be found, under "deleted".
+        log = sam.get("/api/log?scope=deleted&kind=all&q=bridge")[1]
+        texts = [e["text"] for e in log["entries"]]
+        self.assertIn("Report issued", texts)
+        self.assertIn("Site visit", texts)
+        self.assertTrue(any(t.startswith("Project deleted") for t in texts))
+        self.assertTrue(all(e["state"] == "deleted" and e["record"]["ref"] == rec["ref"] for e in log["entries"]))
+        self.assertEqual(sam.get("/api/log?scope=open&kind=all&q=bridge")[1]["entries"], [])
+
+        # Only an administrator restores; the record comes back whole.
+        self.assertEqual(sam.post("/api/records/%d/restore" % rec["id"])[0], 403)
+        self.assertEqual(self.admin.post("/api/records/%d/restore" % other["id"])[0], 404)  # not deleted
+        self.assertEqual(self.admin.post("/api/records/%d/restore" % rec["id"])[0], 200)
+        state = self.state(sam)
+        back = self.find(state, rec["id"])
+        self.assertEqual((back["title"], back["last_action"], back["ref"]), ("Bridge inspection", "Report issued", rec["ref"]))
+        self.assertIn(sorted([rec["id"], other["id"]]), [sorted(p) for p in state["links"]])
+        self.assertEqual([t for t in state["tasks"] if t["id"] == task["id"]][0]["record_id"], rec["id"])
+        kinds = [h["kind"] for h in sam.get("/api/records/%d/history" % rec["id"])[1]["history"]]
+        self.assertEqual(kinds[:2], ["restored", "deleted"])
+        events = [a["event"] for a in self.admin.get("/api/admin/audit")[1]["audit"]]
+        self.assertIn("record_restored", events)
+
+    def test_activity_log_is_catalogued_by_month_and_searchable(self):
+        sam, tina = self.people["sam"], self.people["tina"]
+        rec = self.new_record(sam, "eoi", "Harbour tender zq", status="Preparing")
+        version = 1
+        for text, day in [("Zq drawings requested", "2026-07-03"), ("Zq drawings received", "2026-07-21"),
+                          ("Zq pricing complete", "2026-08-09"), ("Zq submission lodged", "2026-09-30")]:
+            version = sam.post("/api/records/%d/actions" % rec["id"], {"version": version, "text": text, "date": day})[1]["record"]["version"]
+        sam.post("/api/records/%d/notes" % rec["id"], {"text": "Zq note for the file"})
+
+        log = sam.get("/api/log?q=zq")[1]                      # actions only, all months when searching
+        self.assertEqual(log["month"], "all")
+        self.assertEqual([(m["month"], m["count"]) for m in log["months"]], [("2026-09", 1), ("2026-08", 1), ("2026-07", 2)])
+        self.assertEqual([e["text"] for e in log["entries"]],
+                         ["Zq submission lodged", "Zq pricing complete", "Zq drawings received", "Zq drawings requested"])
+        self.assertTrue(all(e["kind"] == "action" for e in log["entries"]))
+        july = sam.get("/api/log?q=zq&month=2026-07")[1]
+        self.assertEqual([e["day"] for e in july["entries"]], ["2026-07-21", "2026-07-03"])
+        self.assertEqual(len(july["months"]), 3)               # the catalogue still lists every month
+        self.assertEqual(sam.get("/api/log?q=zq&month=2026-01")[1]["entries"], [])
+        everything = sam.get("/api/log?q=zq&kind=all")[1]
+        self.assertIn("Zq note for the file", [e["text"] for e in everything["entries"]])
+        self.assertEqual(len(everything["entries"]), 6)        # 4 actions + note + created
+        # With no search the newest month is shown.
+        latest = sam.get("/api/log")[1]
+        self.assertEqual(latest["month"], latest["months"][0]["month"])
+        self.assertTrue(all(e["day"].startswith(latest["month"]) for e in latest["entries"]))
+        # Search covers who did it, the reference and the title; anyone with access can look.
+        self.assertEqual(len(tina.get("/api/log?q=" + rec["ref"].lower())[1]["entries"]), 4)
+        self.assertEqual(len(tina.get("/api/log?q=harbour+tender+zq")[1]["entries"]), 4)
+        self.assertEqual(len(tina.get("/api/log?q=sam+staff&month=2026-08")[1]["entries"]) >= 1, True)
+        # Completed (closed) items are found under "closed", no longer under "open".
+        self.assertEqual(len(sam.get("/api/log?q=zq&scope=open")[1]["entries"]), 4)
+        sam.post("/api/records/%d/actions" % rec["id"], {"version": version, "text": "Zq award notice", "date": "2026-10-15", "status": "Successful"})
+        self.assertEqual(sam.get("/api/log?q=zq&scope=open")[1]["entries"], [])
+        self.assertEqual(len(sam.get("/api/log?q=zq&scope=closed")[1]["entries"]), 5)
+        for bad in ["kind=nonsense", "scope=nonsense", "month=2026", "month=2026-1"]:
+            self.assertEqual(sam.get("/api/log?" + bad)[0], 400, bad)
+        self.assertEqual(Client(self.base).get("/api/log")[0], 401)
+
+    def test_completed_and_deleted_tasks_stay_on_record(self):
+        sam, tina = self.people["sam"], self.people["tina"]
+        done = sam.post("/api/tasks", {"title": "Qx renew licence", "assignee_id": sam.user_id})[1]["task"]
+        gone = sam.post("/api/tasks", {"title": "Qx order samples", "assignee_id": sam.user_id})[1]["task"]
+        sam.put("/api/tasks/%d" % done["id"], {"version": 1, "status": "Done"})
+        self.assertEqual(sam.delete("/api/tasks/%d" % gone["id"])[0], 200)
+        ids = [t["id"] for t in self.state(sam)["tasks"]]
+        self.assertIn(done["id"], ids)
+        self.assertNotIn(gone["id"], ids)
+        self.assertEqual(sam.put("/api/tasks/%d" % gone["id"], {"version": 1, "status": "Done"})[0], 404)
+        self.assertEqual(sam.delete("/api/tasks/%d" % gone["id"])[0], 200)  # harmless to repeat
+        log = sam.get("/api/log?kind=tasks&q=qx")[1]
+        self.assertEqual(sorted(e["text"] for e in log["entries"]), ["Task completed: Qx renew licence", "Task deleted: Qx order samples"])
+        self.assertEqual(len(sam.get("/api/log?kind=tasks&q=qx&scope=deleted")[1]["entries"]), 1)
+        self.assertEqual(sam.get("/api/log?kind=actions&q=qx")[1]["entries"], [])
+        # Private tasks stay private in the log too.
+        self.assertEqual(tina.get("/api/log?kind=tasks&q=qx")[1]["entries"], [])
+        self.assertEqual(len(self.admin.get("/api/log?kind=tasks&q=qx")[1]["entries"]), 2)
+
+    # -- 1.2.0: subcontractor capabilities and follow-ups -------------------------
+
+    def test_subcontractor_capabilities_are_kept_as_a_tidy_list(self):
+        sam = self.people["sam"]
+        sub = self.new_subcon(sam, "Quake Risk Partners", discipline="Structural, Geotechnical",
+                              capabilities=" Seismic assessment ;  HAZOP\nwind  tunnel study, seismic ASSESSMENT,, ")
+        self.assertEqual(sub["capabilities"], "Seismic assessment, HAZOP, wind tunnel study")
+        status, data = sam.put("/api/subcons/%d" % sub["id"], {"version": 1, "capabilities": "Blast analysis"})
+        self.assertEqual(data["subcon"]["capabilities"], "Blast analysis")
+        self.assertEqual(data["subcon"]["discipline"], "Structural, Geotechnical")
+        self.assertEqual(self.new_subcon(sam, "Plain Co")["capabilities"], "")
+
+    def test_each_subcontractor_on_a_record_has_its_own_update_and_follow_up(self):
+        sam, tina = self.people["sam"], self.people["tina"]
+        a = self.new_subcon(sam, "Follow Up Alpha")
+        b = self.new_subcon(sam, "Follow Up Beta")
+        rec = self.new_record(sam, "enquiry", "Enquiry with two subcons", next_action="Reply to client", next_action_date="2026-12-20")
+        base = "/api/records/%d/subcons" % rec["id"]
+        sam.post(base, {"subcon_id": a["id"]})
+        sam.post(base, {"subcon_id": b["id"], "scope": "Survey"})
+
+        def row(client, sub):
+            return [x for x in self.state(client)["record_subcons"]
+                    if x["record_id"] == rec["id"] and x["subcon_id"] == sub["id"]][0]
+
+        fresh = row(sam, a)
+        self.assertEqual((fresh["last_update"], fresh["last_update_date"], fresh["next_action"], fresh["next_action_date"]), ("", None, "", None))
+        status, data = sam.put("%s/%d" % (base, a["id"]), {
+            "last_update": "Sent drawings for pricing", "last_update_date": "2026-11-20",
+            "next_action": "Chase the quote", "next_action_date": "2026-11-27"})
+        self.assertEqual(status, 200, data)
+        status, data = tina.put("%s/%d" % (base, b["id"]), {
+            "last_update": "Quote received", "last_update_date": "2026-11-22",
+            "next_action": "Clarify exclusions", "next_action_date": "2026-12-01"})
+        self.assertEqual(status, 200, data)
+        ra, rb = row(tina, a), row(tina, b)
+        self.assertEqual((ra["last_update"], ra["last_update_date"], ra["next_action"], ra["next_action_date"]),
+                         ("Sent drawings for pricing", "2026-11-20", "Chase the quote", "2026-11-27"))
+        self.assertEqual((rb["last_update"], rb["next_action_date"], rb["scope"]), ("Quote received", "2026-12-01", "Survey"))
+        # The record's own next action is separate and untouched.
+        current = self.find(self.state(sam), rec["id"])
+        self.assertEqual((current["next_action"], current["next_action_date"], current["version"]), ("Reply to client", "2026-12-20", 1))
+        # Updating one field leaves the others; clearing works.
+        sam.put("%s/%d" % (base, a["id"]), {"next_action": "", "next_action_date": None})
+        ra = row(sam, a)
+        self.assertEqual((ra["last_update"], ra["next_action"], ra["next_action_date"]), ("Sent drawings for pricing", "", None))
+        for bad in [{"last_update": "No date given"}, {"last_update": "x", "last_update_date": "soon"},
+                    {"next_action_date": "2026-02-31"}]:
+            self.assertEqual(sam.put("%s/%d" % (base, a["id"]), bad)[0], 400, bad)
+        history = [x["text"] for x in sam.get("/api/records/%d/history" % rec["id"])[1]["history"] if x["kind"] == "subcon"]
+        self.assertIn("Subcontractor Follow Up Alpha - Last update (2026-11-20): Sent drawings for pricing; "
+                      "Next follow-up: Chase the quote; Follow-up expected: 2026-11-27", history)
+        self.assertTrue(any(x.startswith("Subcontractor Follow Up Beta - Last update (2026-11-22): Quote received") for x in history))
 
     # -- tasks ------------------------------------------------------------------
 
@@ -822,10 +1037,64 @@ class InSysTest(unittest.TestCase):
         self.assertEqual(len([r for r in self.state(sam)["records"] if r["title"].startswith("Burst")]), 25)
 
 
-class UpgradeTest(unittest.TestCase):
-    """Data written by InSys 1.0.0 must open, unchanged, in this version."""
+FIXTURES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures")
 
-    V1_TABLES = ("meta", "users", "sessions", "records", "activity", "links", "xrefs", "tasks", "audit")
+
+def build_old_database(path, layout, password="Old-system-pass-1"):
+    """Create a database exactly as an older InSys laid it out, with some work in it.
+    layout 1 = InSys 1.0.0, layout 2 = InSys 1.1.x. Returns the rows it put in."""
+    with open(os.path.join(FIXTURES, "schema_v%d.sql" % layout), encoding="utf-8") as fh:
+        schema = fh.read()
+    conn = sqlite3.connect(path)
+    conn.executescript(schema)
+    now = "2026-10-01T09:00:00Z"
+    conn.execute("INSERT INTO users (username, full_name, role, pw_hash, must_change, active, created_at) "
+                 "VALUES ('admin', 'Old Admin', 'admin', ?, 0, 1, ?)", (insys.hash_password(password), now))
+    conn.execute("INSERT INTO users (username, full_name, role, pw_hash, must_change, active, created_at) "
+                 "VALUES ('pat', 'Pat Staff', 'staff', ?, 0, 1, ?)", (insys.hash_password(password), now))
+    conn.execute("INSERT INTO records (module, ref, title, organisation, status, priority, owner_id, amount, "
+                 "last_action, last_action_date, last_action_by, next_action, next_action_date, created_by, "
+                 "created_at, updated_by, updated_at, version) VALUES ('project', 'PRJ-0001', 'Work from the old version', "
+                 "'Old Client', 'In Progress', 'High', 2, 1250.5, 'Did the survey', '2026-09-20', 2, 'Send the quote', "
+                 "'2026-12-01', 1, ?, 2, ?, 4)", (now, now))
+    conn.execute("INSERT INTO records (module, ref, title, status, created_at, updated_at) "
+                 "VALUES ('finance', 'FIN-0001', 'Old invoice', 'Issued', ?, ?)", (now, now))
+    conn.execute("INSERT INTO activity (record_id, user_id, at, kind, text, action_date) "
+                 "VALUES (1, 2, ?, 'action', 'Did the survey', '2026-09-20')", (now,))
+    conn.execute("INSERT INTO links (a_id, b_id, created_by, created_at) VALUES (1, 2, 1, ?)", (now,))
+    conn.execute("INSERT INTO xrefs (record_id, system, ref, url, created_by, created_at) "
+                 "VALUES (1, 'CRM', 'OPP-1', '', 1, ?)", (now,))
+    conn.execute("INSERT INTO tasks (title, record_id, assignee_id, created_by, created_at, status, updated_at) "
+                 "VALUES ('Old task', 1, 2, 1, ?, 'To Do', ?)", (now, now))
+    conn.execute("INSERT INTO audit (at, username, event) VALUES (?, 'admin', 'login_ok')", (now,))
+    for key, value in [("schema_version", str(layout)), ("org_name", "Old Org"), ("currency", "AUD"),
+                       ("seq_project", "1"), ("seq_finance", "1")]:
+        conn.execute("INSERT INTO meta (key, value) VALUES (?, ?)", (key, value))
+    if layout >= 2:
+        conn.execute("INSERT INTO subcons (ref, name, discipline, services, created_by, created_at, updated_by, "
+                     "updated_at) VALUES ('SUB-0001', 'Old Subcon Ltd', 'Structural', 'Design', 1, ?, 1, ?)", (now, now))
+        conn.execute("INSERT INTO record_subcons (record_id, subcon_id, scope, added_by, added_at) "
+                     "VALUES (1, 1, 'Old scope', 1, ?)", (now,))
+        conn.execute("INSERT INTO meta (key, value) VALUES ('seq_subcon', '1')")
+    conn.commit()
+    conn.close()
+
+
+def snapshot(path):
+    """Every row of every table, limited to the columns that exist in the file now."""
+    conn = sqlite3.connect(path)
+    try:
+        out = {}
+        for (table,) in conn.execute("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'"):
+            columns = [row[1] for row in conn.execute("PRAGMA table_info(%s)" % table)]
+            out[table] = (columns, conn.execute("SELECT %s FROM %s ORDER BY 1, 2" % (",".join(columns), table)).fetchall())
+        return out
+    finally:
+        conn.close()
+
+
+class UpgradeTest(unittest.TestCase):
+    """Data written by every earlier version must open in this one with nothing lost."""
 
     def setUp(self):
         self.saved = (insys.RT.data_dir, insys.RT.upgraded_from, insys.RT.upgrade_backup)
@@ -836,68 +1105,95 @@ class UpgradeTest(unittest.TestCase):
         shutil.rmtree(insys.RT.data_dir, ignore_errors=True)
         insys.RT.data_dir, insys.RT.upgraded_from, insys.RT.upgrade_backup = self.saved
 
-    def make_version_1_database(self):
-        """A database exactly as 1.0.0 laid it out: no subcontractor tables, layout version 1."""
-        insys.init_db()
-        with insys.write_db(bump=False) as conn:
-            conn.execute("INSERT INTO records (module, ref, title, status, created_at, updated_at, "
-                         "last_action, last_action_date, next_action, next_action_date) "
-                         "VALUES ('project', 'PRJ-0001', 'Work from 1.0.0', 'In Progress', ?, ?, "
-                         "'Did the survey', '2026-11-01', 'Send the quote', '2026-12-01')",
-                         (insys.now_iso(), insys.now_iso()))
-            conn.execute("INSERT INTO activity (record_id, user_id, at, kind, text) VALUES (1, 1, ?, 'action', 'Did the survey')",
-                         (insys.now_iso(),))
-            insys.meta_set(conn, "seq_project", 1)
-            conn.execute("DROP TABLE record_subcons")
-            conn.execute("DROP TABLE subcons")
-            insys.meta_set(conn, "schema_version", 1)
-        shutil.rmtree(insys.RT.backup_dir, ignore_errors=True)
-        insys.RT.upgraded_from = insys.RT.upgrade_backup = None
-
-    def dump(self, path):
-        conn = sqlite3.connect(path)
-        try:
-            return {t: conn.execute("SELECT * FROM %s ORDER BY 1" % t).fetchall()
-                    for t in self.V1_TABLES if t not in ("meta", "sessions", "audit")}
-        finally:
-            conn.close()
-
-    def test_version_1_data_is_upgraded_in_place_and_kept(self):
-        self.make_version_1_database()
-        before = self.dump(insys.RT.db_path)
-        self.assertEqual(insys.stored_schema_version(), 1)
-
+    def upgrade_from(self, layout):
+        build_old_database(insys.RT.db_path, layout)
+        before = snapshot(insys.RT.db_path)
+        self.assertEqual(insys.stored_schema_version(), layout)
         self.assertIsNone(insys.init_db())  # no new administrator: the existing one is kept
         self.assertEqual(insys.stored_schema_version(), insys.SCHEMA_VERSION)
-        self.assertEqual(insys.RT.upgraded_from, 1)
-        self.assertEqual(self.dump(insys.RT.db_path), before)  # every existing row untouched
-
-        # A copy from before the upgrade exists, is still a version-1 database, and has the data.
+        self.assertEqual(insys.RT.upgraded_from, layout)
+        after_conn = sqlite3.connect(insys.RT.db_path)
+        # Every table, column and row the old version wrote is still there, unchanged.
+        for table, (columns, rows) in before.items():
+            if table in ("meta", "audit"):
+                continue  # the layout number and the upgrade note are the intended changes here
+            now_rows = after_conn.execute("SELECT %s FROM %s ORDER BY 1, 2" % (",".join(columns), table)).fetchall()
+            self.assertEqual(now_rows, rows, table)
+        meta = dict(after_conn.execute("SELECT key, value FROM meta"))
+        self.assertEqual((meta["org_name"], meta["currency"], meta["seq_project"]), ("Old Org", "AUD", "1"))
+        self.assertEqual(after_conn.execute("SELECT COUNT(*) FROM audit WHERE event = 'login_ok'").fetchone()[0], 1)
+        self.assertEqual(after_conn.execute("SELECT COUNT(*) FROM audit WHERE event = 'upgraded'").fetchone()[0], 1)
+        # Nothing old is treated as deleted, and the new columns start empty.
+        self.assertEqual(after_conn.execute("SELECT COUNT(*) FROM records WHERE deleted_at IS NOT NULL").fetchone()[0], 0)
+        self.assertEqual(after_conn.execute("SELECT COUNT(*) FROM tasks WHERE deleted_at IS NOT NULL").fetchone()[0], 0)
+        after_conn.close()
+        # A copy from before the upgrade exists and is byte-for-byte the old layout and data.
         backup = insys.RT.upgrade_backup
-        self.assertTrue(os.path.basename(backup).startswith("before-upgrade-from-v1-"))
-        conn = sqlite3.connect(backup)
-        self.assertEqual(conn.execute("SELECT value FROM meta WHERE key = 'schema_version'").fetchone()[0], "1")
-        self.assertEqual(conn.execute("SELECT title FROM records").fetchall(), [("Work from 1.0.0",)])
-        self.assertFalse(conn.execute("SELECT 1 FROM sqlite_master WHERE name = 'subcons'").fetchone())
-        conn.close()
-
-        # The new tables are there and usable; old reference numbering carries on.
-        with insys.write_db(bump=False) as conn:
-            self.assertEqual(insys.next_ref(conn, "project"), "PRJ-0002")
-            conn.execute("INSERT INTO subcons (ref, name, created_at, updated_at) VALUES ('SUB-0001', 'New Co', 'x', 'x')")
-            conn.execute("INSERT INTO record_subcons (record_id, subcon_id, added_at) VALUES (1, 1, 'x')")
-            events = [r["event"] for r in conn.execute("SELECT event FROM audit")]
-        self.assertIn("upgraded", events)
-
-        # Starting again does nothing further: no second upgrade, no second copy.
+        self.assertTrue(os.path.basename(backup).startswith("before-upgrade-from-v%d-" % layout))
+        copy = snapshot(backup)
+        for table, (columns, rows) in before.items():
+            if table != "sessions":
+                self.assertEqual(copy[table], (columns, rows), table)
+        # Starting again does nothing further.
         insys.RT.upgraded_from = insys.RT.upgrade_backup = None
+        again = snapshot(insys.RT.db_path)
         insys.init_db()
         self.assertIsNone(insys.RT.upgraded_from)
-        copies = [f for f in os.listdir(insys.RT.backup_dir) if f.startswith("before-upgrade")]
-        self.assertEqual(len(copies), 1)
+        self.assertEqual(snapshot(insys.RT.db_path), again)
+        self.assertEqual(len([f for f in os.listdir(insys.RT.backup_dir) if f.startswith("before-upgrade")]), 1)
+
+    def test_data_from_1_0_0_is_upgraded_and_kept(self):
+        self.upgrade_from(1)
+        with insys.write_db(bump=False) as conn:
+            self.assertEqual(insys.next_ref(conn, "project"), "PRJ-0002")
+            self.assertEqual(conn.execute("SELECT COUNT(*) AS n FROM subcons").fetchone()["n"], 0)
+
+    def test_data_from_1_1_x_is_upgraded_and_kept(self):
+        self.upgrade_from(2)
+        with insys.read_db() as conn:
+            sub = conn.execute("SELECT * FROM subcons").fetchone()
+            link = conn.execute("SELECT * FROM record_subcons").fetchone()
+        self.assertEqual((sub["name"], sub["discipline"], sub["capabilities"]), ("Old Subcon Ltd", "Structural", ""))
+        self.assertEqual((link["scope"], link["last_update"], link["last_update_date"], link["next_action"],
+                          link["next_action_date"]), ("Old scope", "", None, "", None))
+
+    def test_upgraded_data_works_in_the_running_program(self):
+        """Sign in to data from 1.0.0 with its old password and use old and new features."""
+        build_old_database(insys.RT.db_path, 1)
+        insys.init_db()
+        server = insys.Server(("127.0.0.1", 0), insys.Handler)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        try:
+            client = Client("http://127.0.0.1:%d" % server.server_address[1])
+            self.assertEqual(client.login("admin", "Old-system-pass-1")[0], 200)
+            state = client.get("/api/state")[1]
+            self.assertEqual(sorted(r["ref"] for r in state["records"]), ["FIN-0001", "PRJ-0001"])
+            project = [r for r in state["records"] if r["ref"] == "PRJ-0001"][0]
+            self.assertEqual((project["title"], project["last_action"], project["next_action_date"], project["amount"],
+                              project["xrefs"][0]["ref"]), ("Work from the old version", "Did the survey", "2026-12-01", 1250.5, "OPP-1"))
+            self.assertEqual(state["links"], [[1, 2]])
+            self.assertEqual(state["tasks"][0]["title"], "Old task")
+            self.assertEqual(state["meta"]["roles"]["staff"], "Engineering")
+            log = client.get("/api/log?month=all")[1]
+            self.assertEqual([(e["text"], e["day"]) for e in log["entries"]], [("Did the survey", "2026-09-20")])
+            # Old staff login still works and still cannot see finance.
+            pat = Client(client.base)
+            self.assertEqual(pat.login("pat", "Old-system-pass-1")[0], 200)
+            self.assertEqual(pat.get("/api/state")[1]["meta"]["visible_modules"], ["project", "enquiry", "eoi"])
+            # New features work on the old record.
+            sub = client.post("/api/subcons", {"name": "New Subcon", "capabilities": "Seismic"})[1]["subcon"]
+            self.assertEqual(client.post("/api/records/1/subcons", {"subcon_id": sub["id"]})[0], 200)
+            self.assertEqual(client.put("/api/records/1/subcons/%d" % sub["id"],
+                                        {"next_action": "Call", "next_action_date": "2026-12-05"})[0], 200)
+            self.assertEqual(client.delete("/api/records/1")[0], 200)
+            self.assertEqual(client.post("/api/records/1/restore")[0], 200)
+            self.assertEqual(client.post("/api/records/1/actions", {"version": 5, "text": "Sent the quote", "date": "2026-11-25"})[0], 200)
+        finally:
+            server.shutdown()
+            server.server_close()
 
     def test_upgrade_copies_are_not_rotated_away(self):
-        self.make_version_1_database()
+        build_old_database(insys.RT.db_path, 1)
         insys.init_db()
         for index in range(insys.BACKUP_KEEP + 5):
             shutil.copy(insys.RT.upgrade_backup, os.path.join(insys.RT.backup_dir, "insys-20200101-0000%02d.db" % index))
@@ -921,6 +1217,146 @@ class UpgradeTest(unittest.TestCase):
         self.assertEqual(insys.stored_schema_version(), insys.SCHEMA_VERSION)
         self.assertIsNone(insys.RT.upgraded_from)
         self.assertFalse([f for f in os.listdir(insys.RT.backup_dir) if f.startswith("before-upgrade")])
+
+
+class TransferTest(unittest.TestCase):
+    """An administrator can download the database and load it into another InSys."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.saved = insys.RT.data_dir
+        insys.RT.data_dir = tempfile.mkdtemp(prefix="insys-transfer-")
+        password = insys.init_db()
+        cls.server = insys.Server(("127.0.0.1", 0), insys.Handler)
+        cls.base = "http://127.0.0.1:%d" % cls.server.server_address[1]
+        threading.Thread(target=cls.server.serve_forever, daemon=True).start()
+        cls.admin = Client(cls.base)
+        cls.admin.login("admin", password)
+        cls.admin.post("/api/change-password", {"current": password, "new": "Host-system-pass-1"})
+        data = cls.admin.post("/api/admin/users", {"username": "stan", "full_name": "Stan Staff", "role": "staff"})[1]
+        cls.staff = Client(cls.base)
+        cls.staff.login("stan", data["temp_password"])
+        cls.staff.post("/api/change-password", {"current": data["temp_password"], "new": "Stan-system-pass-1"})
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.shutdown()
+        cls.server.server_close()
+        shutil.rmtree(insys.RT.data_dir, ignore_errors=True)
+        insys.RT.data_dir = cls.saved
+
+    def titles(self, client):
+        return sorted(r["title"] for r in client.get("/api/state")[1]["records"])
+
+    def sign_in_admin(self, password="Host-system-pass-1"):
+        self.admin.__init__(self.base)
+        status, _ = self.admin.login("admin", password)
+        self.assertEqual(status, 200)
+
+    def test_1_only_an_administrator_can_download_or_load(self):
+        self.admin.post("/api/records", {"module": "project", "title": "Stays put"})
+        status, payload = self.staff.request("GET", "/api/admin/backup", raw=True)
+        self.assertEqual(status, 403)
+        good = self.admin.request("GET", "/api/admin/backup", raw=True)[1]
+        self.assertIn(self.staff.upload("/api/admin/restore", good)[0], (403, 0))
+        self.assertIn(Client(self.base).upload("/api/admin/restore", good)[0], (401, 0))
+        self.assertIn(self.admin.upload("/api/admin/restore", good, send_csrf=False)[0], (403, 0))
+        self.assertEqual(self.titles(self.admin), ["Stays put"])
+        self.assertEqual(self.staff.get("/api/me")[0], 200)  # nobody was signed out
+        self.assertFalse([f for f in os.listdir(insys.RT.data_dir) if f.startswith("upload-")])
+
+    def test_2_files_that_are_not_a_usable_database_are_refused(self):
+        self.sign_in_admin()
+        before = self.titles(self.admin)
+        good = self.admin.request("GET", "/api/admin/backup", raw=True)[1]
+        newer = os.path.join(insys.RT.data_dir, "newer.db")
+        with open(newer, "wb") as fh:
+            fh.write(good)
+        conn = sqlite3.connect(newer)
+        conn.execute("UPDATE meta SET value = ? WHERE key = 'schema_version'", (str(insys.SCHEMA_VERSION + 1),))
+        conn.commit()
+        conn.close()
+        with open(newer, "rb") as fh:
+            too_new = fh.read()
+        conn = sqlite3.connect(newer)
+        conn.execute("UPDATE meta SET value = ? WHERE key = 'schema_version'", (str(insys.SCHEMA_VERSION),))
+        conn.execute("UPDATE users SET active = 0 WHERE role = 'admin'")
+        conn.commit()
+        conn.close()
+        with open(newer, "rb") as fh:
+            no_admin = fh.read()
+        os.remove(newer)
+        other = os.path.join(insys.RT.data_dir, "other.db")
+        conn = sqlite3.connect(other)
+        conn.execute("CREATE TABLE something (x)")
+        conn.commit()
+        conn.close()
+        with open(other, "rb") as fh:
+            not_insys = fh.read()
+        os.remove(other)
+        cases = [(b"this is not a database at all" * 50, "not an InSys database"),
+                 (good[:len(good) // 2], None), (not_insys, "not an InSys database"),
+                 (too_new, "newer version"), (no_admin, "no active administrator")]
+        for payload, expected in cases:
+            status, data = self.admin.upload("/api/admin/restore", payload)
+            self.assertEqual(status, 400, expected)
+            if expected:
+                self.assertIn(expected, data["error"])
+        self.assertEqual(self.admin.upload("/api/admin/restore", b"")[0], 400)
+        self.assertEqual(self.titles(self.admin), before)
+        self.assertFalse([f for f in os.listdir(insys.RT.backup_dir) if f.startswith("before-loading")])
+        self.assertFalse([f for f in os.listdir(insys.RT.data_dir) if f.startswith("upload-")])
+
+    def test_3_a_downloaded_database_can_be_loaded_back(self):
+        self.sign_in_admin()
+        self.admin.post("/api/records", {"module": "enquiry", "title": "Travels with the file"})
+        status, travelling = self.admin.request("GET", "/api/admin/backup", raw=True)
+        self.assertEqual(status, 200)
+        self.assertIn("insys-database-", self.admin.last_headers["Content-Disposition"])
+        self.admin.post("/api/records", {"module": "eoi", "title": "Made after the download"})
+        self.assertIn("Made after the download", self.titles(self.admin))
+
+        status, data = self.admin.upload("/api/admin/restore", travelling)
+        self.assertEqual(status, 200, data)
+        self.assertEqual(data["records"], 2)
+        # Everyone is signed out and signs in again with the logins in the file.
+        self.assertEqual(self.staff.get("/api/me")[0], 401)
+        self.assertEqual(self.admin.get("/api/me")[0], 401)
+        self.sign_in_admin()
+        self.assertEqual(self.titles(self.admin), ["Stays put", "Travels with the file"])
+        # What was here before the load was kept, whole.
+        kept = os.path.join(insys.RT.backup_dir, data["kept"])
+        conn = sqlite3.connect(kept)
+        self.assertEqual(sorted(r[0] for r in conn.execute("SELECT title FROM records")),
+                         ["Made after the download", "Stays put", "Travels with the file"])
+        conn.close()
+        events = [a["event"] for a in self.admin.get("/api/admin/audit")[1]["audit"]]
+        self.assertIn("database_loaded", events)
+        # The loaded data is fully usable.
+        status, data = self.admin.post("/api/records", {"module": "project", "title": "New work after loading"})
+        self.assertEqual(status, 200, data)
+
+    def test_4_a_database_from_an_older_version_is_upgraded_as_it_is_loaded(self):
+        self.sign_in_admin()
+        old = os.path.join(insys.RT.data_dir, "from-1.0.0.db")
+        build_old_database(old, 1, password="Other-office-pass-9")
+        with open(old, "rb") as fh:
+            payload = fh.read()
+        os.remove(old)
+        status, data = self.admin.upload("/api/admin/restore", payload)
+        self.assertEqual(status, 200, data)
+        self.assertEqual(insys.stored_schema_version(), insys.SCHEMA_VERSION)
+        # The other office's logins now apply here.
+        self.assertEqual(Client(self.base).login("admin", "Host-system-pass-1")[0], 401)
+        self.sign_in_admin("Other-office-pass-9")
+        state = self.admin.get("/api/state")[1]
+        self.assertEqual(sorted(r["ref"] for r in state["records"]), ["FIN-0001", "PRJ-0001"])
+        self.assertEqual(state["meta"]["org_name"], "Old Org")
+        sub = self.admin.post("/api/subcons", {"name": "Works after transfer"})
+        self.assertEqual(sub[0], 200)
+        self.assertEqual(self.admin.post("/api/records/1/subcons", {"subcon_id": sub[1]["subcon"]["id"]})[0], 200)
+        self.assertEqual(self.admin.delete("/api/records/2")[0], 200)
+        self.assertEqual(len(self.admin.get("/api/log?scope=deleted&kind=all&month=all")[1]["entries"]), 1)
 
 
 class ToolingTest(unittest.TestCase):

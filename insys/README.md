@@ -9,7 +9,9 @@ with optional access from anywhere over the internet.
 - **Subcontractor directory**: keep every subcontractor's details in one place,
   put one or several on any project, enquiry or expression of interest, and see
   who is working on what, most urgent action first.
-- **Finance** and **Office Admin** sections, private to those teams.
+- **Activity log**: everything that has been done, catalogued by month and
+  searchable, including work on items that have since been completed or deleted.
+- **Finance** and **Office Admin** sections, kept away from the technical teams.
 - **Overview** of current status across every section, with pilot KPIs.
 - **Cross-references**: link any record to any other (an enquiry to the project
   it became, a project to its invoices), and record the reference an item has
@@ -119,14 +121,23 @@ their own password at first sign-in.
 
 | Role | Can open |
 |---|---|
-| Staff | Overview, My Work, Tasks, Projects, Enquiries, Expressions of Interest, Subcontractors |
-| Finance | Everything Staff can, plus **Finance** |
-| Office Administrator | Everything Staff can, plus **Office Admin** |
-| Administrator | Everything, plus **Admin** |
+| Engineering | Overview, My Work, Tasks, Activity log, Projects, Enquiries, Expressions of Interest, Subcontractors. **No Finance or Office Admin.** |
+| Finance | Everything Engineering can, plus **Finance** |
+| Office Administrator | Everything Engineering can, plus **Office Admin** |
+| Administration | Every section, including **Finance** and **Office Admin**. No Admin area. |
+| Administrator | Everything, plus the **Admin** area (logins, backups, database transfer) |
 
-People outside the Finance or Office Admin team cannot see those records at
-all. If one of them is linked to a project, they see only its reference number
-marked "Restricted".
+Choose the role when you add a person; it can be changed later with **Edit**.
+This is what keeps financial information away from the technical teams: an
+Engineering login cannot see Finance or Office Admin records at all — not in
+lists, searches, the activity log or exports. If one is linked to a project,
+they see only its reference number marked "Restricted". The separation is
+enforced on the server, not just hidden on the page.
+
+(Engineering is the role that versions 1.0 and 1.1 called "Staff". Existing
+Staff logins become Engineering automatically, with exactly the access they had.
+Value fields on projects, enquiries and expressions of interest are part of
+those records and remain visible to Engineering.)
 
 ## Online access (use it from anywhere)
 
@@ -187,6 +198,30 @@ from the host computer only.
   action first (overdue first; on the same date, higher priority first; items
   with no next-action date last). Marking a subcontractor *Inactive* keeps
   their history but stops them being added to new work.
+- **Each subcontractor on an item is tracked separately.** *Update* next to a
+  subcontractor records the last known update from them and the next follow-up
+  with its expected date — independent of the item's own last and next action,
+  and of the other subcontractors on it. Their follow-up date is what the
+  directory and *Work by priority* use for that subcontractor; an overdue one
+  is flagged in the Subcons column.
+- **Find by capability** (a tab on the Subcontractors page) answers "who can do
+  this scope?". Give each subcontractor their disciplines and a list of
+  capabilities and specialised studies, then type what a scope needs —
+  `structural, seismic assessment, geotechnical investigation` — and InSys
+  lists who covers which requirement, best match first, and points out any
+  requirement nobody covers. Tick the ones to approach and add them all to the
+  enquiry in one step, or start an email to them.
+- **Activity log** (in the sidebar) is the long-term record. Every logged
+  action is filed under the month it was done; pick a month from the catalogue
+  on the left, or search across all months by what was done, a reference, a
+  title or a person. Switch between *Actions done*, *Tasks* and *All
+  activity*, and between open, completed/closed and deleted items.
+- **Deleting does not destroy.** A deleted project, enquiry, EOI, finance or
+  office item disappears from every list, but it and its whole history stay
+  in the Activity log under *Deleted items*, where an administrator can
+  **Restore** it. Deleted and completed tasks stay on record there too.
+  (Items deleted in version 1.0 or 1.1, before this existed, were removed
+  outright and cannot be recovered.)
 - **Tasks** are jobs for a named person, optionally attached to a record. Each
   person sees theirs under **My Work**; only the assignee, the creator or an
   administrator can change a task.
@@ -211,9 +246,11 @@ Your work is kept. To upgrade:
    folder instead: replace `insys.py` and the `web` folder, keep `data`.)
 3. Start it as usual.
 
-On the first start, the new version makes a copy of your data exactly as the
+This works from any earlier version, including straight from 1.0.0. On the
+first start, the new version makes a copy of your data exactly as the
 old version left it — `backups\before-upgrade-from-v1-(date).db` inside the data
-folder — and only then adds what it needs. Existing records, history, links,
+folder — and only then adds what it needs (upgrades only ever add tables and
+columns; nothing existing is changed or removed). Existing records, history, links,
 tasks, people and passwords are not altered. The window tells you this has
 happened, and it is noted in Admin → Security log. These copies are never
 deleted automatically.
@@ -227,6 +264,7 @@ If you use the office-network choice, Windows may ask again whether to allow
 
 | Version | What changed |
 |---|---|
+| 1.2.0 | Activity log by month with completed and deleted items; deleted items kept and restorable; per-subcontractor last update and next follow-up; capability search; Administration and Engineering roles; database transfer between systems; optional Samaritan look. |
 | 1.1.1 | A Subcons column in the Projects, Enquiries and Expressions of Interest lists. No change to stored data. |
 | 1.1.0 | Subcontractor directory; subcontractors on projects, enquiries and expressions of interest. |
 | 1.0.0 | First version. |
@@ -243,6 +281,16 @@ Everything is stored in the `data` folder next to `insys.py`:
 | `tunnel.log` | Output of the online-access tool. |
 
 - **Download a backup** at any time from **Admin → System & online access**.
+- **Transfer to another system** (administrators only, same page): *Download
+  database* gives one file holding everything — records, history,
+  subcontractors and logins. Copy it to the other computer, start InSys there,
+  sign in as its administrator and use *Load a database file*. That InSys then
+  hosts the same data on its own network. Before loading, it saves a copy of
+  whatever it held (`backups\before-loading-transfer-…`). Afterwards everyone
+  signs in with the usernames and passwords from the system the file came from.
+  A file from an older version of InSys is upgraded as it is loaded; a file
+  from a newer version is refused. The two systems are then independent:
+  loading replaces, it does not merge, and later changes are not synchronised.
 - To restore: stop InSys, replace `data\insys.db` with a backup file (renamed to
   `insys.db`), start InSys again.
 - To move InSys to another computer: stop it, copy the whole folder.
@@ -266,6 +314,14 @@ Everything is stored in the `data` folder next to `insys.py`:
 This is appropriate for a pilot with ordinary business information. Before
 putting highly sensitive data in it or scaling beyond a pilot, have the
 deployment reviewed and plan for a fixed address and off-site backups.
+
+## The Samaritan look
+
+InSys has a second appearance: stark white, black monospace type and a single
+red mark. Switch with **Theme** at the bottom of the sidebar, by clicking the
+InSys logo five times, or by typing `samaritan` in the search box and pressing
+Enter. The same actions switch back to the standard look. It is remembered per
+browser and affects only the person who chose it.
 
 ## Troubleshooting
 

@@ -103,6 +103,7 @@
     filters: {},
     sort: {},
     history: { id: null, items: null },
+    log: { q: '', kind: 'actions', scope: 'all', month: '', data: null, error: null, seq: 0 },
     routed: false,      // has the address bar been read since signing in?
     adminTab: 'users',
     admin: { users: null, system: null, audit: null },
@@ -113,6 +114,7 @@
     { id: 'overview', label: 'Overview', group: 'Status' },
     { id: 'my', label: 'My Work', group: 'Status' },
     { id: 'tasks', label: 'Tasks', group: 'Status' },
+    { id: 'log', label: 'Activity log', group: 'Status' },
     { id: 'projects', module: 'project', group: 'Work' },
     { id: 'enquiries', module: 'enquiry', group: 'Work' },
     { id: 'eois', module: 'eoi', group: 'Work' },
@@ -164,8 +166,13 @@
       const sub = I.subs.get(x.subcon_id);
       const rec = I.recs.get(x.record_id);
       if (!sub || !rec) return;
-      pushMap(I.subsByRec, rec.id, { sub: sub, scope: x.scope });
-      pushMap(I.recsBySub, sub.id, { rec: rec, scope: x.scope });
+      const entry = {
+        sub: sub, rec: rec, scope: x.scope || '',
+        last_update: x.last_update || '', last_update_date: x.last_update_date || null,
+        next_action: x.next_action || '', next_action_date: x.next_action_date || null,
+      };
+      pushMap(I.subsByRec, rec.id, entry);
+      pushMap(I.recsBySub, sub.id, entry);
     });
     S.I = I;
   }
@@ -222,6 +229,7 @@
         setSync(true);
         renderAll();
         if (S.view === 'admin') loadAdmin(S.adminTab);
+        if (S.view === 'log') loadLog();
       } finally {
         refreshing = null;
       }
@@ -367,8 +375,35 @@
   // Signing in
   // ------------------------------------------------------------------
 
+  // The alternative look, remembered per browser. It is switched from the
+  // sidebar, by clicking the logo five times, or by typing "samaritan" in the
+  // search box and pressing Enter.
+  const THEME_KEY = 'insys-theme';
+  function savedTheme() {
+    try { return window.localStorage.getItem(THEME_KEY) === 'samaritan' ? 'samaritan' : 'standard'; } catch (e) { return 'standard'; }
+  }
+  function setTheme(name, announce) {
+    if (name === 'samaritan') document.documentElement.setAttribute('data-theme', 'samaritan');
+    else document.documentElement.removeAttribute('data-theme');
+    try { window.localStorage.setItem(THEME_KEY, name); } catch (e) { /* stays for this visit only */ }
+    const button = document.getElementById('theme-toggle');
+    if (button) button.textContent = 'Theme: ' + (name === 'samaritan' ? 'Samaritan' : 'Standard');
+    if (announce) toast(name === 'samaritan' ? 'Samaritan theme on. Click the InSys logo five times to switch back.' : 'Standard theme restored.');
+  }
+  const currentTheme = () => (document.documentElement.getAttribute('data-theme') === 'samaritan' ? 'samaritan' : 'standard');
+  const toggleTheme = () => setTheme(currentTheme() === 'samaritan' ? 'standard' : 'samaritan', true);
+  setTheme(savedTheme(), false);
+
+  let logoClicks = [];
+  function logoClicked() {
+    const now = Date.now();
+    logoClicks = logoClicks.filter((at) => now - at < 2500);
+    logoClicks.push(now);
+    if (logoClicks.length >= 5) { logoClicks = []; toggleTheme(); }
+  }
+
   function brand() {
-    return h('div', { class: 'brand' },
+    return h('div', { class: 'brand', onclick: logoClicked },
       h('div', { class: 'brand-mark', text: 'IS', 'aria-hidden': 'true' }),
       h('div', null, h('div', { class: 'brand-name', text: 'InSys' }), h('div', { class: 'brand-sub', text: 'Internal Systems' })));
   }
@@ -523,6 +558,7 @@
     if (before !== S.view) {
       window.scrollTo(0, 0);
       if (S.view === 'admin') loadAdmin(S.adminTab);
+      if (S.view === 'log') loadLog();
     }
   });
 
@@ -540,6 +576,7 @@
       onfocus: () => drawSearch(search.value),
       onkeydown: (e) => {
         if (e.key === 'Escape') { search.value = ''; drawSearch(''); search.blur(); }
+        if (e.key === 'Enter' && search.value.trim().toLowerCase() === 'samaritan') { search.value = ''; drawSearch(''); toggleTheme(); return; }
         if (e.key === 'Enter') { const first = document.querySelector('#search-results button'); if (first) first.click(); }
       },
       onblur: () => setTimeout(() => { if (!document.activeElement || !document.activeElement.closest('#search-results')) drawSearch(''); }, 150),
@@ -592,7 +629,7 @@
         });
       } else if (v.id === 'subcons') {
         const busy = S.data.subcons.filter((sub) => subconWork(sub).open.length);
-        const late = busy.filter((sub) => subconWork(sub).open.some((x) => x.rec.next_action_date && x.rec.next_action_date < t)).length;
+        const late = busy.filter((sub) => subconWork(sub).open.some((x) => { const d = followUp(x).date; return !!d && d < t; })).length;
         count = h('span', {
           class: 'count' + (late ? ' alert' : ''), text: busy.length,
           title: plural(busy.length, 'subcontractor') + ' on open work' + (late ? ', ' + late + ' with an overdue action' : ''),
@@ -613,7 +650,10 @@
       h('div', { class: 'name', text: S.me.full_name }),
       h('div', { class: 'role', text: S.data.meta.roles[S.me.role] || S.me.role }));
     const org = S.data.meta.org_name;
-    document.getElementById('side-foot').textContent = (org ? org + ' · ' : '') + 'InSys ' + S.data.meta.app_version;
+    document.getElementById('side-foot').replaceChildren(
+      h('div', { text: (org ? org + ' · ' : '') + 'InSys ' + S.data.meta.app_version }),
+      h('button', { id: 'theme-toggle', type: 'button', class: 'theme-toggle', title: 'Switch between the standard look and the Samaritan look',
+        text: 'Theme: ' + (currentTheme() === 'samaritan' ? 'Samaritan' : 'Standard'), onclick: toggleTheme }));
     document.title = (org ? org + ' - ' : '') + 'InSys';
   }
 
@@ -630,8 +670,10 @@
     else if (v.id === 'my') node = viewMy();
     else if (v.id === 'tasks') node = viewTasks();
     else if (v.id === 'subcons') node = viewSubcons();
+    else if (v.id === 'log') node = viewLog();
     else node = viewAdmin();
     main.replaceChildren(node);
+    if (S.view === 'log') drawLog();
     if (focusId) {
       const el = document.getElementById(focusId);
       if (el) {
@@ -722,9 +764,30 @@
   const usesSubcons = (module) => (S.data.meta.subcon_modules || []).includes(module);
   const subconNames = (r) => (S.I.subsByRec.get(r.id) || []).map((x) => x.sub.name).join(', ');
 
+  /**
+   * What is next for a subcontractor on a record: the follow-up set for that
+   * subcontractor if there is one, otherwise the record's own next action.
+   */
+  function followUp(x) {
+    const own = !!(x.next_action || x.next_action_date);
+    return { own: own, text: own ? x.next_action : x.rec.next_action, date: own ? x.next_action_date : x.rec.next_action_date };
+  }
+  function pairUrgencyKey(x) {
+    const rank = PRIORITY_RANK[x.rec.priority] === undefined ? 2 : PRIORITY_RANK[x.rec.priority];
+    if (!isOpen(x.rec)) return '3';
+    const date = followUp(x).date;
+    return date ? '1' + date + rank : '2' + rank;
+  }
+  function byPairUrgency(a, b) {
+    const x = pairUrgencyKey(a); const y = pairUrgencyKey(b);
+    if (x !== y) return x < y ? -1 : 1;
+    if (a.rec.id !== b.rec.id) return refKey(a.rec) < refKey(b.rec) ? -1 : 1;
+    return a.sub.name.toLowerCase() < b.sub.name.toLowerCase() ? -1 : 1;
+  }
+
   /** A subcontractor's work, most urgent first. */
   function subconWork(sub) {
-    const all = (S.I.recsBySub.get(sub.id) || []).slice().sort((a, b) => byUrgency(a.rec, b.rec));
+    const all = (S.I.recsBySub.get(sub.id) || []).slice().sort(byPairUrgency);
     const open = all.filter((x) => isOpen(x.rec));
     return { all: all, open: open, closed: all.filter((x) => !isOpen(x.rec)), top: open[0] || null };
   }
@@ -818,8 +881,12 @@
             return h('td', { class: 'cell-subcons' }, entries.map((entry) => h('div', null,
               h('a', {
                 href: subHref(entry.sub), text: entry.sub.name,
-                title: [entry.sub.discipline, entry.scope ? 'Scope: ' + entry.scope : '', entry.sub.active ? '' : 'Inactive'].filter(Boolean).join(' · ') || 'Open ' + entry.sub.ref,
-              }))));
+                title: [entry.sub.discipline, entry.scope ? 'Scope: ' + entry.scope : '',
+                  entry.last_update ? 'Last update: ' + entry.last_update : '',
+                  entry.next_action ? 'Next follow-up: ' + entry.next_action : '',
+                  entry.sub.active ? '' : 'Inactive'].filter(Boolean).join(' · ') || 'Open ' + entry.sub.ref,
+              }),
+              isOpen(r) && entry.next_action_date && entry.next_action_date <= today() ? [' ', dueChip(entry.next_action_date)] : null)));
           }
           case 'status': return h('td', null, statusPill(r));
           case 'last': return h('td', { class: 'cell-text' }, r.last_action
@@ -1167,7 +1234,8 @@
 
   function ownerOptions(module, currentId) {
     const team = mods()[module].team;
-    const list = S.data.users.filter((u) => (u.active && (!team || u.role === 'admin' || u.role === team)) || u.id === currentId);
+    const everywhere = S.data.meta.all_section_roles || ['admin'];
+    const list = S.data.users.filter((u) => (u.active && (!team || everywhere.includes(u.role) || u.role === team)) || u.id === currentId);
     return [{ value: '', label: 'Unassigned' }].concat(list.map((u) => ({ value: u.id, label: u.full_name + (u.active ? '' : ' (inactive)') })));
   }
 
@@ -1375,7 +1443,7 @@
         type: 'button', class: 'btn quiet dangerous', text: 'Delete task',
         onclick: () => {
           dlg.close();
-          confirmDialog('Delete this task?', '"' + task.title + '" will be removed for everyone.', 'Delete task', async () => {
+          confirmDialog('Delete this task?', '"' + task.title + '" will be removed from every task list. It stays on record in the Activity log.', 'Delete task', async () => {
             await api('DELETE', '/api/tasks/' + task.id);
             await refresh();
             toast('Task deleted.');
@@ -1483,7 +1551,7 @@
 
     const tasks = sortTasks(S.I.tasksByRec.get(rec.id) || []);
     const hist = S.history.id === rec.id ? S.history.items : null;
-    const kindLabel = { created: 'Created', updated: 'Edited', action: 'Action', note: 'Note', link: 'Link', xref: 'Reference', task: 'Task', subcon: 'Subcontractor' };
+    const kindLabel = KIND_LABELS;
 
     const drawer = h('aside', { class: 'drawer', role: 'dialog', 'aria-label': rec.ref + ' ' + rec.title },
       top(rec.ref + ' · ' + m.singular, rec.title),
@@ -1496,7 +1564,7 @@
         h('button', { type: 'button', class: 'btn', text: 'Add task', onclick: () => taskForm(null, rec) }),
         isAdmin() ? h('button', {
           type: 'button', class: 'btn quiet dangerous', text: 'Delete',
-          onclick: () => confirmDialog('Delete ' + rec.ref + '?', 'This permanently deletes "' + rec.title + '" with its history, links and references. Its tasks are kept but unlinked. This cannot be undone.', 'Delete permanently', async () => {
+          onclick: () => confirmDialog('Delete ' + rec.ref + '?', '"' + rec.title + '" will be removed from every list. Its history is kept in the Activity log under "Deleted items", where an administrator can restore it.', 'Delete', async () => {
             await api('DELETE', '/api/records/' + rec.id);
             go(S.view);
             await refresh();
@@ -1567,14 +1635,163 @@
   }
 
   // ------------------------------------------------------------------
+  // Activity log: everything done, catalogued by month
+  // ------------------------------------------------------------------
+
+  const MONTHS_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const monthLabel = (m) => MONTHS_FULL[+m.slice(5) - 1] + ' ' + m.slice(0, 4);
+  const KIND_LABELS = {
+    created: 'Created', updated: 'Edited', action: 'Action', note: 'Note', link: 'Link', xref: 'Reference',
+    task: 'Task', subcon: 'Subcontractor', deleted: 'Deleted', restored: 'Restored',
+  };
+
+  async function loadLog() {
+    const L = S.log;
+    const seq = ++L.seq;
+    const params = new URLSearchParams({ q: L.q, kind: L.kind, scope: L.scope, month: L.month });
+    try {
+      const data = await api('GET', '/api/log?' + params.toString());
+      if (seq !== L.seq) return;  // a newer request has been made since
+      L.data = data;
+      L.error = null;
+    } catch (e) {
+      if (seq !== L.seq) return;
+      L.error = e.message;
+    }
+    if (S.view === 'log') drawLog();
+  }
+
+  let logTimer = null;
+  function logFilterChanged(delay) {
+    S.log.month = '';  // let the server pick: newest month, or all months when searching
+    clearTimeout(logTimer);
+    logTimer = setTimeout(loadLog, delay || 0);
+  }
+
+  function restoreRecord(record) {
+    confirmDialog('Restore ' + record.ref + '?', '"' + record.title + '" will be put back in ' + mods()[record.module].label +
+      ' with its history, links and subcontractors.', 'Restore', async () => {
+      await api('POST', '/api/records/' + record.id + '/restore', {});
+      await refresh();
+      toast(record.ref + ' restored.');
+      go(viewForModule(record.module), record.ref);
+    });
+  }
+
+  function exportLogCsv() {
+    const data = S.log.data;
+    if (!data) return;
+    const lines = [['Date', 'Logged at', 'Who', 'Reference', 'Section', 'Title', 'Item state', 'Type', 'What was done'].map(csvCell).join(',')];
+    data.entries.forEach((e) => {
+      lines.push([e.day, e.at, userName(e.user_id), e.record ? e.record.ref : '', e.record ? mods()[e.record.module].singular : 'Task',
+        e.record ? e.record.title : '', e.state === 'deleted' ? 'Deleted' : (e.state === 'closed' ? 'Completed / closed' : 'Open'),
+        KIND_LABELS[e.kind] || e.kind, e.text].map(csvCell).join(','));
+    });
+    saveCsv('insys-activity-log-' + (data.month === 'all' ? 'all' : data.month) + '.csv', lines);
+  }
+
+  function drawLog() {
+    const host = document.getElementById('log-host');
+    if (!host) return;
+    const L = S.log;
+    if (L.error) { host.replaceChildren(h('div', { class: 'table-wrap' }, h('div', { class: 'empty', text: L.error }))); return; }
+    const data = L.data;
+    if (!data) { host.replaceChildren(h('p', { class: 'muted', text: 'Loading…' })); return; }
+    const total = data.months.reduce((sum, m) => sum + m.count, 0);
+    const pick = (month) => () => { L.month = month; loadLog(); };
+    const index = h('nav', { class: 'month-index', 'aria-label': 'Months' },
+      h('button', { type: 'button', class: data.month === 'all' ? 'active' : null, onclick: pick('all') },
+        h('span', { text: 'All months' }), h('span', { class: 'count', text: total })),
+      data.months.map((m) => h('button', { type: 'button', class: data.month === m.month ? 'active' : null, onclick: pick(m.month) },
+        h('span', { text: monthLabel(m.month) }), h('span', { class: 'count', text: m.count }))));
+
+    let body;
+    if (!data.entries.length) {
+      body = h('div', { class: 'table-wrap' }, h('div', { class: 'empty', text: total
+        ? 'Nothing in this month matches. Pick another month on the left.'
+        : (L.q || L.scope !== 'all' || L.kind !== 'actions' ? 'Nothing matches this search.' : 'Nothing has been logged yet. Actions appear here as people use "Log action".') }));
+    } else {
+      const rows = [];
+      let lastMonth = null;
+      data.entries.forEach((e) => {
+        const month = e.day.slice(0, 7);
+        if (data.month === 'all' && month !== lastMonth) {
+          lastMonth = month;
+          rows.push(h('tr', { class: 'month-row' }, h('th', { colspan: '4', scope: 'colgroup', text: monthLabel(month) })));
+        }
+        const r = e.record;
+        let item;
+        if (!r) {
+          item = h('td', { class: 'muted', text: 'Task' });
+        } else if (e.state === 'deleted') {
+          item = h('td', { class: 'cell-text' },
+            h('span', { class: 'ref', text: r.ref }), ' ', h('span', { class: 'tag', text: 'Deleted' }),
+            h('div', { class: 'cell-sub', text: r.title }),
+            isAdmin() && e.kind === 'deleted' ? h('button', { type: 'button', class: 'btn quiet', text: 'Restore', 'aria-label': 'Restore ' + r.ref, onclick: () => restoreRecord(r) }) : null);
+        } else {
+          item = h('td', { class: 'cell-text' },
+            h('a', { class: 'ref', href: '#/log/' + r.ref, text: r.ref }),
+            e.state === 'closed' ? [' ', h('span', { class: 'tag', text: r.status })] : null,
+            h('div', { class: 'cell-sub', text: r.title }));
+        }
+        rows.push(h('tr', null,
+          h('td', { class: 'nowrap', text: fmtDate(e.day) }),
+          item,
+          h('td', { class: 'log-text' }, h('span', { class: 'tag', text: KIND_LABELS[e.kind] || 'Update' }), ' ', h('span', { class: 'text', text: e.text })),
+          h('td', { class: 'nowrap', text: userName(e.user_id) })));
+      });
+      body = h('div', null,
+        h('div', { class: 'table-wrap' }, h('table', null,
+          h('thead', null, h('tr', null, ['Date', 'Item', 'What was done', 'By'].map((x) => h('th', { scope: 'col', text: x })))),
+          h('tbody', null, rows))),
+        data.truncated ? h('p', { class: 'muted small', style: { marginTop: '8px' }, text: 'Showing the newest ' + data.entries.length + ' of ' + data.total + '. Pick a month or search to narrow it down.' }) : null);
+    }
+    host.replaceChildren(h('div', { class: 'log-layout' }, index, h('div', { class: 'log-entries' },
+      h('p', { class: 'muted small', style: { marginBottom: '8px' }, text: (data.month === 'all' ? 'All months' : monthLabel(data.month)) + ' · ' + plural(data.total, 'entry', 'entries') }),
+      body)));
+  }
+
+  function viewLog() {
+    const L = S.log;
+    const node = h('div', { class: 'view' },
+      h('div', { class: 'view-head' },
+        h('div', null, h('h1', { text: 'Activity log' }),
+          h('p', { class: 'sub', text: 'Everything that has been done, catalogued by month. Completed and deleted items stay here for future reference.' })),
+        h('div', { class: 'actions' }, h('button', { type: 'button', class: 'btn', text: 'Export CSV', title: 'Download the entries shown below as a spreadsheet', onclick: exportLogCsv }))),
+      h('div', { class: 'filters' },
+        h('input', { id: 'flt-log-q', type: 'search', placeholder: 'Search what was done, a reference or a person…', 'aria-label': 'Search the activity log', value: L.q,
+          oninput: (e) => { L.q = e.target.value; logFilterChanged(250); } }),
+        h('select', { id: 'flt-log-kind', 'aria-label': 'Type of entry', value: L.kind, onchange: (e) => { L.kind = e.target.value; logFilterChanged(); } },
+          h('option', { value: 'actions', text: 'Actions done' }), h('option', { value: 'tasks', text: 'Tasks' }), h('option', { value: 'all', text: 'All activity' })),
+        h('select', { id: 'flt-log-scope', 'aria-label': 'Which items', value: L.scope, onchange: (e) => { L.scope = e.target.value; logFilterChanged(); } },
+          h('option', { value: 'all', text: 'All items' }), h('option', { value: 'open', text: 'Open items' }),
+          h('option', { value: 'closed', text: 'Completed / closed items' }), h('option', { value: 'deleted', text: 'Deleted items' }))),
+      h('div', { id: 'log-host' }));
+    // The results are drawn once this node is on the page (see renderMain).
+    return node;
+  }
+
+  // ------------------------------------------------------------------
   // Subcontractors: directory, picker, and their place on a record
   // ------------------------------------------------------------------
 
   const DISCIPLINES = ['Structural', 'Civil', 'Mechanical', 'Electrical', 'HVAC', 'Plumbing / hydraulics',
     'Fire protection', 'Geotechnical', 'Surveying', 'Architectural', 'Environmental', 'Instrumentation & controls'];
 
-  const subconHay = (sub) => [sub.ref, sub.name, sub.discipline, sub.services, sub.contact_name, sub.email,
+  const subconHay = (sub) => [sub.ref, sub.name, sub.discipline, sub.capabilities, sub.services, sub.contact_name, sub.email,
     sub.phone, sub.address, sub.registration, sub.notes].join(' ').toLowerCase();
+
+  // What a subcontractor can do, for matching against the needs of a scope.
+  const capabilityHay = (sub) => [sub.discipline, sub.capabilities, sub.services, sub.notes, sub.name].join(' ').toLowerCase();
+  const splitList = (text) => {
+    const seen = new Set();
+    return (text || '').split(/[,;\n]+/).map((x) => x.trim()).filter((x) => {
+      const key = x.toLowerCase();
+      if (!x || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  };
 
   const subHref = (sub) => '#/' + S.view + '/' + sub.ref;
 
@@ -1587,11 +1804,13 @@
     return parts.join(' · ');
   }
 
-  /** Next action of a record, as shown in the subcontractor lists. */
-  function nextActionCell(r) {
-    if (!isOpen(r)) return h('span', { class: 'muted', text: '—' });
-    return [r.next_action ? h('div', { text: r.next_action }) : null,
-      r.next_action_date ? dueChip(r.next_action_date) : h('span', { class: 'chip none', text: r.next_action ? 'No date set' : 'Not set' })];
+  /** What is next for a subcontractor on a record, as shown in the subcontractor lists. */
+  function followUpCell(x) {
+    if (!isOpen(x.rec)) return h('span', { class: 'muted', text: '—' });
+    const f = followUp(x);
+    return [f.text ? h('div', { text: f.text }) : null,
+      f.date ? dueChip(f.date) : h('span', { class: 'chip none', text: f.text ? 'No date set' : 'Not set' }),
+      f.own ? [' ', h('span', { class: 'tag', title: 'A follow-up set for this subcontractor on this item', text: 'Subcon follow-up' })] : null];
   }
 
   function subconForm(sub, opts) {
@@ -1603,9 +1822,12 @@
       wide: true,
       fields: [
         { name: 'name', label: 'Subcontractor / company name', required: true, full: true, maxlength: 150, value: sub ? sub.name : (options.name || '') },
-        { name: 'discipline', label: 'Discipline', maxlength: 100, options: known, placeholder: 'e.g. Structural', value: sub ? sub.discipline : '' },
+        { name: 'discipline', label: 'Engineering discipline(s)', maxlength: 100, options: known, placeholder: 'e.g. Structural, Civil', value: sub ? sub.discipline : '' },
         { name: 'active', label: 'Status', type: 'select', value: sub && !sub.active ? 'no' : 'yes',
           options: [{ value: 'yes', label: 'Active' }, { value: 'no', label: 'Inactive (not for new work)' }] },
+        { name: 'capabilities', label: 'Capabilities and specialised studies', type: 'textarea', rows: 2, full: true, maxlength: 1500, value: sub ? sub.capabilities : '',
+          placeholder: 'e.g. Seismic assessment, Wind tunnel study, HAZOP, Finite element analysis',
+          hint: 'Separate with commas. These are what "Find by capability" searches, so list anything you may later need to find them for.' },
         { name: 'contact_name', label: 'Contact person', maxlength: 150, value: sub ? sub.contact_name : '' },
         { name: 'phone', label: 'Phone', maxlength: 60, value: sub ? sub.phone : '' },
         { name: 'email', label: 'Email', maxlength: 200, value: sub ? sub.email : '' },
@@ -1619,7 +1841,7 @@
       submitLabel: sub ? 'Save changes' : 'Add to directory',
       onSubmit: async (v) => {
         const body = {
-          name: v.name, discipline: v.discipline, active: v.active === 'yes', contact_name: v.contact_name, phone: v.phone,
+          name: v.name, discipline: v.discipline, capabilities: v.capabilities, active: v.active === 'yes', contact_name: v.contact_name, phone: v.phone,
           email: v.email, website: v.website, registration: v.registration, address: v.address, services: v.services, notes: v.notes,
         };
         if (sub) {
@@ -1640,7 +1862,7 @@
 
   /** The searchable pop-up for putting subcontractors on a record. Stays open so several can be added. */
   function subconPicker(rec) {
-    const search = h('input', { id: 'subcon-search', type: 'search', autocomplete: 'off', placeholder: 'Search by name, discipline, contact…', 'aria-label': 'Search subcontractors' });
+    const search = h('input', { id: 'subcon-search', type: 'search', autocomplete: 'off', placeholder: 'Search by name, discipline, capability, contact…', 'aria-label': 'Search subcontractors' });
     const list = h('div', { class: 'pick-list' });
     const error = h('div', { class: 'form-error', role: 'alert', hidden: true });
     const dlg = h('dialog', { class: 'dlg wide' });
@@ -1683,7 +1905,8 @@
         },
         h('span', { class: 'pick-main' },
           h('span', { class: 'cell-title', text: sub.name }),
-          h('span', { class: 'cell-sub', text: [sub.ref, sub.discipline, sub.contact_name, sub.phone].filter(Boolean).join(' · ') })),
+          h('span', { class: 'cell-sub', text: [sub.ref, sub.discipline, sub.contact_name, sub.phone].filter(Boolean).join(' · ') }),
+          sub.capabilities ? h('span', { class: 'cell-sub', text: sub.capabilities.length > 110 ? sub.capabilities.slice(0, 110) + '…' : sub.capabilities }) : null),
         h('span', { class: 'pick-side', text: added ? '✓ Added' : 'Add' }));
       }));
     };
@@ -1713,15 +1936,31 @@
     search.focus();
   }
 
-  function scopeForm(rec, entry) {
+  /** Scope, last known update and next follow-up for one subcontractor on one record. */
+  function followUpForm(rec, entry) {
     formDialog({
       title: entry.sub.name + ' on ' + rec.ref,
-      intro: 'What is this subcontractor doing on this ' + mods()[rec.module].singular.toLowerCase() + '?',
-      fields: [{ name: 'scope', label: 'Scope of work', full: true, maxlength: 300, value: entry.scope, placeholder: 'e.g. Structural design and certification' }],
-      submitLabel: 'Save scope',
+      intro: 'Track this subcontractor separately from the ' + mods()[rec.module].singular.toLowerCase() + ' itself: what you last heard from them, and what you need to follow up next.',
+      wide: true,
+      fields: [
+        { name: 'scope', label: 'Scope of work', full: true, maxlength: 300, value: entry.scope, placeholder: 'e.g. Structural design and certification' },
+        { type: 'section', label: 'Last known update' },
+        { name: 'last_update', label: 'What was the last update from or about them?', type: 'textarea', rows: 2, full: true, maxlength: 500, value: entry.last_update,
+          placeholder: 'e.g. Sent drawings for pricing; they confirmed receipt' },
+        { name: 'last_update_date', label: 'Date of that update', type: 'date', value: entry.last_update_date || today() },
+        { type: 'section', label: 'Next follow-up' },
+        { name: 'next_action', label: 'Next follow-up action', full: true, maxlength: 500, value: entry.next_action, placeholder: 'e.g. Chase their quote',
+          hint: 'Clear this when nothing further is needed from them.' },
+        { name: 'next_action_date', label: 'Expected date', type: 'date', value: entry.next_action_date },
+      ],
+      submitLabel: 'Save',
       onSubmit: async (v) => {
-        await api('PUT', '/api/records/' + rec.id + '/subcons/' + entry.sub.id, { scope: v.scope });
+        await api('PUT', '/api/records/' + rec.id + '/subcons/' + entry.sub.id, {
+          scope: v.scope, last_update: v.last_update, last_update_date: v.last_update ? (v.last_update_date || null) : null,
+          next_action: v.next_action, next_action_date: v.next_action_date || null,
+        });
         await refresh();
+        toast('Saved for ' + entry.sub.name + '.');
       },
     });
   }
@@ -1729,16 +1968,23 @@
   /** The "Subcontractors" card inside a project, enquiry or EOI. */
   function subconCard(rec) {
     const entries = S.I.subsByRec.get(rec.id) || [];
+    const open = isOpen(rec);
     return h('section', { class: 'card' },
       h('div', { class: 'section-head' }, h('h2', { text: 'Subcontractors' }),
         h('button', { type: 'button', class: 'btn small', text: 'Add subcontractor', onclick: () => subconPicker(rec) })),
-      entries.length ? h('ul', { class: 'list' }, entries.map((entry) => h('li', null,
+      entries.length ? h('ul', { class: 'list subcon-list' }, entries.map((entry) => h('li', null,
         h('div', { class: 'main' },
           h('a', { class: 'cell-title', href: subHref(entry.sub), text: entry.sub.name }),
           entry.sub.active ? null : [' ', h('span', { class: 'tag', text: 'Inactive' })],
-          h('div', { class: 'small muted', text: [entry.sub.discipline, entry.scope ? 'Scope: ' + entry.scope : 'No scope noted'].filter(Boolean).join(' · ') })),
+          h('div', { class: 'small muted', text: [entry.sub.discipline, entry.scope ? 'Scope: ' + entry.scope : 'No scope noted'].filter(Boolean).join(' · ') }),
+          h('div', { class: 'small' }, h('span', { class: 'muted', text: 'Last update: ' }),
+            entry.last_update ? [entry.last_update, h('span', { class: 'muted', text: ' (' + fmtDate(entry.last_update_date) + ')' })] : h('span', { class: 'muted', text: 'none recorded' })),
+          h('div', { class: 'small' }, h('span', { class: 'muted', text: 'Next follow-up: ' }),
+            (entry.next_action || entry.next_action_date)
+              ? [entry.next_action || 'Follow up', ' ', entry.next_action_date ? (open ? dueChip(entry.next_action_date) : h('span', { class: 'muted', text: fmtDate(entry.next_action_date) })) : h('span', { class: 'chip none', text: 'No date set' })]
+              : h('span', { class: 'muted', text: 'none set' }))),
         h('div', { class: 'side' },
-          h('button', { type: 'button', class: 'btn quiet', text: 'Scope', 'aria-label': 'Edit scope of work for ' + entry.sub.name, onclick: () => scopeForm(rec, entry) }),
+          h('button', { type: 'button', class: 'btn small', text: 'Update', 'aria-label': 'Update ' + entry.sub.name + ' on ' + rec.ref, onclick: () => followUpForm(rec, entry) }),
           h('button', {
             type: 'button', class: 'btn quiet dangerous', text: 'Remove', 'aria-label': 'Remove ' + entry.sub.name + ' from ' + rec.ref,
             onclick: () => confirmDialog('Remove ' + entry.sub.name + '?', entry.sub.name + ' will be taken off ' + rec.ref + '. They stay in the directory.', 'Remove', async () => {
@@ -1750,14 +1996,18 @@
   }
 
   function workList(items) {
-    return h('ul', { class: 'list' }, items.map((x) => h('li', null,
-      h('div', { class: 'main' },
-        h('a', { class: 'ref', href: recHref(x.rec), text: x.rec.ref }), ' ', h('span', { class: 'cell-title', text: x.rec.title }),
-        h('div', { class: 'small muted', text: [mods()[x.rec.module].singular, x.scope ? 'Scope: ' + x.scope : '', 'Owner: ' + userName(x.rec.owner_id)].filter(Boolean).join(' · ') }),
-        isOpen(x.rec) ? h('div', { class: 'small', text: x.rec.next_action ? 'Next: ' + x.rec.next_action : 'No next action set' }) : null),
-      h('div', { class: 'side' },
-        isOpen(x.rec) && x.rec.next_action_date ? dueChip(x.rec.next_action_date) : null,
-        prioChip(x.rec.priority), statusPill(x.rec)))));
+    return h('ul', { class: 'list' }, items.map((x) => {
+      const f = followUp(x);
+      return h('li', null,
+        h('div', { class: 'main' },
+          h('a', { class: 'ref', href: recHref(x.rec), text: x.rec.ref }), ' ', h('span', { class: 'cell-title', text: x.rec.title }),
+          h('div', { class: 'small muted', text: [mods()[x.rec.module].singular, x.scope ? 'Scope: ' + x.scope : '', 'Owner: ' + userName(x.rec.owner_id)].filter(Boolean).join(' · ') }),
+          x.last_update ? h('div', { class: 'small', text: 'Last update: ' + x.last_update + ' (' + fmtDate(x.last_update_date) + ')' }) : null,
+          isOpen(x.rec) ? h('div', { class: 'small', text: f.text ? (f.own ? 'Follow-up: ' : 'Next: ') + f.text : 'No next action set' }) : null),
+        h('div', { class: 'side' },
+          isOpen(x.rec) && f.date ? dueChip(f.date) : null,
+          prioChip(x.rec.priority), statusPill(x.rec)));
+    }));
   }
 
   /** The panel that opens for a subcontractor (SUB-0001). */
@@ -1770,6 +2020,7 @@
     }
     const work = subconWork(sub);
     const link = (href, text) => h('a', { href: href, target: '_blank', rel: 'noopener noreferrer', text: text });
+    const caps = splitList(sub.capabilities);
     return h('aside', { class: 'drawer', role: 'dialog', 'aria-label': sub.ref + ' ' + sub.name },
       top(sub.ref + ' · Subcontractor', sub.name),
       h('div', { class: 'badges' },
@@ -1794,8 +2045,9 @@
         work.open.length ? workList(work.open) : h('p', { class: 'muted small', text: 'Not on any open project, enquiry or expression of interest. Add them from a record with "Add subcontractor".' })),
 
       card('Details', null, h('div', { class: 'details' },
-        detail('Discipline', sub.discipline),
+        detail('Engineering discipline(s)', sub.discipline),
         detail('Contact person', sub.contact_name),
+        detail('Capabilities and specialised studies', caps.length ? h('div', { class: 'tag-row' }, caps.map((c) => h('span', { class: 'tag', text: c }))) : '', true),
         detail('Phone', sub.phone ? h('a', { href: 'tel:' + sub.phone.replace(/[^0-9+]/g, ''), text: sub.phone }) : ''),
         detail('Email', sub.email ? h('a', { href: 'mailto:' + sub.email, text: sub.email }) : ''),
         detail('Website', sub.website ? link(sub.website, sub.website) : ''),
@@ -1810,29 +2062,61 @@
   }
 
   function exportSubconsCsv(subs) {
-    const header = ['Reference', 'Subcontractor', 'Discipline', 'Status', 'Contact person', 'Phone', 'Email', 'Website',
+    const header = ['Reference', 'Subcontractor', 'Discipline', 'Capabilities', 'Status', 'Contact person', 'Phone', 'Email', 'Website',
       'Registration / licence', 'Address', 'Services', 'Notes', 'Open projects', 'Open enquiries', 'Open EOIs',
       'Current work', 'Most urgent action', 'Most urgent action due'];
     const lines = [header.map(csvCell).join(',')];
     subs.forEach((sub) => {
       const work = subconWork(sub);
       const n = (module) => work.open.filter((x) => x.rec.module === module).length;
-      lines.push([sub.ref, sub.name, sub.discipline, sub.active ? 'Active' : 'Inactive', sub.contact_name, sub.phone, sub.email, sub.website,
+      const f = work.top ? followUp(work.top) : null;
+      lines.push([sub.ref, sub.name, sub.discipline, sub.capabilities, sub.active ? 'Active' : 'Inactive', sub.contact_name, sub.phone, sub.email, sub.website,
         sub.registration, sub.address, sub.services, sub.notes, n('project'), n('enquiry'), n('eoi'),
         work.open.map((x) => x.rec.ref).join('; '),
-        work.top ? work.top.rec.ref + ': ' + (work.top.rec.next_action || 'no next action set') : '',
-        work.top ? work.top.rec.next_action_date : ''].map(csvCell).join(','));
+        work.top ? work.top.rec.ref + ': ' + (f.text || 'no next action set') : '',
+        f ? f.date : ''].map(csvCell).join(','));
     });
     saveCsv('insys-subcontractors-' + today() + '.csv', lines);
   }
 
+  /** Put several subcontractors on one record in one go (from "Find by capability"). */
+  function addSubconsToRecord(subs, after) {
+    const order = { enquiry: 0, eoi: 1, project: 2 };
+    const records = S.data.records.filter((r) => usesSubcons(r.module) && isOpen(r))
+      .sort((a, b) => (order[a.module] - order[b.module]) || (b.id - a.id));
+    if (!records.length) { toast('There is no open enquiry, expression of interest or project to add them to yet.', true); return; }
+    formDialog({
+      title: 'Add ' + plural(subs.length, 'subcontractor') + ' to…',
+      intro: subs.map((sub) => sub.name).join(', '),
+      fields: [{ name: 'record', label: 'Enquiry, expression of interest or project', required: true, full: true,
+        options: records.map((r) => r.ref + ' — ' + r.title), placeholder: 'Type a reference or title, e.g. ENQ-0004',
+        hint: 'Start typing and pick from the list. Open items only.' }],
+      submitLabel: 'Add to this item',
+      onSubmit: async (v) => {
+        const found = /^([A-Za-z]{3}-\d+)/.exec(v.record);
+        const rec = found ? S.I.byRef.get(found[1].toUpperCase()) : null;
+        if (!rec || !usesSubcons(rec.module)) throw new Error('Pick an enquiry, expression of interest or project from the list.');
+        const already = new Set((S.I.subsByRec.get(rec.id) || []).map((x) => x.sub.id));
+        const fresh = subs.filter((sub) => !already.has(sub.id));
+        for (const sub of fresh) {
+          await api('POST', '/api/records/' + rec.id + '/subcons', { subcon_id: sub.id });
+        }
+        await refresh();
+        toast(fresh.length ? plural(fresh.length, 'subcontractor') + ' added to ' + rec.ref + '.' : 'They were already on ' + rec.ref + '.');
+        if (after) after();
+        go(viewForModule(rec.module), rec.ref);
+      },
+    });
+  }
+
   function viewSubcons() {
-    const f = S.filters.subcons || (S.filters.subcons = { q: '', status: 'active', mode: 'directory', sort: 'urgent' });
+    const f = S.filters.subcons || (S.filters.subcons = { q: '', status: 'active', mode: 'directory', sort: 'urgent', need: '', picked: new Set() });
     const t = today();
     const subs = S.data.subcons;
     const work = new Map(subs.map((sub) => [sub.id, subconWork(sub)]));
     const engaged = subs.filter((sub) => work.get(sub.id).open.length);
-    const late = engaged.filter((sub) => work.get(sub.id).open.some((x) => x.rec.next_action_date && x.rec.next_action_date < t));
+    const lateDate = (x) => { const d = followUp(x).date; return !!d && d < t; };
+    const late = engaged.filter((sub) => work.get(sub.id).open.some(lateDate));
     const host = h('div');
 
     const visible = () => {
@@ -1851,7 +2135,7 @@
       const rows = visible().sort((a, b) => {
         const wa = work.get(a.id); const wb = work.get(b.id);
         if (f.sort === 'urgent') {
-          if (wa.top && wb.top) { const c = byUrgency(wa.top.rec, wb.top.rec); if (wa.top.rec.id !== wb.top.rec.id) return c; }
+          if (wa.top && wb.top) { const c = byPairUrgency(wa.top, wb.top); if (pairUrgencyKey(wa.top) !== pairUrgencyKey(wb.top)) return c; }
           else if (wa.top || wb.top) return wa.top ? -1 : 1;
         } else if (f.sort === 'busy' && wa.open.length !== wb.open.length) {
           return wb.open.length - wa.open.length;
@@ -1872,6 +2156,7 @@
             h('td', { class: 'cell-text' },
               h('div', { class: 'cell-title', text: sub.name }),
               sub.discipline ? h('div', { class: 'cell-sub', text: sub.discipline }) : null,
+              sub.capabilities ? h('div', { class: 'cell-sub', text: sub.capabilities.length > 90 ? sub.capabilities.slice(0, 90) + '…' : sub.capabilities }) : null,
               sub.active ? null : h('span', { class: 'tag', text: 'Inactive' })),
             h('td', { class: 'cell-text' },
               sub.contact_name ? h('div', { text: sub.contact_name }) : null,
@@ -1881,7 +2166,7 @@
               : h('span', { class: 'muted', text: 'None' })),
             h('td', { class: 'cell-text' }, w.top
               ? [h('div', { class: 'cell-sub' }, h('a', { class: 'ref', href: recHref(w.top.rec), text: w.top.rec.ref }), ' ', w.top.rec.title),
-                nextActionCell(w.top.rec), ' ', prioChip(w.top.rec.priority)]
+                followUpCell(w.top), ' ', prioChip(w.top.rec.priority)]
               : h('span', { class: 'muted', text: '—' })));
         }))));
     };
@@ -1889,17 +2174,18 @@
     const priorities = () => {
       const shown = new Set(visible().map((sub) => sub.id));
       const rows = [];
-      subs.forEach((sub) => { if (shown.has(sub.id)) work.get(sub.id).open.forEach((x) => rows.push({ sub: sub, rec: x.rec, scope: x.scope })); });
-      rows.sort((a, b) => (a.rec.id === b.rec.id ? (a.sub.name.toLowerCase() < b.sub.name.toLowerCase() ? -1 : 1) : byUrgency(a.rec, b.rec)));
+      subs.forEach((sub) => { if (shown.has(sub.id)) work.get(sub.id).open.forEach((x) => rows.push(x)); });
+      rows.sort(byPairUrgency);
       if (!rows.length) {
         return h('div', { class: 'table-wrap' }, h('div', { class: 'empty', text: 'No subcontractor is on any open project, enquiry or expression of interest' + (f.q || f.status !== 'active' ? ' that matches these filters.' : '.') }));
       }
       return h('div', { class: 'table-wrap' }, h('table', null,
-        h('thead', null, h('tr', null, ['Next action', 'Subcontractor', 'Ref', 'Section', 'Title', 'Status', 'Owner'].map((x) => h('th', { scope: 'col', text: x })))),
+        h('thead', null, h('tr', null, ['Next action', 'Subcontractor', 'Last update', 'Ref', 'Section', 'Title', 'Status', 'Owner'].map((x) => h('th', { scope: 'col', text: x })))),
         h('tbody', null, rows.map((x) => h('tr', { class: 'clickable', onclick: (e) => { if (!e.target.closest('a, button, input')) go('subcons', x.rec.ref); } },
-          h('td', { class: 'cell-text' }, nextActionCell(x.rec), ' ', prioChip(x.rec.priority)),
+          h('td', { class: 'cell-text' }, followUpCell(x), ' ', prioChip(x.rec.priority)),
           h('td', { class: 'cell-text' }, h('a', { class: 'cell-title', href: subHref(x.sub), text: x.sub.name }),
             h('div', { class: 'cell-sub', text: [x.sub.discipline, x.scope].filter(Boolean).join(' · ') })),
+          h('td', { class: 'cell-text' }, x.last_update ? [h('div', { text: x.last_update }), h('div', { class: 'cell-sub', text: fmtDate(x.last_update_date) })] : h('span', { class: 'muted', text: '—' })),
           h('td', null, h('a', { class: 'ref', href: recHref(x.rec), text: x.rec.ref })),
           h('td', { class: 'nowrap', text: mods()[x.rec.module].singular }),
           h('td', { class: 'cell-text' }, h('div', { class: 'cell-title', text: x.rec.title }),
@@ -1908,21 +2194,111 @@
           h('td', { class: x.rec.owner_id === null ? 'muted nowrap' : 'nowrap', text: userName(x.rec.owner_id) }))))));
     };
 
+    // "What does this scope need?" -> who can do it.
+    const capability = () => {
+      const terms = splitList(f.need).map((x) => x.toLowerCase());
+      const active = subs.filter((sub) => sub.active);
+      if (!terms.length) {
+        const known = new Map();
+        active.forEach((sub) => splitList(sub.discipline).concat(splitList(sub.capabilities)).forEach((c) => {
+          const key = c.toLowerCase();
+          if (!known.has(key)) known.set(key, { label: c, count: 0 });
+          known.get(key).count += 1;
+        }));
+        const tags = Array.from(known.values()).sort((a, b) => (b.count - a.count) || (a.label.toLowerCase() < b.label.toLowerCase() ? -1 : 1));
+        return h('div', { class: 'card' },
+          h('p', { class: 'muted', text: 'Type what the scope needs in the box above, separated by commas, for example "structural, seismic assessment, geotechnical investigation". InSys lists the subcontractors whose disciplines, capabilities, services or notes cover each requirement.' }),
+          tags.length ? [h('h3', { class: 'muted', style: { margin: '14px 0 8px' }, text: 'Disciplines and capabilities in the directory - click one to search for it' }),
+            h('div', { class: 'tag-row' }, tags.map((x) => h('button', {
+              type: 'button', class: 'tag-button', text: x.label + (x.count > 1 ? ' (' + x.count + ')' : ''),
+              onclick: () => { f.need = x.label; renderMain(); const box = document.getElementById('flt-subcons-need'); if (box) box.focus(); },
+            })))]
+            : h('p', { class: 'muted small', style: { marginTop: '10px' }, text: 'No disciplines or capabilities have been entered for any subcontractor yet. Add them with "Edit details" on each subcontractor.' }));
+      }
+      const scored = active.map((sub) => {
+        const hay = capabilityHay(sub);
+        return { sub: sub, hit: terms.filter((term) => hay.includes(term)) };
+      }).filter((x) => x.hit.length).sort((a, b) => (b.hit.length - a.hit.length) ||
+        (work.get(a.sub.id).open.length - work.get(b.sub.id).open.length) || (a.sub.name.toLowerCase() < b.sub.name.toLowerCase() ? -1 : 1));
+      const uncovered = terms.filter((term) => !scored.some((x) => x.hit.includes(term)));
+      const ids = new Set(scored.map((x) => x.sub.id));
+      Array.from(f.picked).forEach((id) => { if (!ids.has(id)) f.picked.delete(id); });
+      const bar = h('div', { class: 'select-bar' });
+      const drawBar = () => {
+        const chosen = scored.map((x) => x.sub).filter((sub) => f.picked.has(sub.id));
+        const emails = chosen.map((sub) => sub.email).filter(Boolean);
+        bar.replaceChildren(
+          h('span', { class: 'cell-title', text: chosen.length ? plural(chosen.length, 'subcontractor') + ' selected' : 'Tick the subcontractors to approach' }),
+          h('button', { type: 'button', class: 'btn primary small', disabled: !chosen.length, text: 'Add selected to an enquiry…',
+            title: 'Put the selected subcontractors on an enquiry, expression of interest or project',
+            onclick: () => addSubconsToRecord(chosen, () => { f.picked.clear(); }) }),
+          h('button', { type: 'button', class: 'btn small', disabled: !emails.length, text: 'Email selected',
+            title: emails.length ? 'Start an email to ' + emails.join(', ') : 'None of the selected subcontractors has an email address',
+            onclick: () => { window.location.href = 'mailto:' + emails.map(encodeURIComponent).join(','); } }),
+          h('button', { type: 'button', class: 'btn small', disabled: !emails.length, text: 'Copy email addresses',
+            onclick: async () => { try { await navigator.clipboard.writeText(emails.join('; ')); toast(plural(emails.length, 'email address', 'email addresses') + ' copied.'); } catch (e) { toast(emails.join('; ')); } } }),
+          chosen.length && emails.length < chosen.length ? h('span', { class: 'muted small', text: (chosen.length - emails.length) + ' selected without an email address' }) : null);
+      };
+      drawBar();
+      const summary = h('p', { class: 'muted', style: { marginBottom: '10px' } },
+        scored.length ? plural(scored.length, 'active subcontractor') + ' cover' + (scored.length === 1 ? 's' : '') + ' at least one requirement, best match first.' : 'No active subcontractor covers any of these requirements.',
+        uncovered.length ? [' Not covered by anyone: ', uncovered.map((term, i) => [i ? ' ' : '', h('span', { class: 'chip overdue' }, h('span', { class: 'icon', text: '!', 'aria-hidden': 'true' }), term)])] : null);
+      if (!scored.length) return h('div', null, summary);
+      return h('div', null, summary, bar,
+        h('div', { class: 'table-wrap' }, h('table', null,
+          h('thead', null, h('tr', null,
+            h('th', { scope: 'col' }, h('span', { text: 'Select' })),
+            ['Subcontractor', 'Covers', 'Capabilities and services', 'Current work', 'Contact'].map((x) => h('th', { scope: 'col', text: x })))),
+          h('tbody', null, scored.map((x) => {
+            const sub = x.sub;
+            const box = h('input', { type: 'checkbox', 'aria-label': 'Select ' + sub.name, onchange: () => { if (box.checked) f.picked.add(sub.id); else f.picked.delete(sub.id); drawBar(); } });
+            box.checked = f.picked.has(sub.id);
+            const w = work.get(sub.id);
+            return h('tr', null,
+              h('td', null, box),
+              h('td', { class: 'cell-text' }, h('a', { class: 'cell-title', href: subHref(sub), text: sub.name }),
+                h('div', { class: 'cell-sub', text: [sub.ref, sub.discipline].filter(Boolean).join(' · ') })),
+              h('td', { class: 'cell-text' },
+                h('div', { class: 'cell-title', text: x.hit.length + ' of ' + terms.length }),
+                h('div', { class: 'tag-row' }, terms.map((term) => (x.hit.includes(term)
+                  ? h('span', { class: 'tag match', text: '✓ ' + term })
+                  : h('span', { class: 'tag miss', text: term }))))),
+              h('td', { class: 'cell-text' },
+                sub.capabilities ? h('div', { text: sub.capabilities }) : null,
+                sub.services ? h('div', { class: 'cell-sub', text: sub.services.length > 160 ? sub.services.slice(0, 160) + '…' : sub.services }) : null,
+                !sub.capabilities && !sub.services ? h('span', { class: 'muted', text: '—' }) : null),
+              h('td', { class: 'cell-text' }, w.open.length ? workSummary(w.open) : h('span', { class: 'muted', text: 'None' })),
+              h('td', { class: 'cell-text' }, sub.contact_name ? h('div', { text: sub.contact_name }) : null,
+                h('div', { class: 'cell-sub', text: [sub.phone, sub.email].filter(Boolean).join(' · ') || (sub.contact_name ? '' : 'No contact details') })));
+          })))));
+    };
+
     const sortSelect = h('select', { id: 'flt-subcons-sort', 'aria-label': 'Order', value: f.sort, onchange: (e) => { f.sort = e.target.value; draw(); } },
       h('option', { value: 'urgent', text: 'Most urgent action first' }), h('option', { value: 'busy', text: 'Most current work first' }), h('option', { value: 'name', text: 'Name A to Z' }));
     const draw = () => {
       sortSelect.hidden = f.mode !== 'directory';
-      host.replaceChildren(f.mode === 'work' ? priorities() : directory());
+      host.replaceChildren(f.mode === 'work' ? priorities() : (f.mode === 'capability' ? capability() : directory()));
     };
     draw();
 
-    const modes = [['directory', 'Directory'], ['work', 'Work by priority']];
+    const modes = [['directory', 'Directory'], ['work', 'Work by priority'], ['capability', 'Find by capability']];
+    const filters = f.mode === 'capability'
+      ? h('div', { class: 'filters' },
+        h('input', { id: 'flt-subcons-need', class: 'wide-input', type: 'search', value: f.need, 'aria-label': 'What the scope needs',
+          placeholder: 'What does the scope need? e.g. structural, seismic assessment, geotechnical investigation',
+          oninput: (e) => { f.need = e.target.value; draw(); } }))
+      : h('div', { class: 'filters' },
+        h('input', { id: 'flt-subcons-q', type: 'search', placeholder: 'Search name, discipline, capability, contact, or a record…', 'aria-label': 'Search subcontractors', value: f.q, oninput: (e) => { f.q = e.target.value; draw(); } }),
+        h('select', { id: 'flt-subcons-status', 'aria-label': 'Show', value: f.status, onchange: (e) => { f.status = e.target.value; draw(); } },
+          h('option', { value: 'active', text: 'Active subcontractors' }), h('option', { value: 'engaged', text: 'On open work' }),
+          h('option', { value: 'all', text: 'All, including inactive' }), h('option', { value: 'inactive', text: 'Inactive only' })),
+        sortSelect);
     return h('div', { class: 'view' },
       h('div', { class: 'view-head' },
         h('div', null, h('h1', { text: 'Subcontractors' }),
           h('p', { class: 'sub', text: 'Directory of subcontractors, and the projects, enquiries and expressions of interest each one is working on.' })),
         h('div', { class: 'actions' },
-          h('button', { type: 'button', class: 'btn', text: 'Export CSV', title: 'Download the subcontractors shown below as a spreadsheet', onclick: () => exportSubconsCsv(visible()) }),
+          h('button', { type: 'button', class: 'btn', text: 'Export CSV', title: 'Download the subcontractors shown in the directory as a spreadsheet', onclick: () => exportSubconsCsv(visible()) }),
           h('button', { type: 'button', class: 'btn primary', text: '+ Add subcontractor', onclick: () => subconForm(null) }))),
       h('div', { class: 'tiles' },
         tile('In the directory', subs.length, null, subs.filter((sub) => !sub.active).length ? subs.filter((sub) => !sub.active).length + ' inactive' : null),
@@ -1933,12 +2309,7 @@
         type: 'button', role: 'tab', 'aria-selected': String(f.mode === x[0]), class: f.mode === x[0] ? 'active' : null, text: x[1],
         onclick: () => { f.mode = x[0]; renderMain(); },
       }))),
-      h('div', { class: 'filters' },
-        h('input', { id: 'flt-subcons-q', type: 'search', placeholder: 'Search name, discipline, contact, or a record…', 'aria-label': 'Search subcontractors', value: f.q, oninput: (e) => { f.q = e.target.value; draw(); } }),
-        h('select', { id: 'flt-subcons-status', 'aria-label': 'Show', value: f.status, onchange: (e) => { f.status = e.target.value; draw(); } },
-          h('option', { value: 'active', text: 'Active subcontractors' }), h('option', { value: 'engaged', text: 'On open work' }),
-          h('option', { value: 'all', text: 'All, including inactive' }), h('option', { value: 'inactive', text: 'Inactive only' })),
-        sortSelect),
+      filters,
       host);
   }
 
@@ -2066,8 +2437,10 @@
     const fields = [];
     if (!u) fields.push({ name: 'username', label: 'Username', required: true, maxlength: 32, placeholder: 'e.g. jsmith', hint: 'Lowercase letters, numbers, dots or dashes.' });
     fields.push({ name: 'full_name', label: 'Full name', required: true, maxlength: 100, value: u ? u.full_name : '' });
-    fields.push({ name: 'role', label: 'Role', type: 'select', full: !!u, options: roleOptions(), value: u ? u.role : 'staff',
-      hint: 'Staff: Projects, Enquiries and EOIs. Finance / Office Administrator: those plus their own section. Administrator: everything.' });
+    fields.push({ name: 'role', label: 'Role', type: 'select', full: !!u, options: roleOptions(), value: u ? u.role : 'staff' });
+    const access = S.data.meta.role_access || {};
+    fields.push({ type: 'custom', node: h('dl', { class: 'role-list' }, Object.keys(S.data.meta.roles).map((key) => [
+      h('dt', { text: S.data.meta.roles[key] }), h('dd', { text: access[key] || '' })])) });
     formDialog({
       title: u ? 'Edit ' + u.full_name : 'Add a person',
       intro: u ? 'Username: ' + u.username : 'InSys creates a temporary password for you to pass on.',
@@ -2105,7 +2478,9 @@
           : 'Setting up the secure connection. This normally takes a few seconds.' })];
     } else {
       online = [h('span', { class: 'pill dead', text: 'Off' }),
-        h('div', { class: 'small muted', text: 'InSys is only reachable on the host computer. To use it from anywhere, close InSys and start it with "Start-InSys-Online.bat".' })];
+        h('div', { class: 'small muted', text: sys.packaged
+          ? 'InSys is only reachable on the host computer. To use it from anywhere, close InSys, start it again and choose 3 (Online).'
+          : 'InSys is only reachable on the host computer. To use it from anywhere, close InSys and start it with "Start-InSys-Online.bat".' })];
     }
     return h('div', null,
       card('Where InSys is running', null, h('div', { class: 'kv' },
@@ -2117,7 +2492,46 @@
         h('p', { class: 'muted', text: 'InSys saves an automatic backup into the "backups" folder inside the data folder once a day and keeps the latest 20. ' +
           (sys.last_backup_hours === null ? 'No automatic backup has been made yet.' : 'The most recent one was made ' + (sys.last_backup_hours < 1 ? 'less than an hour' : 'about ' + plural(Math.round(sys.last_backup_hours), 'hour')) + ' ago.') }),
         h('p', { style: { marginTop: '10px' } }, h('a', { class: 'btn', href: '/api/admin/backup', download: '', text: 'Download a backup now' })),
-        h('p', { class: 'small muted', style: { marginTop: '8px' }, text: 'The backup file holds all InSys data, including (scrambled) passwords. Store it somewhere safe.' })));
+        h('p', { class: 'small muted', style: { marginTop: '8px' }, text: 'The backup file holds all InSys data, including (scrambled) passwords. Store it somewhere safe.' })),
+      transferCard());
+  }
+
+  /** Administrator only: take the whole database to another InSys, or bring one in. */
+  function transferCard() {
+    const picker = h('input', {
+      id: 'transfer-file', type: 'file', accept: '.db', hidden: true, 'aria-label': 'Database file to load',
+      onchange: () => {
+        const file = picker.files && picker.files[0];
+        picker.value = '';
+        if (!file) return;
+        confirmDialog('Load "' + file.name + '" into this InSys?',
+          'Everything in this InSys now will be replaced by the contents of the file. A copy of the current data is saved in the backups folder first. ' +
+          'Everyone, including you, will be signed out and must sign in with a username and password from the InSys the file came from.',
+          'Replace the data with this file', async () => {
+            let res;
+            try {
+              res = await fetch('/api/admin/restore', {
+                method: 'POST', credentials: 'same-origin', cache: 'no-store', body: file,
+                headers: { 'Content-Type': 'application/octet-stream', 'X-CSRF-Token': S.csrf || '' },
+              });
+            } catch (e) {
+              throw new Error('The file could not be sent. Check the connection and that the file is under 300 MB.');
+            }
+            let data = null;
+            try { data = await res.json(); } catch (e) { data = null; }
+            if (!res.ok) throw new Error((data && data.error) || 'The file could not be loaded (' + res.status + ').');
+            setTimeout(() => signedOut('Database loaded: ' + plural(data.records, 'record') + ' and ' + plural(data.users, 'login') +
+              '. Sign in with a username and password from the InSys the file came from.'), 0);
+          }, true);
+      },
+    });
+    return card('Transfer to another computer or office', 'Administrators only',
+      h('p', { class: 'muted', text: 'To host InSys somewhere else, download the whole database as one file, copy it to the other computer, and load it into the InSys running there (Admin, System & online access, "Load a database file"). ' +
+        'The other InSys then has all the records, history, subcontractors and logins, and runs independently on its own network.' }),
+      h('p', { style: { marginTop: '10px' } },
+        h('a', { class: 'btn primary', href: '/api/admin/backup', download: '', text: 'Download database' }), ' ',
+        h('button', { type: 'button', class: 'btn', text: 'Load a database file…', onclick: () => picker.click() }), picker),
+      h('p', { class: 'small muted', style: { marginTop: '8px' }, text: 'After the copy, the two systems are separate: changes made in one do not appear in the other. Loading a file replaces what is here; it does not merge.' }));
   }
 
   function adminLog() {
@@ -2128,6 +2542,7 @@
       password_reset: 'Password reset', user_created: 'Login created', user_updated: 'Login changed',
       record_deleted: 'Record deleted', backup_downloaded: 'Backup downloaded', settings_changed: 'Settings changed',
       upgraded: 'InSys upgraded', subcon_deleted: 'Subcontractor deleted',
+      record_restored: 'Record restored', database_loaded: 'Database loaded',
     };
     if (!items.length) return h('div', { class: 'table-wrap' }, h('div', { class: 'empty', text: 'Nothing logged yet.' }));
     return h('div', { class: 'table-wrap' }, h('table', null,

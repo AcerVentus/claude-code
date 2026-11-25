@@ -419,6 +419,122 @@ dialog.dlg::backdrop { background: rgba(11, 11, 11, .45); }
 }
 .toast.error { background: var(--crit); color: #fff; }
 
+/* ---------- Activity log ---------- */
+
+.log-layout { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 16px; align-items: start; }
+.month-index { display: flex; flex-direction: column; gap: 2px; padding: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; max-height: 70vh; overflow-y: auto; }
+.month-index button {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 7px 10px; border: 0; border-radius: 6px; background: none; color: var(--ink2);
+  font: inherit; font-weight: 550; text-align: left; cursor: pointer;
+}
+.month-index button:hover { background: var(--neutral-soft); color: var(--ink); }
+.month-index button.active { background: var(--accent-soft); color: var(--accent); }
+.month-index .count { padding: 0 6px; border-radius: 10px; background: var(--neutral-soft); color: var(--ink2); font-size: 12px; font-weight: 600; }
+tr.month-row th { background: var(--neutral-soft); color: var(--ink); font-size: 13px; }
+.log-text { min-width: 220px; overflow-wrap: anywhere; }
+.filters input#flt-log-q { flex: 1 1 320px; max-width: 460px; }
+.log-text .text { white-space: pre-wrap; }
+
+/* ---------- Subcontractor extras ---------- */
+
+.tag-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.tag.match { background: var(--good-soft); color: var(--good-ink); }
+.tag.miss { background: transparent; box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink2); text-decoration: line-through; }
+.tag-button {
+  padding: 3px 9px; border: 1px solid var(--line-strong); border-radius: 999px;
+  background: var(--raised); color: var(--ink); font: inherit; font-size: 12px; font-weight: 550; cursor: pointer;
+}
+.tag-button:hover { border-color: var(--accent); color: var(--accent); }
+.select-bar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 9px 12px; margin-bottom: 10px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+}
+.filters input.wide-input { flex: 1 1 100%; max-width: 760px; }
+.subcon-list li { align-items: flex-start; }
+.subcon-list .small { margin-top: 2px; }
+.role-list { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 0; font-size: 12px; }
+.role-list dt { font-weight: 650; }
+.role-list dd { margin: 0; color: var(--ink2); }
+.side-foot { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.theme-toggle { padding: 0; border: 0; background: none; color: var(--muted); font: inherit; font-size: 12px; text-decoration: underline; cursor: pointer; }
+.theme-toggle:hover { color: var(--ink); }
+.brand { cursor: default; user-select: none; }
+
+/* ---------- Samaritan theme ----------
+   An alternative look: stark white, black type, one red mark. Switched from the
+   sidebar, by clicking the logo five times, or by typing "samaritan" in the
+   search box. It sets every colour itself, so it looks the same whether the
+   computer is in light or dark mode. Status colours keep their meaning. */
+
+:root[data-theme="samaritan"] {
+  color-scheme: light;
+  --bg: #f3f3f1;
+  --surface: #ffffff;
+  --raised: #ffffff;
+  --ink: #0a0a0a;
+  --ink2: #333333;
+  --muted: #666666;
+  --line: #d2d2ce;
+  --line-strong: #0a0a0a;
+  --accent: #0a0a0a;
+  --accent-ink: #ffffff;
+  --accent-hover: #c8102e;
+  --accent-soft: #e9e9e6;
+  --bar: #0a0a0a;
+  --focus: #c8102e;
+  --good: #0ca30c;
+  --good-ink: #006300;
+  --good-soft: #e1f0e1;
+  --warn: #fab219;
+  --warn-ink: #5c4300;
+  --warn-soft: #fdf1d2;
+  --crit: #c8102e;
+  --crit-ink: #a50d25;
+  --crit-soft: #fbe3e7;
+  --neutral-soft: #e9e9e6;
+  --shadow: 0 0 0 1px #0a0a0a, 6px 6px 0 rgba(10, 10, 10, .12);
+  --mark: #c8102e;
+}
+[data-theme="samaritan"] body {
+  font-family: ui-monospace, "Cascadia Mono", "Cascadia Code", Consolas, "Lucida Console", "Courier New", monospace;
+  font-size: 13px;
+}
+[data-theme="samaritan"] *, [data-theme="samaritan"] *::before, [data-theme="samaritan"] *::after { border-radius: 0 !important; }
+[data-theme="samaritan"] h1, [data-theme="samaritan"] h2, [data-theme="samaritan"] h3,
+[data-theme="samaritan"] th, [data-theme="samaritan"] .btn, [data-theme="samaritan"] .tabs button,
+[data-theme="samaritan"] .nav-group, [data-theme="samaritan"] .field-label, [data-theme="samaritan"] .tile .label,
+[data-theme="samaritan"] .brand-name, [data-theme="samaritan"] .brand-sub, [data-theme="samaritan"] .pill,
+[data-theme="samaritan"] .details .k, [data-theme="samaritan"] .kicker { text-transform: uppercase; letter-spacing: .07em; }
+[data-theme="samaritan"] h1 { font-size: 19px; font-weight: 700; }
+[data-theme="samaritan"] .view-head h1, [data-theme="samaritan"] .auth-card h1 { display: inline-block; padding-bottom: 3px; border-bottom: 3px solid var(--mark); }
+[data-theme="samaritan"] .view-head h1::after, [data-theme="samaritan"] .auth-card h1::after { content: "_"; color: var(--mark); animation: insys-cursor 1.1s steps(1) infinite; }
+@keyframes insys-cursor { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="samaritan"] .view-head h1::after, [data-theme="samaritan"] .auth-card h1::after { animation: none; }
+}
+[data-theme="samaritan"] .brand-mark { background: #0a0a0a; box-shadow: inset 0 -4px 0 var(--mark); }
+[data-theme="samaritan"] .card, [data-theme="samaritan"] .tile, [data-theme="samaritan"] .table-wrap,
+[data-theme="samaritan"] .track-box, [data-theme="samaritan"] .month-index, [data-theme="samaritan"] .select-bar,
+[data-theme="samaritan"] .auth-card { border-color: #0a0a0a; }
+[data-theme="samaritan"] .card.flush .table-wrap { border: 0; }
+[data-theme="samaritan"] .sidebar { border-right-color: #0a0a0a; }
+[data-theme="samaritan"] .topbar { border-bottom-color: #0a0a0a; }
+[data-theme="samaritan"] thead th { border-bottom-color: #0a0a0a; }
+[data-theme="samaritan"] .nav a.active, [data-theme="samaritan"] .month-index button.active { background: #0a0a0a; color: #ffffff; }
+[data-theme="samaritan"] .nav a.active .count, [data-theme="samaritan"] .month-index button.active .count { background: #ffffff; color: #0a0a0a; }
+[data-theme="samaritan"] .tabs button.active { color: #0a0a0a; border-bottom-color: var(--mark); }
+[data-theme="samaritan"] main a, [data-theme="samaritan"] .drawer a { text-decoration: underline; text-decoration-color: var(--mark); text-underline-offset: 2px; }
+[data-theme="samaritan"] a.btn { text-decoration: none; }
+[data-theme="samaritan"] .btn.primary:hover { background: var(--mark); border-color: var(--mark); }
+[data-theme="samaritan"] .btn.quiet:hover { background: var(--accent-soft); }
+[data-theme="samaritan"] tr.clickable:hover td { background: #f3f3f1; box-shadow: inset 3px 0 0 var(--mark); }
+[data-theme="samaritan"] tr.clickable:hover td + td { box-shadow: none; }
+[data-theme="samaritan"] .timeline li.action::before { background: var(--mark); }
+[data-theme="samaritan"] .toast { background: #0a0a0a; color: #ffffff; box-shadow: inset 4px 0 0 var(--mark); }
+[data-theme="samaritan"] dialog.dlg::backdrop, [data-theme="samaritan"] .backdrop { background: rgba(243, 243, 241, .82); }
+
 /* ---------- Small screens ---------- */
 
 @media (max-width: 900px) {
@@ -438,6 +554,11 @@ dialog.dlg::backdrop { background: rgba(11, 11, 11, .45); }
   .who .role { display: none; }
   main { padding: 16px 12px 60px; }
   .grid-2, .grid-3 { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 900px) {
+  .log-layout { grid-template-columns: minmax(0, 1fr); }
+  .month-index { flex-direction: row; overflow-x: auto; max-height: none; }
+  .month-index button { white-space: nowrap; }
 }
 @media (max-width: 600px) {
   .track-grid, .details, .form-grid { grid-template-columns: minmax(0, 1fr); }
