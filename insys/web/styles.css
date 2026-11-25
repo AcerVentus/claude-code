@@ -270,6 +270,8 @@ td.nowrap { white-space: nowrap; }
 .cell-title { font-weight: 600; }
 .cell-sub { color: var(--ink2); font-size: 12px; }
 .cell-text { min-width: 150px; max-width: 280px; overflow-wrap: anywhere; }
+.cell-subcons { min-width: 130px; max-width: 220px; overflow-wrap: anywhere; }
+.cell-subcons div + div { margin-top: 3px; }
 .empty { padding: 28px 16px; text-align: center; color: var(--ink2); }
 
 /* ---------- Pills and chips ---------- */

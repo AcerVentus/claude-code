@@ -755,6 +755,7 @@
     due: (r) => r.due_date,
     amount: (r) => r.amount,
     owner: (r) => (r.owner_id === null ? null : userName(r.owner_id).toLowerCase()),
+    subcons: (r) => subconNames(r).toLowerCase(),
   };
 
   function sortRows(rows, sort) {
@@ -781,7 +782,12 @@
     const m = opts.module ? mods()[opts.module] : null;
     const cols = [{ key: 'ref', label: 'Ref' }];
     if (!m) cols.push({ key: 'module', label: 'Section' });
-    cols.push({ key: 'title', label: 'Title' }, { key: 'status', label: 'Status' },
+    // Sections that use subcontractors get a column for them; in the mixed
+    // tables (Overview, My Work) they are named under the title instead.
+    const subconColumn = !!m && usesSubcons(opts.module);
+    cols.push({ key: 'title', label: 'Title' });
+    if (subconColumn) cols.push({ key: 'subcons', label: 'Subcons' });
+    cols.push({ key: 'status', label: 'Status' },
       { key: 'last', label: 'Last action' }, { key: 'next', label: 'Next action' });
     if (m) cols.push({ key: 'due', label: m.due_label });
     if (opts.module === 'finance') cols.push({ key: 'amount', label: 'Amount', num: true });
@@ -804,8 +810,17 @@
           case 'title': return h('td', { class: 'cell-text' },
             h('div', { class: 'cell-title', text: r.title }),
             r.organisation ? h('div', { class: 'cell-sub', text: r.organisation }) : null,
-            subconNames(r) ? h('div', { class: 'cell-sub', text: 'Subcon: ' + subconNames(r) }) : null,
+            !subconColumn && subconNames(r) ? h('div', { class: 'cell-sub', text: 'Subcon: ' + subconNames(r) }) : null,
             prioChip(r.priority));
+          case 'subcons': {
+            const entries = S.I.subsByRec.get(r.id) || [];
+            if (!entries.length) return h('td', { class: 'muted', text: '—' });
+            return h('td', { class: 'cell-subcons' }, entries.map((entry) => h('div', null,
+              h('a', {
+                href: subHref(entry.sub), text: entry.sub.name,
+                title: [entry.sub.discipline, entry.scope ? 'Scope: ' + entry.scope : '', entry.sub.active ? '' : 'Inactive'].filter(Boolean).join(' · ') || 'Open ' + entry.sub.ref,
+              }))));
+          }
           case 'status': return h('td', null, statusPill(r));
           case 'last': return h('td', { class: 'cell-text' }, r.last_action
             ? [h('div', { text: r.last_action }), h('div', { class: 'cell-sub', text: fmtDate(r.last_action_date) })]

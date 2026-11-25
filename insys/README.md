@@ -178,7 +178,9 @@ from the host computer only.
   page). On a project, enquiry or expression of interest, **Add subcontractor**
   opens a searchable list: type part of a name, discipline or contact and click
   to add. Several can be on the same item in parallel, each with a note of
-  their scope. A subcontractor not yet in the directory can be added from the
+  their scope. The Projects, Enquiries and Expressions of Interest lists
+  have a **Subcons** column naming everyone on each item; click a name to open
+  that subcontractor, or the column heading to sort by it. A subcontractor not yet in the directory can be added from the
   same pop-up. The directory shows, for each subcontractor, the open work they
   are on across all three sections and their most urgent action; *Work by
   priority* lists every subcontractor's open work in one list, soonest next
@@ -225,6 +227,7 @@ If you use the office-network choice, Windows may ask again whether to allow
 
 | Version | What changed |
 |---|---|
+| 1.1.1 | A Subcons column in the Projects, Enquiries and Expressions of Interest lists. No change to stored data. |
 | 1.1.0 | Subcontractor directory; subcontractors on projects, enquiries and expressions of interest. |
 | 1.0.0 | First version. |
 
