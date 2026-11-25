@@ -209,8 +209,15 @@ class InSysTest(unittest.TestCase):
 
     def test_oversized_request_is_rejected(self):
         sam = self.people["sam"]
-        status, _ = sam.post("/api/records", {"module": "project", "title": "x" * (1024 * 1024 + 10)})
+        before = len(self.state(sam)["records"])
+        # The server refuses without reading the body. The client either receives
+        # the 413 reply or, if it is still sending, finds the connection closed.
+        try:
+            status, _ = sam.post("/api/records", {"module": "project", "title": "x" * (1024 * 1024 + 10)})
+        except (urllib.error.URLError, ConnectionError):
+            status = 413
         self.assertEqual(status, 413)
+        self.assertEqual(len(self.state(sam)["records"]), before)
 
     def test_password_policy(self):
         tina = self.people["tina"]
@@ -719,6 +726,40 @@ class ToolingTest(unittest.TestCase):
     def test_default_run_is_not_reachable_from_other_computers(self):
         self.assertTrue(insys.is_loopback("127.0.0.1"))
         self.assertFalse(insys.is_loopback("192.168.1.20"))
+
+    def test_start_menu_choices_and_memory(self):
+        saved = insys.RT.data_dir
+        insys.RT.data_dir = tempfile.mkdtemp(prefix="insys-menu-")
+        try:
+            answer = lambda key: (lambda valid, default, seconds: key)
+            accept_default = lambda valid, default, seconds: default
+            self.assertEqual(insys.start_menu(ask=accept_default), "local")   # nothing remembered yet
+            self.assertEqual(insys.start_menu(ask=answer("3")), "online")
+            self.assertEqual(insys.start_menu(ask=accept_default), "online")  # remembered
+            self.assertEqual(insys.start_menu(ask=answer("4")), "reset")
+            self.assertEqual(insys.start_menu(ask=accept_default), "online")  # a reset is not remembered
+            self.assertEqual(insys.start_menu(ask=answer("2")), "lan")
+            # Anything that is not a real choice falls back to the remembered one.
+            for junk in ["", "9", "x", "12", None]:
+                self.assertEqual(insys.start_menu(ask=answer(junk)), "lan", junk)
+            with open(os.path.join(insys.RT.data_dir, "start-mode.txt"), "w") as fh:
+                fh.write("nonsense")
+            self.assertEqual(insys.start_menu(ask=accept_default), "local")
+        finally:
+            shutil.rmtree(insys.RT.data_dir, ignore_errors=True)
+            insys.RT.data_dir = saved
+
+    def test_temporary_folders_are_recognised(self):
+        temp = tempfile.gettempdir()
+        self.assertTrue(insys.inside_temp_folder(temp))
+        self.assertTrue(insys.inside_temp_folder(os.path.join(temp, "Temp1_InSys.zip")))
+        self.assertFalse(insys.inside_temp_folder(os.path.dirname(os.path.abspath(insys.__file__))))
+        self.assertFalse(insys.inside_temp_folder(temp.rstrip("\\/") + "-not-really-temp"))
+
+    def test_data_folder_when_run_from_source(self):
+        self.assertFalse(insys.PACKAGED)
+        self.assertEqual(insys.default_data_dir(), os.path.join(insys.APP_DIR, "data"))
+        self.assertEqual(insys.WEB_DIR, os.path.join(insys.APP_DIR, "web"))
 
 
 if __name__ == "__main__":

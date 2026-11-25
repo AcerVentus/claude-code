@@ -10,6 +10,10 @@ Windows (and macOS / Linux) with nothing to install besides Python itself.
     python insys.py --help       all options
 
 Data lives in the "data" folder next to this file (SQLite database, backups).
+
+It can also be packaged as a single Windows program, InSys.exe, which carries
+its own copy of Python (see README.md and the packaging folder). In that form
+the data lives in an "InSys-data" folder next to InSys.exe.
 """
 
 import argparse
@@ -29,6 +33,7 @@ import socket
 import sqlite3
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 import traceback
@@ -40,9 +45,17 @@ from urllib.parse import parse_qs, urlparse
 VERSION = "1.0.0"
 MIN_PYTHON = (3, 9)
 
-APP_DIR = os.path.dirname(os.path.abspath(__file__))
-WEB_DIR = os.path.join(APP_DIR, "web")
-TOOLS_DIR = os.path.join(APP_DIR, "tools")
+# PACKAGED is true when InSys runs as the single-file program, InSys.exe. Its
+# launcher (packaging/launcher) unpacks a private copy of Python and of these
+# files, then starts this script with INSYS_HOME set to the folder InSys.exe is
+# in. BUNDLE_DIR holds the program files; APP_DIR is where things that must
+# persist are kept.
+BUNDLE_DIR = os.path.dirname(os.path.abspath(__file__))
+PACKAGED = os.environ.get("INSYS_PACKAGED") == "1" and bool(os.environ.get("INSYS_HOME"))
+APP_DIR = os.path.abspath(os.environ["INSYS_HOME"]) if PACKAGED else BUNDLE_DIR
+WEB_DIR = os.path.join(BUNDLE_DIR, "web")
+DATA_DIR_NAME = "InSys-data" if PACKAGED else "data"
+MENU_SECONDS = 15
 
 DEFAULT_PORT = 8080
 MAX_BODY = 1024 * 1024  # 1 MB per request is plenty for a tracker
@@ -218,7 +231,8 @@ class Runtime:
     """Process-wide state. One instance, RT, created at import time."""
 
     def __init__(self):
-        self.data_dir = os.path.join(APP_DIR, "data")
+        self.data_dir = os.path.join(APP_DIR, DATA_DIR_NAME)
+        self.pause_on_exit = PACKAGED
         self.instance = secrets.token_hex(8)
         self.boot = secrets.token_hex(4)
         self.counter = 0
@@ -229,6 +243,7 @@ class Runtime:
         self.public_url = None
         self.tunnel_status = "off"
         self.lan = False
+        self.kept_awake = False
 
     @property
     def db_path(self):
@@ -237,6 +252,13 @@ class Runtime:
     @property
     def backup_dir(self):
         return os.path.join(self.data_dir, "backups")
+
+    @property
+    def tools_dir(self):
+        """Where a downloaded cloudflared lives."""
+        if PACKAGED:
+            return os.path.join(self.data_dir, "tools")
+        return os.path.join(APP_DIR, "tools")
 
     @property
     def first_login_file(self):
@@ -1869,7 +1891,7 @@ def cloudflared_asset():
 
 def find_cloudflared():
     exe = "cloudflared.exe" if os.name == "nt" else "cloudflared"
-    local = os.path.join(TOOLS_DIR, exe)
+    local = os.path.join(RT.tools_dir, exe)
     if os.path.isfile(local):
         return local
     return shutil.which("cloudflared")
@@ -1911,7 +1933,8 @@ def ensure_cloudflared(interactive=True):
     say("")
     say("  Online access uses Cloudflare's free tunnel tool (cloudflared).")
     say("  It is not on this computer yet, so InSys will download it once")
-    say("  (about 60 MB) from Cloudflare's official GitHub page:")
+    say("  (about 60 MB, needs an internet connection) from Cloudflare's")
+    say("  official GitHub page:")
     say("    " + CLOUDFLARED_RELEASE + asset)
     if interactive and sys.stdin is not None and sys.stdin.isatty():
         try:
@@ -1921,8 +1944,8 @@ def ensure_cloudflared(interactive=True):
         if answer not in ("", "y", "yes"):
             say("  Skipped. InSys will run on this computer only.")
             return None
-    os.makedirs(TOOLS_DIR, exist_ok=True)
-    dest = os.path.join(TOOLS_DIR, "cloudflared.exe" if os.name == "nt" else "cloudflared")
+    os.makedirs(RT.tools_dir, exist_ok=True)
+    dest = os.path.join(RT.tools_dir, "cloudflared.exe" if os.name == "nt" else "cloudflared")
     say("  Downloading... this can take a minute.")
     try:
         download_file(CLOUDFLARED_RELEASE + asset, dest)
@@ -2046,6 +2069,141 @@ class Tunnel(threading.Thread):
 # Start-up
 # ---------------------------------------------------------------------------
 
+def dir_writable(path):
+    try:
+        fd, name = tempfile.mkstemp(prefix="insys-write-test-", dir=path)
+        os.close(fd)
+        os.remove(name)
+        return True
+    except OSError:
+        return False
+
+
+def default_data_dir():
+    """The data folder: beside the program, unless that place is read-only."""
+    beside = os.path.join(APP_DIR, DATA_DIR_NAME)
+    if not PACKAGED or os.path.isdir(beside) or dir_writable(APP_DIR):
+        return beside
+    base = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
+    return os.path.join(base, "InSys", DATA_DIR_NAME)
+
+
+def inside_temp_folder(path):
+    """True when path is in the system temporary folder - which is where Windows
+    puts a program that is run straight out of a ZIP file. Data kept there would
+    be thrown away, so InSys refuses to create a new database in such a place."""
+    try:
+        here = os.path.normcase(os.path.realpath(path))
+        temp = os.path.normcase(os.path.realpath(tempfile.gettempdir()))
+    except OSError:
+        return False
+    return here == temp or here.startswith(temp.rstrip("\\/") + os.sep)
+
+
+def read_key(valid, default, seconds):
+    """Wait up to `seconds` for one of the characters in `valid`.
+    Enter, or running out of time, gives `default`."""
+    if os.name == "nt":
+        import msvcrt
+        deadline = time.time() + seconds
+        while time.time() < deadline:
+            if msvcrt.kbhit():
+                key = msvcrt.getwch()
+                if key in ("\x00", "\xe0"):   # arrow / function key: swallow its second half
+                    msvcrt.getwch()
+                elif key == "\x03":
+                    raise KeyboardInterrupt
+                elif key in ("\r", "\n"):
+                    return default
+                elif len(key) == 1 and key in valid:
+                    return key
+            else:
+                time.sleep(0.05)
+        return default
+    import select
+    ready, _, _ = select.select([sys.stdin], [], [], seconds)
+    if not ready:
+        return default
+    answer = sys.stdin.readline().strip()[:1]
+    return answer if len(answer) == 1 and answer in valid else default
+
+
+MODES = {"1": "local", "2": "lan", "3": "online"}
+
+
+def remembered_mode():
+    try:
+        with open(os.path.join(RT.data_dir, "start-mode.txt"), "r", encoding="utf-8") as fh:
+            value = fh.read().strip()
+    except OSError:
+        return "1"
+    return value if value in MODES else "1"
+
+
+def remember_mode(key):
+    try:
+        with open(os.path.join(RT.data_dir, "start-mode.txt"), "w", encoding="utf-8") as fh:
+            fh.write(key)
+    except OSError:
+        pass
+
+
+def start_menu(ask=read_key):
+    """Ask how to run. Returns 'local', 'lan', 'online' or 'reset'."""
+    default = remembered_mode()
+    say("")
+    say("=" * 70)
+    say("  InSys - Internal Systems   (version %s)" % VERSION)
+    say("=" * 70)
+    say("")
+    say("  How would you like to run InSys?")
+    say("")
+    say("    1  This computer only                      - works offline")
+    say("    2  This computer and the office network    - works offline")
+    say("    3  Online, from anywhere over the internet - needs internet")
+    say("")
+    say("    4  Reset the administrator password")
+    say("")
+    say("  Press 1, 2, 3 or 4.  Enter, or waiting %d seconds, chooses [%s]."
+        % (MENU_SECONDS, default))
+    key = ask("1234", default, MENU_SECONDS)
+    if key not in ("1", "2", "3", "4"):
+        key = default
+    say("  -> %s" % key)
+    if key == "4":
+        return "reset"
+    remember_mode(key)
+    return MODES[key]
+
+
+def keep_awake():
+    """Ask Windows not to go to sleep on idle while other people depend on this
+    computer. Does not override the lid, the power button or a manual sleep."""
+    if os.name != "nt":
+        return False
+    try:
+        import ctypes
+        ES_CONTINUOUS, ES_SYSTEM_REQUIRED = 0x80000000, 0x00000001
+        set_state = ctypes.windll.kernel32.SetThreadExecutionState
+        set_state.argtypes = [ctypes.c_uint]
+        set_state.restype = ctypes.c_uint
+        return bool(set_state(ES_CONTINUOUS | ES_SYSTEM_REQUIRED))
+    except Exception:
+        return False
+
+
+def finish(code):
+    """Leave the last message readable when InSys runs in its own window."""
+    if RT.pause_on_exit and sys.stdin is not None:
+        try:
+            if sys.stdin.isatty():
+                say("")
+                input("  Press Enter to close this window. ")
+        except (EOFError, KeyboardInterrupt, OSError, ValueError):
+            pass
+    return code
+
+
 def local_opener():
     """urllib opener that never routes localhost through a system proxy."""
     return urllib.request.build_opener(urllib.request.ProxyHandler({}))
@@ -2154,8 +2312,17 @@ def banner(first_password):
             say("      On your network  :  http://%s:%d" % (address, RT.port))
     if RT.online_requested:
         say("      Over the internet:  (being set up - the address appears below)")
+    elif PACKAGED:
+        say("      Over the internet:  off  (restart InSys and choose 3 to switch on)")
     else:
         say("      Over the internet:  off  (use Start-InSys-Online.bat to switch on)")
+    if RT.lan and not lan_addresses():
+        say("")
+        say("  No network connection was found, so only this computer can reach")
+        say("  InSys for now. Connect to the office network and restart InSys.")
+    elif RT.lan:
+        say("")
+        say("  If Windows asks whether to allow InSys on the network, choose Allow.")
     say("")
     creds = read_first_login()
     if creds:
@@ -2177,6 +2344,8 @@ def banner(first_password):
     say("")
     say("  Keep this window open while InSys is in use.")
     say("  To stop InSys, close this window or press Ctrl+C.")
+    if RT.kept_awake:
+        say("  This computer will not go to sleep by itself while InSys is running.")
     say(line)
 
 
@@ -2193,6 +2362,10 @@ def parse_args(argv):
                         help="folder for the database and backups (default: ./data)")
     parser.add_argument("--no-browser", action="store_true",
                         help="do not open the web browser automatically")
+    parser.add_argument("--menu", action="store_true",
+                        help="ask how to run at start-up (the default for InSys.exe)")
+    parser.add_argument("--no-menu", action="store_true",
+                        help="never ask; run for this computer only unless told otherwise")
     parser.add_argument("--reset-admin", action="store_true",
                         help="give the administrator a new temporary password, then exit")
     parser.add_argument("--user", default="admin",
@@ -2202,6 +2375,24 @@ def parse_args(argv):
 
 
 def main(argv=None):
+    """Run InSys; returns the process exit code."""
+    try:
+        return finish(run(argv))
+    except KeyboardInterrupt:
+        return 0
+    except Exception:
+        log_error("InSys stopped unexpectedly:\n" + traceback.format_exc())
+        say("")
+        say("  InSys stopped because of an unexpected problem:")
+        say("")
+        say("  " + traceback.format_exc().strip().splitlines()[-1])
+        say("")
+        say("  Your data has not been changed. Details were written to:")
+        say("      %s" % os.path.join(RT.data_dir, "insys.log"))
+        return finish(1)
+
+
+def run(argv=None):
     if sys.version_info < MIN_PYTHON:
         say("InSys needs Python %d.%d or newer. This is Python %s."
             % (MIN_PYTHON[0], MIN_PYTHON[1], platform.python_version()))
@@ -2211,11 +2402,30 @@ def main(argv=None):
             stream.reconfigure(errors="replace")
         except Exception:
             pass
+    if PACKAGED and os.name == "nt":
+        try:
+            import ctypes
+            ctypes.windll.kernel32.SetConsoleTitleW("InSys - Internal Systems")
+        except Exception:
+            pass
     args = parse_args(argv)
     if args.data_dir:
         RT.data_dir = os.path.abspath(args.data_dir)
     elif os.environ.get("INSYS_DATA_DIR"):
         RT.data_dir = os.path.abspath(os.environ["INSYS_DATA_DIR"])
+    else:
+        RT.data_dir = default_data_dir()
+        if PACKAGED and not os.path.isdir(RT.data_dir) and inside_temp_folder(APP_DIR):
+            say("")
+            say("  InSys is being run from a temporary folder:")
+            say("      %s" % APP_DIR)
+            say("")
+            say("  This usually means it was opened straight from inside a ZIP file")
+            say("  or an email. Anything saved here would be lost.")
+            say("")
+            say("  Please copy InSys.exe to a permanent folder first - for example")
+            say("  C:\\InSys or your Documents folder - and start it from there.")
+            return 1
     try:
         os.makedirs(RT.data_dir, exist_ok=True)
     except OSError as exc:
@@ -2243,7 +2453,19 @@ def main(argv=None):
     if not os.path.isfile(os.path.join(WEB_DIR, "index.html")):
         say("The 'web' folder is missing next to insys.py. Please extract the complete")
         say("InSys folder again and start it from there.")
+        if PACKAGED:
+            say("(InSys.exe may have been damaged or partly removed by antivirus software.")
+            say("Download it again, or restore it, and start it once more.)")
         return 1
+
+    interactive = sys.stdin is not None and sys.stdin.isatty()
+    wants_menu = (PACKAGED or args.menu) and not args.no_menu
+    if wants_menu and interactive and not (args.online or args.lan):
+        mode = start_menu()
+        if mode == "reset":
+            return reset_admin(args.user.strip().lower())
+        args.online = mode == "online"
+        args.lan = mode == "lan"
 
     try:
         first_password = init_db()
@@ -2271,6 +2493,8 @@ def main(argv=None):
 
     threading.Thread(target=server.serve_forever, daemon=True).start()
     threading.Thread(target=backup_loop, daemon=True).start()
+    if args.online or args.lan:
+        RT.kept_awake = keep_awake()
     banner(first_password)
 
     tunnel = None
@@ -2315,6 +2539,9 @@ def main(argv=None):
         server.server_close()
         remove_lock()
     say("  InSys has stopped. Your data is safe in: %s" % RT.data_dir)
+    RT.pause_on_exit = False
+    if PACKAGED:
+        time.sleep(2)  # long enough to read the line above before the window goes
     return 0
 
 

@@ -17,10 +17,66 @@ with optional access from anywhere over the internet.
 - Changes made by one person appear on everyone else's screen within about
   five seconds — no refreshing.
 
-It is one Python file plus a small web page. There is nothing to install besides
-Python itself, no database server, and no subscription.
+It is one Python file plus a small web page, with no database server and no
+subscription. There are two ways to run it:
 
-## Starting InSys on Windows
+- **`InSys.exe`** — a single program with everything inside it. Nothing to
+  install, nothing to download, works with no internet connection.
+- **From the source folder** with `Start-InSys.bat`, which needs Python on the
+  computer.
+
+Both use the same data format, so you can switch between them.
+
+## InSys.exe — one file, works offline
+
+1. Put `InSys.exe` in a permanent folder of its own, for example `C:\InSys`.
+   (Not inside a ZIP file and not in a temporary folder — InSys refuses to
+   create its database there, because Windows would later delete it.)
+2. Double-click it. The first start takes a few seconds longer while it unpacks
+   its own private copy of Python; later starts are quick.
+3. Choose how to run it:
+
+   | Choice | Who can use it | Internet needed |
+   |---|---|---|
+   | **1** This computer only | You, on this computer | No |
+   | **2** This computer and the office network | Anyone on the same office network or Wi-Fi, at the `http://…` address shown | No |
+   | **3** Online | Anyone, anywhere, at the `https://…` address shown | Yes |
+   | **4** Reset the administrator password | — | No |
+
+   InSys remembers your last choice: next time just press Enter, or wait 15
+   seconds and it starts by itself.
+4. Your browser opens the sign-in page. Keep the InSys window open — closing it
+   stops InSys.
+
+Your data is stored in a folder called **`InSys-data`** next to `InSys.exe`. To
+move InSys to another computer, copy `InSys.exe` and `InSys-data` together.
+
+Things to know:
+
+- **Windows may warn about an unknown publisher** ("Windows protected your PC")
+  the first time, because the program is not code-signed. Click **More info** →
+  **Run anyway**. Some antivirus products are suspicious of any unsigned program
+  that unpacks files; if yours blocks InSys, allow `InSys.exe`.
+- **Choice 2** uses plain (unencrypted) HTTP inside your office network, and
+  Windows will ask once whether to allow InSys through the firewall — choose
+  **Allow** for private networks. Use it on a network you trust.
+- **Choice 3** downloads Cloudflare's tunnel tool the first time (about 60 MB),
+  so it needs the internet. If there is no connection, InSys says so and keeps
+  working on the computer itself. See *Online access* below.
+- With choice 2 or 3, InSys asks Windows not to go to sleep by itself while it
+  is running, since other people depend on it. Closing the lid or pressing the
+  power button still sleeps the computer.
+- Needs 64-bit Windows 10 or 11.
+- The private copy of Python is unpacked to
+  `%LocalAppData%\InSys\runtime`. It can be deleted at any time while InSys is
+  not running; InSys recreates it.
+
+The first-sign-in, team, tracking, backup and security sections below apply to
+both ways of running InSys. Where they mention `Start-InSys-Online.bat` or
+`Reset-Admin-Password.bat`, the `InSys.exe` equivalents are choices 3 and 4,
+and the `data` folder is `InSys-data`.
+
+## Starting InSys from the source folder
 
 1. Copy the whole `insys` folder to the computer that will host it, for example
    `C:\InSys`. (If it arrived as a ZIP file, right-click the ZIP → **Properties**
@@ -71,7 +127,8 @@ marked "Restricted".
 
 ## Online access (use it from anywhere)
 
-Double-click **`Start-InSys-Online.bat`** instead of `Start-InSys.bat`.
+Choose **3** in `InSys.exe`, or double-click **`Start-InSys-Online.bat`** instead
+of `Start-InSys.bat`.
 
 InSys starts as normal and also opens a secure (HTTPS) connection through
 Cloudflare's free tunnel service. After a few seconds the black window shows an
@@ -101,7 +158,8 @@ Things to know for the pilot:
 - Your data stays on the host computer. The tunnel only carries the encrypted
   traffic between your team's browsers and that computer.
 
-Without `--online`, InSys accepts connections from the host computer only.
+Without online access (or the office-network choice), InSys accepts connections
+from the host computer only.
 
 ## How tracking works
 
@@ -182,12 +240,35 @@ python insys.py [--online] [--lan] [--port N] [--data-dir PATH] [--no-browser]
 python insys.py --reset-admin [--user NAME]
 ```
 
+`InSys.exe` accepts the same options (for example `InSys.exe --online` in a
+shortcut skips the menu; `--no-menu` skips it and runs for this computer only).
+
+### Building InSys.exe
+
+```
+python packaging/build_exe.py
+```
+
+This needs Python 3.9+ and [Go](https://go.dev/dl/) 1.21+ and works on Windows,
+macOS or Linux; the result is `dist/InSys.exe`. The build downloads the official
+Python runtime for Windows from nuget.org once and checks it against a pinned
+SHA-256. `InSys.exe` is a small launcher (`packaging/launcher/main.go`) with
+that runtime, `insys.py` and the `web` folder embedded in it. The runtime is
+unmodified and runs in isolated mode, so a Python already installed on the
+computer is neither used nor affected.
+
+`python packaging/smoke_test.py dist/InSys.exe` starts a built program, signs
+in, stores a record and stops it again. The GitHub workflow
+`.github/workflows/insys-windows.yml` runs the server tests, the build and that
+smoke test on a Windows machine and keeps the resulting `InSys.exe` as a
+downloadable artifact.
+
 - Requires Python 3.9 or newer; standard library only. Runs the same way on
   macOS and Linux (`python3 insys.py`). On macOS, install `cloudflared` yourself
   (`brew install cloudflared`) to use `--online`.
-- `--lan` also accepts connections from other computers on the local network
-  (plain HTTP — prefer `--online` outside a trusted office network; Windows will
-  ask for firewall permission).
+- `--lan` (choice 2 in `InSys.exe`) also accepts connections from other
+  computers on the local network (plain HTTP — prefer `--online` outside a
+  trusted office network; Windows will ask for firewall permission).
 - If `cloudflared` is already installed and on the PATH, InSys uses it instead of
   downloading its own copy.
 - Tests: `python -m unittest discover -s tests -v` from this folder.
@@ -205,3 +286,6 @@ python insys.py --reset-admin [--user NAME]
 | `Start-InSys-Online.bat` | Windows launcher with internet access. |
 | `Reset-Admin-Password.bat` | Administrator password recovery. |
 | `tests/` | Automated tests for the server. |
+| `packaging/build_exe.py` | Builds `InSys.exe`. |
+| `packaging/launcher/` | The launcher that `InSys.exe` is made from. |
+| `packaging/smoke_test.py` | Starts a built `InSys.exe` and checks it works. |

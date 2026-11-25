@@ -1,6 +1,12 @@
 # Live data, backups and logs never belong in version control.
 /data/
+/InSys-data/
 # Downloaded on demand by --online.
 /tools/
+# Build output and downloads (packaging/build_exe.py).
+/build/
+/dist/
+/packaging/launcher/payload.zip
+/packaging/launcher/payload.sha256
 __pycache__/
 *.pyc
