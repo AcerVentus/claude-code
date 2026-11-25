@@ -1,2 +1,4 @@
 # Windows batch files must keep their CRLF line endings exactly as stored.
 *.bat -text
+# Built programs are binary.
+*.exe binary
