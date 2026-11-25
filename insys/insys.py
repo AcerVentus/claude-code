@@ -42,15 +42,16 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-VERSION = "1.2.0"
+VERSION = "1.2.1"
 
 # The database layout this version reads and writes. Version 1 is InSys 1.0.0;
 # version 2 (InSys 1.1.x) adds the subcontractor directory; version 3 (InSys
 # 1.2.0) adds the deleted-items archive, subcontractor capabilities and
 # per-subcontractor follow-up tracking. An older database is upgraded in place
 # on start-up, after a backup copy has been made. Upgrades only ever add tables
-# and columns; nothing existing is altered or removed.
-SCHEMA_VERSION = 3
+# and columns; nothing existing is altered or removed. Version 4 (InSys 1.2.1)
+# adds the updates feed behind the notification banners and bell.
+SCHEMA_VERSION = 4
 
 MAX_UPLOAD = 300 * 1024 * 1024  # a transferred database file
 MIN_PYTHON = (3, 9)
@@ -666,6 +667,21 @@ CREATE TABLE IF NOT EXISTS record_subcons (
     PRIMARY KEY (record_id, subcon_id)
 );
 CREATE INDEX IF NOT EXISTS idx_record_subcons_subcon ON record_subcons(subcon_id);
+CREATE TABLE IF NOT EXISTS events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    at TEXT NOT NULL,
+    actor_id INTEGER,
+    scope TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    text TEXT NOT NULL,
+    record_id INTEGER,
+    task_id INTEGER,
+    subcon_id INTEGER
+);
+CREATE TABLE IF NOT EXISTS event_seen (
+    user_id INTEGER PRIMARY KEY,
+    last_id INTEGER NOT NULL
+);
 CREATE TABLE IF NOT EXISTS audit (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     at TEXT NOT NULL,
@@ -819,6 +835,14 @@ def apply_schema(conn, existing):
             meta_set(conn, "currency", "")
     elif existing is not None and existing < SCHEMA_VERSION:
         meta_set(conn, "schema_version", SCHEMA_VERSION)
+    if existing is not None and existing < 4 and \
+            conn.execute("SELECT COUNT(*) AS n FROM events").fetchone()["n"] == 0:
+        # Data from before the updates feed existed: start the feed with the most
+        # recent history so the bell is not empty. Nobody is shown these as new.
+        recent = conn.execute("SELECT id FROM activity ORDER BY id DESC LIMIT 1 OFFSET 59").fetchone()
+        conn.execute("INSERT INTO events (at, actor_id, scope, kind, text, record_id) "
+                     "SELECT at, user_id, 'record', kind, text, record_id FROM activity "
+                     "WHERE id >= ? ORDER BY id", (recent["id"] if recent else 0,))
 
 
 def init_db():
@@ -1000,10 +1024,28 @@ def check_version(body, row, what="record"):
                        % what, code="conflict")
 
 
-def add_activity(conn, record_id, user, kind, text, action_date=None):
+EVENTS_KEPT = 5000
+
+
+def add_event(conn, user, scope, kind, text, record_id=None, task_id=None, subcon_id=None):
+    """Add to the updates feed that drives other people's banners and bell.
+    scope says who may see it: 'record' (people who can open that record's
+    section, plus the people a task on it belongs to), 'task' (the people the
+    task belongs to), 'subcons' (everyone) or 'admin' (administrators)."""
+    cur = conn.execute(
+        "INSERT INTO events (at, actor_id, scope, kind, text, record_id, task_id, subcon_id) "
+        "VALUES (?,?,?,?,?,?,?,?)",
+        (now_iso(), user["id"] if user else None, scope, kind, text[:500], record_id, task_id, subcon_id))
+    if cur.lastrowid % 500 == 0:
+        conn.execute("DELETE FROM events WHERE id <= ?", (cur.lastrowid - EVENTS_KEPT,))
+
+
+def add_activity(conn, record_id, user, kind, text, action_date=None, task_id=None):
+    """Write to a record's history, and tell other people about it."""
     conn.execute(
         "INSERT INTO activity (record_id, user_id, at, kind, text, action_date) VALUES (?,?,?,?,?,?)",
         (record_id, user["id"], now_iso(), kind, text, action_date))
+    add_event(conn, user, "record", kind, text, record_id=record_id, task_id=task_id)
 
 
 def user_name(conn, user_id):
@@ -1309,6 +1351,83 @@ def h_activity(ctx):
             "WHERE r.module IN (%s) AND r.deleted_at IS NULL ORDER BY a.id DESC LIMIT 40" % marks,
             mods).fetchall()
     return {"activity": [dict(r) for r in rows]}
+
+
+EVENT_WINDOW = 400   # how far back the feed looks
+EVENT_LIST = 50      # how many updates the bell shows
+
+
+def visible_events(conn, user):
+    """Recent updates this user is allowed to know about, newest first. Each is
+    (row, show_record): show_record is False when the user may know about a
+    task but not about the record it is attached to."""
+    rows = conn.execute(
+        "SELECT e.*, r.ref AS r_ref, r.title AS r_title, r.module AS r_module, r.deleted_at AS r_deleted, "
+        "t.assignee_id AS t_assignee, t.created_by AS t_creator, s.ref AS s_ref, s.name AS s_name "
+        "FROM events e LEFT JOIN records r ON r.id = e.record_id LEFT JOIN tasks t ON t.id = e.task_id "
+        "LEFT JOIN subcons s ON s.id = e.subcon_id ORDER BY e.id DESC LIMIT ?", (EVENT_WINDOW,)).fetchall()
+    out = []
+    for e in rows:
+        own_task = e["task_id"] is not None and user["id"] in (e["t_assignee"], e["t_creator"])
+        if e["scope"] == "admin":
+            if user["role"] == "admin":
+                out.append((e, False))
+        elif e["scope"] == "subcons":
+            out.append((e, False))
+        elif e["scope"] == "task":
+            if user["role"] == "admin" or own_task:
+                out.append((e, False))
+        elif e["scope"] == "record" and e["r_module"] in MODULES:
+            if can_view(user, e["r_module"]):
+                out.append((e, True))
+            elif own_task:
+                out.append((e, False))
+    return out
+
+
+def seen_event_id(conn, user):
+    row = conn.execute("SELECT last_id FROM event_seen WHERE user_id = ?", (user["id"],)).fetchone()
+    return row["last_id"] if row else None
+
+
+def h_events(ctx):
+    """Updates made by other people, for the banners and the bell."""
+    user = ctx.user
+    with read_db() as conn:
+        last_id = conn.execute("SELECT COALESCE(MAX(id), 0) AS n FROM events").fetchone()["n"]
+        seen = seen_event_id(conn, user)
+        visible = [(e, show) for e, show in visible_events(conn, user) if e["actor_id"] != user["id"]]
+    if seen is None:
+        # First look: nothing that happened before now counts as unread.
+        seen = last_id
+        with write_db(bump=False) as conn:
+            conn.execute("INSERT OR IGNORE INTO event_seen (user_id, last_id) VALUES (?, ?)",
+                         (user["id"], last_id))
+    events = []
+    for e, show_record in visible[:EVENT_LIST]:
+        item = {"id": e["id"], "at": e["at"], "actor_id": e["actor_id"], "scope": e["scope"],
+                "kind": e["kind"], "text": e["text"], "unread": e["id"] > seen,
+                "record": None, "subcon": None, "task": e["task_id"] is not None}
+        if show_record:
+            item["record"] = {"id": e["record_id"], "ref": e["r_ref"], "title": e["r_title"],
+                              "module": e["r_module"], "deleted": bool(e["r_deleted"])}
+        if e["scope"] == "subcons" and e["s_ref"]:
+            item["subcon"] = {"ref": e["s_ref"], "name": e["s_name"]}
+        events.append(item)
+    return {"events": events, "last_id": last_id,
+            "unread": len([1 for e, _ in visible if e["id"] > seen])}
+
+
+def h_events_seen(ctx):
+    """The bell has been opened: everything up to last_id has been seen."""
+    last_id = int_field(ctx.body, "last_id", "Last update", required=True)
+    with write_db(bump=False) as conn:
+        newest = conn.execute("SELECT COALESCE(MAX(id), 0) AS n FROM events").fetchone()["n"]
+        last_id = min(last_id, newest)
+        conn.execute("INSERT INTO event_seen (user_id, last_id) VALUES (?, ?) "
+                     "ON CONFLICT(user_id) DO UPDATE SET last_id = MAX(last_id, excluded.last_id)",
+                     (ctx.user["id"], last_id))
+    return {"ok": True}
 
 
 LOG_LIMIT = 500
@@ -1670,6 +1789,8 @@ def h_subcon_create(ctx):
                        "updated_by": ctx.user["id"], "updated_at": now})
         cur = conn.execute("INSERT INTO subcons (%s) VALUES (%s)"
                            % (",".join(fields), ",".join("?" * len(fields))), list(fields.values()))
+        add_event(conn, ctx.user, "subcons", "subcon",
+                  "Subcontractor added to the directory: %s" % fields["name"], subcon_id=cur.lastrowid)
         return {"subcon": subcon_json(get_subcon(conn, cur.lastrowid))}
 
 
@@ -1685,6 +1806,11 @@ def h_subcon_update(ctx):
             sets = ", ".join("%s = ?" % k for k in changed)
             conn.execute("UPDATE subcons SET %s, updated_by = ?, updated_at = ?, version = version + 1 "
                          "WHERE id = ?" % sets, list(changed.values()) + [ctx.user["id"], now_iso(), row["id"]])
+            if list(changed) == ["active"]:
+                note = "Subcontractor marked %s: %s" % ("active" if changed["active"] else "inactive", row["name"])
+            else:
+                note = "Subcontractor details updated: %s" % changed.get("name", row["name"])
+            add_event(conn, ctx.user, "subcons", "subcon", note, subcon_id=row["id"])
         return {"subcon": subcon_json(get_subcon(conn, row["id"])), "changed": bool(changed)}
 
 
@@ -1696,6 +1822,8 @@ def h_subcon_delete(ctx):
             add_activity(conn, link["record_id"], ctx.user, "subcon",
                          "Subcontractor removed (deleted from the directory): %s" % row["name"])
         conn.execute("DELETE FROM subcons WHERE id = ?", (row["id"],))
+        add_event(conn, ctx.user, "subcons", "subcon",
+                  "Subcontractor deleted from the directory: %s" % row["name"])
         audit(conn, "subcon_deleted", "%s %s (was on %d record(s))" % (row["ref"], row["name"], len(used)),
               user=ctx.user, ip=ctx.ip)
     return {"ok": True}
@@ -1835,10 +1963,11 @@ def h_task_create(ctx):
         cur = conn.execute("INSERT INTO tasks (%s) VALUES (%s)"
                            % (",".join(fields), ",".join("?" * len(fields))),
                            list(fields.values()))
+        added = "Task added: %s (assigned to %s)" % (fields["title"], user_name(conn, fields["assignee_id"]))
         if fields["record_id"] is not None:
-            add_activity(conn, fields["record_id"], ctx.user, "task",
-                         "Task added: %s (assigned to %s)"
-                         % (fields["title"], user_name(conn, fields["assignee_id"])))
+            add_activity(conn, fields["record_id"], ctx.user, "task", added, task_id=cur.lastrowid)
+        else:
+            add_event(conn, ctx.user, "task", "task", added, task_id=cur.lastrowid)
         row = conn.execute("SELECT * FROM tasks WHERE id = ?", (cur.lastrowid,)).fetchone()
         return {"task": dict(row)}
 
@@ -1864,15 +1993,24 @@ def h_task_update(ctx):
                          list(changed.values()) + [task["id"]])
             record_id = changed.get("record_id", task["record_id"])
             title = changed.get("title", task["title"])
-            if record_id is not None:
-                if changed.get("status") == "Done":
-                    add_activity(conn, record_id, ctx.user, "task", "Task completed: %s" % title)
-                elif "status" in changed and task["status"] == "Done":
-                    add_activity(conn, record_id, ctx.user, "task", "Task reopened: %s" % title)
-                if "assignee_id" in changed:
-                    add_activity(conn, record_id, ctx.user, "task",
-                                 "Task reassigned: %s (now with %s)"
-                                 % (title, user_name(conn, changed["assignee_id"])))
+            notes = []
+            if changed.get("status") == "Done":
+                notes.append("Task completed: %s" % title)
+            elif "status" in changed and task["status"] == "Done":
+                notes.append("Task reopened: %s" % title)
+            if "assignee_id" in changed:
+                notes.append("Task reassigned: %s (now with %s)"
+                             % (title, user_name(conn, changed["assignee_id"])))
+            for note in notes:
+                if record_id is not None:
+                    add_activity(conn, record_id, ctx.user, "task", note, task_id=task["id"])
+                else:
+                    add_event(conn, ctx.user, "task", "task", note, task_id=task["id"])
+            if not notes:
+                # Other edits (wording, due date, priority) are not part of a record's
+                # history, but the people the task belongs to are still told.
+                add_event(conn, ctx.user, "record" if record_id is not None else "task", "task",
+                          "Task updated: %s" % title, record_id=record_id, task_id=task["id"])
         row = conn.execute("SELECT * FROM tasks WHERE id = ?", (task["id"],)).fetchone()
         return {"task": dict(row)}
 
@@ -1891,7 +2029,9 @@ def h_task_delete(ctx):
                      (now_iso(), ctx.user["id"], task["id"]))
         if task["record_id"] is not None:
             add_activity(conn, task["record_id"], ctx.user, "task",
-                         "Task deleted: %s" % task["title"])
+                         "Task deleted: %s" % task["title"], task_id=task["id"])
+        else:
+            add_event(conn, ctx.user, "task", "task", "Task deleted: %s" % task["title"], task_id=task["id"])
     return {"ok": True}
 
 
@@ -1931,6 +2071,7 @@ def h_admin_user_create(ctx):
             "VALUES (?,?,?,?,1,1,?)",
             (username, full_name, role, hash_password(password), now_iso()))
         audit(conn, "user_created", "%s (%s)" % (username, ROLES[role]), user=ctx.user, ip=ctx.ip)
+        add_event(conn, ctx.user, "admin", "admin", "Login created: %s (%s)" % (full_name, ROLES[role]))
         row = conn.execute("SELECT * FROM users WHERE id = ?", (cur.lastrowid,)).fetchone()
     return {"user": admin_user_json(row), "temp_password": password}
 
@@ -1971,6 +2112,8 @@ def h_admin_user_update(ctx):
         if details:
             audit(conn, "user_updated", "%s - %s" % (row["username"], ", ".join(details)),
                   user=ctx.user, ip=ctx.ip)
+            add_event(conn, ctx.user, "admin", "admin",
+                      "Login changed: %s - %s" % (row["full_name"], ", ".join(details)))
         row = conn.execute("SELECT * FROM users WHERE id = ?", (row["id"],)).fetchone()
     return {"user": admin_user_json(row)}
 
@@ -1987,6 +2130,7 @@ def h_admin_user_reset(ctx):
                      (hash_password(password), row["id"]))
         conn.execute("DELETE FROM sessions WHERE user_id = ?", (row["id"],))
         audit(conn, "password_reset", row["username"], user=ctx.user, ip=ctx.ip)
+        add_event(conn, ctx.user, "admin", "admin", "Password reset for %s" % row["full_name"])
     return {"temp_password": password, "user": admin_user_json(row)}
 
 
@@ -2019,6 +2163,7 @@ def h_admin_settings(ctx):
         meta_set(conn, "org_name", org_name)
         meta_set(conn, "currency", currency)
         audit(conn, "settings_changed", "", user=ctx.user, ip=ctx.ip)
+        add_event(conn, ctx.user, "admin", "admin", "Organisation settings changed")
     return {"ok": True}
 
 
@@ -2110,6 +2255,9 @@ def h_admin_restore(ctx, path):
                   "the previous data was kept as %s"
                   % (info["records"], info["users"], ctx.user["username"], os.path.basename(kept)),
                   ip=ctx.ip)
+            add_event(conn, None, "admin", "admin",
+                      "A transferred database was loaded (%d records, %d logins)"
+                      % (info["records"], info["users"]))
     remove_first_login_file()
     ctx.handler.clear_session_cookie()
     return {"ok": True, "records": info["records"], "users": info["users"],
@@ -2138,6 +2286,8 @@ ROUTES = [
     ("GET", r"/api/state", h_state, "user"),
     ("GET", r"/api/activity", h_activity, "user"),
     ("GET", r"/api/log", h_log, "user"),
+    ("GET", r"/api/events", h_events, "user"),
+    ("POST", r"/api/events/seen", h_events_seen, "user"),
     ("POST", r"/api/records", h_record_create, "user"),
     ("PUT", r"/api/records/(\d{1,12})", h_record_update, "user"),
     ("DELETE", r"/api/records/(\d{1,12})", h_record_delete, "admin"),

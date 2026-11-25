@@ -814,6 +814,113 @@ class InSysTest(unittest.TestCase):
                       "Next follow-up: Chase the quote; Follow-up expected: 2026-11-27", history)
         self.assertTrue(any(x.startswith("Subcontractor Follow Up Beta - Last update (2026-11-22): Quote received") for x in history))
 
+    # -- 1.2.1: updates from other people (banners and the bell) -------------------
+
+    def test_updates_reach_other_people_who_may_see_them(self):
+        sam, tina, fiona, oscar = (self.people[n] for n in ("sam", "tina", "fiona", "oscar"))
+        manager = self.make_user("adele", "Adele Office-Manager", "administration")
+        boss = self.make_user("boss2", "Second Administrator", "admin")
+        everyone = [sam, tina, fiona, oscar, manager, boss, self.admin]
+
+        def feed(client):
+            status, data = client.get("/api/events")
+            self.assertEqual(status, 200, data)
+            return data
+
+        def texts(client):
+            return [e["text"] for e in feed(client)["events"]]
+
+        for client in everyone:   # first look: whatever happened earlier is not "new"
+            first = feed(client)
+            self.assertEqual(first["unread"], 0)
+            self.assertFalse([e for e in first["events"] if e["unread"]])
+
+        # A project change: everyone else is told, the person who did it is not.
+        project = self.new_record(sam, "project", "Notify project zz")
+        created = "Project created with status Planning"
+        for client in (tina, fiona, oscar, manager, boss, self.admin):
+            data = feed(client)
+            newest = data["events"][0]
+            self.assertEqual((newest["text"], newest["actor_id"], newest["unread"]), (created, sam.user_id, True))
+            self.assertEqual((newest["record"]["ref"], newest["record"]["title"], newest["record"]["module"]),
+                             (project["ref"], "Notify project zz", "project"))
+            self.assertEqual(data["unread"], 1)
+        self.assertNotIn(sam.user_id, [e["actor_id"] for e in feed(sam)["events"]])
+        self.assertEqual(feed(sam)["unread"], 0)
+
+        # A finance change: only Finance, Administration and Administrators are told.
+        invoice = self.new_record(fiona, "finance", "Notify invoice zz", amount=100)
+        fiona.post("/api/records/%d/actions" % invoice["id"], {"version": 1, "text": "Invoice zz sent", "date": "2026-11-25"})
+        for client in (manager, boss, self.admin):
+            self.assertEqual(texts(client)[0], "Invoice zz sent")
+        for client in (sam, tina, oscar):
+            dump = json.dumps(feed(client))
+            self.assertNotIn("Invoice zz sent", dump)
+            self.assertNotIn("Notify invoice zz", dump)
+        self.assertEqual(feed(tina)["unread"], 1)   # still just the project
+
+        # An office change: Office Administrators, Administration and Administrators.
+        self.new_record(oscar, "office", "Notify office zz")
+        self.assertIn("Office item created with status Open", texts(manager)[:1])
+        self.assertNotIn("Notify office zz", json.dumps(feed(fiona)))
+        self.assertNotIn("Notify office zz", json.dumps(feed(sam)))
+
+        # Administration (logins, settings): Administrators only.
+        self.admin.post("/api/admin/users", {"username": "newbie", "full_name": "New Starter", "role": "staff"})
+        self.assertEqual(texts(boss)[0], "Login created: New Starter (Engineering)")
+        self.assertEqual(feed(boss)["events"][0]["scope"], "admin")
+        for client in (sam, fiona, manager):
+            self.assertNotIn("Login created", json.dumps(feed(client)))
+
+        # The subcontractor directory belongs to everyone.
+        sub = self.new_subcon(sam, "Notify Subcon zz")
+        newest = feed(oscar)["events"][0]
+        self.assertEqual((newest["text"], newest["subcon"]["ref"]), ("Subcontractor added to the directory: Notify Subcon zz", sub["ref"]))
+        sam.post("/api/records/%d/subcons" % project["id"], {"subcon_id": sub["id"]})
+        self.assertEqual(texts(tina)[0], "Subcontractor added: Notify Subcon zz")
+
+        # A personal task: the person it is given to (and administrators), nobody else.
+        task = sam.post("/api/tasks", {"title": "Notify task zz", "assignee_id": tina.user_id})[1]["task"]
+        self.assertEqual(texts(tina)[0], "Task added: Notify task zz (assigned to Tina Staff)")
+        self.assertEqual(texts(boss)[0], "Task added: Notify task zz (assigned to Tina Staff)")
+        for client in (fiona, oscar, manager):
+            self.assertNotIn("Notify task zz", json.dumps(feed(client)))
+        tina.put("/api/tasks/%d" % task["id"], {"version": 1, "status": "Done"})
+        self.assertEqual(texts(sam)[0], "Task completed: Notify task zz")
+        sam.put("/api/tasks/%d" % task["id"], {"version": 2, "due_date": "2026-12-24"})
+        self.assertEqual(texts(tina)[0], "Task updated: Notify task zz")
+
+        # A task on a finance item given to an engineer: they hear about the task,
+        # and nothing about the finance item it sits on.
+        fiona.post("/api/tasks", {"title": "Notify PO check zz", "assignee_id": sam.user_id, "record_id": invoice["id"]})
+        mine = feed(sam)["events"][0]
+        self.assertEqual((mine["text"], mine["record"], mine["task"]),
+                         ("Task added: Notify PO check zz (assigned to Sam Staff)", None, True))
+        self.assertNotIn("Notify PO check zz", json.dumps(feed(tina)))
+        self.assertEqual(feed(manager)["events"][0]["record"]["ref"], invoice["ref"])
+
+        # Opening the bell marks them seen, for that person only; it never goes backwards.
+        data = feed(tina)
+        self.assertGreaterEqual(data["unread"], 4)
+        self.assertEqual(tina.post("/api/events/seen", {"last_id": data["last_id"]})[0], 200)
+        after = feed(tina)
+        self.assertEqual(after["unread"], 0)
+        self.assertFalse([e for e in after["events"] if e["unread"]])
+        self.assertGreaterEqual(feed(oscar)["unread"], 2)
+        tina.post("/api/events/seen", {"last_id": 1})
+        self.assertEqual(feed(tina)["unread"], 0)
+        tina.post("/api/events/seen", {"last_id": 10 ** 9})   # cannot mark the future as seen
+        sam.post("/api/records/%d/notes" % project["id"], {"text": "One more zz"})
+        again = feed(tina)
+        self.assertEqual((again["unread"], again["events"][0]["text"], again["events"][0]["unread"]), (1, "One more zz", True))
+        # Deleting is announced too, to the same audience.
+        self.admin.delete("/api/records/%d" % project["id"])
+        newest = feed(tina)["events"][0]
+        self.assertEqual((newest["text"], newest["record"]["deleted"]), ("Project deleted (status was Planning)", True))
+        for bad in [{}, {"last_id": "x"}, {"last_id": -1}]:
+            self.assertEqual(tina.post("/api/events/seen", bad)[0], 400, bad)
+        self.assertEqual(Client(self.base).get("/api/events")[0], 401)
+
     # -- tasks ------------------------------------------------------------------
 
     def test_tasks_belong_to_people(self):
@@ -1148,6 +1255,15 @@ class UpgradeTest(unittest.TestCase):
             self.assertEqual(insys.next_ref(conn, "project"), "PRJ-0002")
             self.assertEqual(conn.execute("SELECT COUNT(*) AS n FROM subcons").fetchone()["n"], 0)
 
+    def test_data_from_1_2_0_is_upgraded_and_kept(self):
+        self.upgrade_from(3)
+        with insys.read_db() as conn:
+            link = conn.execute("SELECT * FROM record_subcons").fetchone()
+            events = conn.execute("SELECT scope, kind, text, record_id, actor_id FROM events").fetchall()
+        self.assertEqual(link["scope"], "Old scope")
+        # The updates feed starts with the existing history, so the bell is not empty.
+        self.assertEqual([tuple(e) for e in events], [("record", "action", "Did the survey", 1, 2)])
+
     def test_data_from_1_1_x_is_upgraded_and_kept(self):
         self.upgrade_from(2)
         with insys.read_db() as conn:
@@ -1176,6 +1292,10 @@ class UpgradeTest(unittest.TestCase):
             self.assertEqual(state["meta"]["roles"]["staff"], "Engineering")
             log = client.get("/api/log?month=all")[1]
             self.assertEqual([(e["text"], e["day"]) for e in log["entries"]], [("Did the survey", "2026-09-20")])
+            # The bell shows the earlier history, none of it marked as new.
+            updates = client.get("/api/events")[1]
+            self.assertEqual([(e["text"], e["unread"]) for e in updates["events"]], [("Did the survey", False)])
+            self.assertEqual(updates["unread"], 0)
             # Old staff login still works and still cannot see finance.
             pat = Client(client.base)
             self.assertEqual(pat.login("pat", "Old-system-pass-1")[0], 200)

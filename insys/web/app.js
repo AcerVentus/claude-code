@@ -104,6 +104,9 @@
     sort: {},
     history: { id: null, items: null },
     log: { q: '', kind: 'actions', scope: 'all', month: '', data: null, error: null, seq: 0 },
+    // Updates made by other people. `shown` is the newest update already
+    // announced with a banner in this browser (null until the first load).
+    events: { list: [], unread: 0, lastId: 0, shown: null, open: false },
     routed: false,      // has the address bar been read since signing in?
     adminTab: 'users',
     admin: { users: null, system: null, audit: null },
@@ -218,16 +221,27 @@
     if (refreshing) { refreshAgain = true; return refreshing; }
     refreshing = (async () => {
       try {
+        const announced = S.events.shown;
         do {
           refreshAgain = false;
-          const results = await Promise.all([api('GET', '/api/state'), api('GET', '/api/activity')]);
+          const results = await Promise.all([api('GET', '/api/state'), api('GET', '/api/activity'), api('GET', '/api/events')]);
           S.data = results[0];
           S.me = results[0].me;
           S.activity = results[1].activity;
+          S.events.list = results[2].events;
+          S.events.unread = results[2].unread;
+          S.events.lastId = results[2].last_id;
           buildIndex(S.data);
         } while (refreshAgain);
         setSync(true);
         renderAll();
+        // Anything newer than what this browser has already announced gets a banner.
+        // On the first load nothing does: the bell's count covers what was missed.
+        const fresh = announced === null ? [] : S.events.list.filter((e) => e.id > announced);
+        S.events.shown = S.events.lastId;
+        renderBell();
+        if (S.events.open) { markUpdatesSeen(); renderBell(); }  // the list is on screen, so it has been seen
+        else if (fresh.length) showBanners(fresh);
         if (S.view === 'admin') loadAdmin(S.adminTab);
         if (S.view === 'log') loadLog();
       } finally {
@@ -411,6 +425,7 @@
   function signedOut(message) {
     if (!S.me && document.getElementById('login-form')) return;
     S.me = null; S.data = null; S.csrf = ''; S.routed = false;
+    resetUpdates();
     closeDialogs();
     showLogin(message);
   }
@@ -504,6 +519,7 @@
   async function signOut() {
     try { await api('POST', '/api/logout', {}); } catch (e) { /* signing out regardless */ }
     S.me = null; S.data = null; S.csrf = ''; S.routed = false;
+    resetUpdates();
     closeDialogs();
     showLogin();
   }
@@ -563,7 +579,11 @@
   });
 
   document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && S.events.open) { closeBell(); return; }
     if (e.key === 'Escape' && S.data && S.openRef && !document.querySelector('dialog[open]')) go(S.view);
+  });
+  document.addEventListener('click', (e) => {
+    if (S.events.open && !e.target.closest('.bell-wrap')) closeBell();
   });
 
   function ensureShell() {
@@ -590,6 +610,10 @@
             h('div', { class: 'search' }, search, h('div', { id: 'search-results', class: 'search-results', hidden: true, onmousedown: (e) => e.preventDefault() })),
             h('div', { class: 'topbar-right' },
               h('span', { id: 'sync', class: 'sync' }, h('span', { class: 'dot' }), h('span', { class: 'label', text: 'Live' })),
+              h('div', { class: 'bell-wrap' },
+                h('button', { id: 'bell', type: 'button', class: 'bell', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'aria-controls': 'bell-panel', onclick: toggleBell },
+                  bellIcon(), h('span', { id: 'bell-count', class: 'bell-count', hidden: true })),
+                h('div', { id: 'bell-panel', class: 'bell-panel', role: 'region', 'aria-label': 'Updates from other people', hidden: true })),
               h('div', { class: 'who', id: 'who' }),
               h('button', { class: 'btn small', type: 'button', text: 'Password', title: 'Change your password', onclick: changePasswordDialog }),
               h('button', { class: 'btn small', type: 'button', text: 'Sign out', onclick: signOut }))),
@@ -1635,6 +1659,152 @@
   }
 
   // ------------------------------------------------------------------
+  // Updates from other people: banners, and the bell that keeps them
+  // ------------------------------------------------------------------
+
+  const BANNER_SECONDS = 8;
+
+  function bellIcon() {
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('width', '18');
+    svg.setAttribute('height', '18');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('focusable', 'false');
+    const path = document.createElementNS(NS, 'path');
+    path.setAttribute('fill', 'currentColor');
+    path.setAttribute('d', 'M12 22a2.2 2.2 0 0 0 2.2-2.2H9.8A2.2 2.2 0 0 0 12 22zm7-5.2-1.6-1.7V10a5.4 5.4 0 0 0-4.2-5.3V3.6a1.2 1.2 0 0 0-2.4 0v1.1A5.4 5.4 0 0 0 6.6 10v5.1L5 16.8v1.4h14v-1.4z');
+    svg.appendChild(path);
+    return svg;
+  }
+
+  function timeAgo(iso) {
+    const seconds = (Date.now() - new Date(iso).getTime()) / 1000;
+    if (isNaN(seconds)) return '';
+    if (seconds < 60) return 'just now';
+    if (seconds < 3600) return Math.floor(seconds / 60) + ' min ago';
+    if (seconds < 86400) return Math.floor(seconds / 3600) + ' h ago';
+    return fmtDateTime(iso);
+  }
+
+  const eventWho = (e) => (e.actor_id === null || e.actor_id === undefined ? 'InSys' : userName(e.actor_id));
+  function eventSubject(e) {
+    if (e.record) return e.record.ref + ' ' + e.record.title + (e.record.deleted ? ' (deleted)' : '');
+    if (e.subcon) return e.subcon.ref + ' ' + e.subcon.name;
+    if (e.scope === 'subcons') return 'Subcontractor directory';
+    if (e.scope === 'admin') return 'Administration';
+    return 'Task';
+  }
+  const snippet = (text) => (text.length > 140 ? text.slice(0, 140) + '…' : text);
+
+  /** Go to whatever an update is about. */
+  function openEvent(e) {
+    closeBell();
+    if (e.record && e.record.deleted) {
+      Object.assign(S.log, { q: e.record.ref, kind: 'all', scope: 'deleted', month: '' });
+      if (S.view === 'log') { renderAll(); loadLog(); } else go('log');
+    } else if (e.record) go(viewForModule(e.record.module), e.record.ref);
+    else if (e.subcon) go('subcons', e.subcon.ref);
+    else if (e.scope === 'subcons') go('subcons');
+    else if (e.scope === 'admin') { S.adminTab = 'users'; go('admin'); }
+    else go('my');
+  }
+
+  function showBanners(events) {
+    let host = document.getElementById('banners');
+    if (!host) { host = h('div', { id: 'banners', 'aria-live': 'polite' }); document.body.appendChild(host); }
+    const oldestFirst = events.slice().sort((a, b) => a.id - b.id);
+    const shown = oldestFirst.slice(-3);
+    const more = oldestFirst.length - shown.length;
+    const fade = (el) => {
+      setTimeout(() => el.classList.add('fading'), (BANNER_SECONDS - 1) * 1000);
+      setTimeout(() => el.remove(), BANNER_SECONDS * 1000);
+    };
+    shown.forEach((e) => {
+      const el = h('div', { class: 'banner', role: 'status' },
+        h('button', { type: 'button', class: 'banner-main', title: 'Open', onclick: () => { el.remove(); openEvent(e); } },
+          h('span', { class: 'banner-who', text: eventWho(e) + ' · ' + (KIND_LABELS[e.kind] || 'Update') }),
+          h('span', { class: 'banner-what', text: eventSubject(e) }),
+          h('span', { class: 'banner-text', text: snippet(e.text) })),
+        h('button', { type: 'button', class: 'banner-close', 'aria-label': 'Dismiss this update', text: '×', onclick: () => el.remove() }));
+      host.appendChild(el);
+      fade(el);
+    });
+    if (more > 0) {
+      const el = h('div', { class: 'banner', role: 'status' },
+        h('button', { type: 'button', class: 'banner-main', onclick: (ev) => { ev.stopPropagation(); el.remove(); if (!S.events.open) toggleBell(); } },
+          h('span', { class: 'banner-who', text: 'and ' + plural(more, 'more update') }),
+          h('span', { class: 'banner-text', text: 'Open the bell to see them all.' })));
+      host.appendChild(el);
+      fade(el);
+    }
+    while (host.children.length > 4) host.firstChild.remove();
+  }
+
+  function renderBell() {
+    const button = document.getElementById('bell');
+    if (!button) return;
+    const E = S.events;
+    const count = document.getElementById('bell-count');
+    count.hidden = !E.unread;
+    count.textContent = E.unread > 99 ? '99+' : String(E.unread);
+    button.setAttribute('aria-label', 'Updates from other people' + (E.unread ? ', ' + E.unread + ' new' : ''));
+    button.title = E.unread ? plural(E.unread, 'new update') + ' from other people' : 'Updates from other people';
+    button.setAttribute('aria-expanded', String(E.open));
+    button.classList.toggle('has-new', !!E.unread);
+    const panel = document.getElementById('bell-panel');
+    panel.hidden = !E.open;
+    if (!E.open) return;
+    const items = E.list.map((e) => h('button', { type: 'button', class: 'bell-item' + (e.unread ? ' unread' : ''), onclick: () => openEvent(e) },
+      h('span', { class: 'bell-meta' },
+        h('span', { text: eventWho(e) + ' · ' + (KIND_LABELS[e.kind] || 'Update') }),
+        h('span', { text: (e.unread ? 'New · ' : '') + timeAgo(e.at) })),
+      h('span', { class: 'bell-what', text: eventSubject(e) }),
+      h('span', { class: 'bell-text', text: snippet(e.text) })));
+    panel.replaceChildren(
+      h('div', { class: 'bell-head' }, h('h2', { text: 'Updates from other people' }),
+        h('span', { class: 'muted small', text: E.list.some((e) => e.unread) ? plural(E.list.filter((e) => e.unread).length, 'new update') : 'Nothing new' })),
+      items.length ? h('div', { class: 'bell-list' }, items)
+        : h('div', { class: 'bell-empty', text: 'No updates from other people yet. Changes they make to things you can see will appear here.' }),
+      h('div', { class: 'bell-foot' }, h('a', { href: '#/log', onclick: closeBell, text: 'See everything in the Activity log' })));
+  }
+
+  /** Opening the bell counts as having seen what is in it. */
+  function markUpdatesSeen() {
+    const E = S.events;
+    if (!E.unread) return;
+    E.unread = 0;
+    api('POST', '/api/events/seen', { last_id: E.lastId }).catch(() => {});
+  }
+
+  function toggleBell(event) {
+    if (event) event.stopPropagation();
+    S.events.open = !S.events.open;
+    renderBell();           // drawn first so new items are still marked "New" this once
+    if (S.events.open) {
+      markUpdatesSeen();
+      renderBell();
+      const host = document.getElementById('banners');
+      if (host) host.replaceChildren();   // they are all in the list now
+    }
+    else S.events.list.forEach((e) => { e.unread = false; });
+  }
+
+  function closeBell() {
+    if (!S.events.open) return;
+    S.events.open = false;
+    S.events.list.forEach((e) => { e.unread = false; });
+    renderBell();
+  }
+
+  function resetUpdates() {
+    S.events = { list: [], unread: 0, lastId: 0, shown: null, open: false };
+    const host = document.getElementById('banners');
+    if (host) host.remove();
+  }
+
+  // ------------------------------------------------------------------
   // Activity log: everything done, catalogued by month
   // ------------------------------------------------------------------
 
@@ -1642,7 +1812,7 @@
   const monthLabel = (m) => MONTHS_FULL[+m.slice(5) - 1] + ' ' + m.slice(0, 4);
   const KIND_LABELS = {
     created: 'Created', updated: 'Edited', action: 'Action', note: 'Note', link: 'Link', xref: 'Reference',
-    task: 'Task', subcon: 'Subcontractor', deleted: 'Deleted', restored: 'Restored',
+    task: 'Task', subcon: 'Subcontractor', deleted: 'Deleted', restored: 'Restored', admin: 'Administration',
   };
 
   async function loadLog() {

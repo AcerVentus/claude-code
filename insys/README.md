@@ -20,7 +20,8 @@ with optional access from anywhere over the internet.
 - **An administrator login** with the overall view, team workload, people
   management, a security log and backups.
 - Changes made by one person appear on everyone else's screen within about
-  five seconds — no refreshing.
+  five seconds — no refreshing — and are announced with a **banner**; a **bell**
+  at the top keeps the latest updates from other people.
 
 It is one Python file plus a small web page, with no database server and no
 subscription. There are two ways to run it:
@@ -211,6 +212,22 @@ from the host computer only.
   lists who covers which requirement, best match first, and points out any
   requirement nobody covers. Tick the ones to approach and add them all to the
   enquiry in one step, or start an email to them.
+- **Banners and the bell.** When someone else changes something you are
+  allowed to see, a banner slides in at the bottom right of your screen saying
+  who did what, on which item; click it to open that item. It fades after a
+  few seconds. The **bell** at the top then shows how many updates you have
+  not looked at; click it for the latest updates from other people, newest
+  first, and click any of them to go there. Opening the bell marks them seen
+  (this is remembered per person, on any device). Your own changes are never
+  announced to you, and signing in after time away does not replay old
+  banners — the bell's count tells you what you missed.
+  Who is told follows the same access rules as everything else: changes to
+  projects, enquiries, expressions of interest and the subcontractor directory
+  go to everyone; Finance changes only to Finance, Administration and
+  Administrators; Office Admin changes only to Office Administrators,
+  Administration and Administrators; a personal task only to the people it
+  belongs to; and logins, settings and other administration only to
+  Administrators, who therefore see every update.
 - **Activity log** (in the sidebar) is the long-term record. Every logged
   action is filed under the month it was done; pick a month from the catalogue
   on the left, or search across all months by what was done, a reference, a
@@ -264,6 +281,7 @@ If you use the office-network choice, Windows may ask again whether to allow
 
 | Version | What changed |
 |---|---|
+| 1.2.1 | Banners announcing other people's changes, and a bell listing the latest updates, each limited to what that person's role may see. |
 | 1.2.0 | Activity log by month with completed and deleted items; deleted items kept and restorable; per-subcontractor last update and next follow-up; capability search; Administration and Engineering roles; database transfer between systems; optional Samaritan look. |
 | 1.1.1 | A Subcons column in the Projects, Enquiries and Expressions of Interest lists. No change to stored data. |
 | 1.1.0 | Subcontractor directory; subcontractors on projects, enquiries and expressions of interest. |
