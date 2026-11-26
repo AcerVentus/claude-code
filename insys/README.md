@@ -252,8 +252,30 @@ from the host computer only.
   example turn an enquiry into a project, carrying the details across) and *Add
   external ref* for references in other systems. The search box at the top finds
   records by any of these references.
-- Every record has a permanent reference (`PRJ-0001`, `ENQ-0001`, `EOI-0001`,
-  `FIN-0001`, `OFF-0001`) and a direct web address you can paste into an email.
+- **Your own numbers.** Projects, enquiries and expressions of interest can
+  carry the number you already use for them (a project number, enquiry number
+  or tender number). State it when you create the item, or give it to an
+  existing one from the **Number** cell in the list (*Set number* / *Change*)
+  or from the open record. From then on that number is what InSys shows and
+  what you search by — in the lists, the Overview, the Subcontractors page,
+  the Activity log, banners and exports. A number must be unique within its
+  section (projects, enquiries and EOIs are numbered independently), and it
+  can be changed or cleared at any time; the change is recorded in the item's
+  history.
+- Behind it, every record keeps a permanent system reference (`PRJ-0001`,
+  `ENQ-0001`, `EOI-0001`, `FIN-0001`, `OFF-0001`) and a direct web address you
+  can paste into an email. These never change, so links and history stay valid
+  whatever numbers are given later; an item with no number of its own is shown
+  by this reference, and searching for it always works. Finance and Office
+  Admin items use the system reference only.
+- **Sorting.** Click any column heading in a section list to sort by it; click
+  again to reverse. Every column follows the same rule: ascending first (A to
+  Z, lowest, earliest), descending is its exact reverse, and rows with nothing
+  in that column stay at the bottom either way. Text sorts the way it reads —
+  capitals are ignored and "Job 2" comes before "Job 10" — and items with the
+  same value stay in the order they were entered. Status sorts in the order
+  work moves through the statuses, not alphabetically. The arrow shows the
+  column and direction in use.
 - **Export CSV** on each section downloads the rows currently shown, for Excel.
 - If two people edit the same record at once, the second save is refused with a
   message rather than silently overwriting the first.
@@ -287,6 +309,7 @@ If you use the office-network choice, Windows may ask again whether to allow
 
 | Version | What changed |
 |---|---|
+| 1.2.4 | Your own numbers for projects, enquiries and expressions of interest; column sorting made consistent. |
 | 1.2.3 | The Activity log and the bell show the actual date and time of each update. No change to stored data. |
 | 1.2.2 | Client names beside each item on the Subcontractors summary; a theme chooser with a Dark theme. No change to stored data. |
 | 1.2.1 | Banners announcing other people's changes, and a bell listing the latest updates, each limited to what that person's role may see. |

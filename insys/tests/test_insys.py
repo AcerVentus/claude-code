@@ -921,6 +921,76 @@ class InSysTest(unittest.TestCase):
             self.assertEqual(tina.post("/api/events/seen", bad)[0], 400, bad)
         self.assertEqual(Client(self.base).get("/api/events")[0], 401)
 
+    # -- 1.2.4: the user's own project / enquiry / EOI numbers ----------------------
+
+    def test_users_give_projects_enquiries_and_eois_their_own_numbers(self):
+        sam, tina, fiona = self.people["sam"], self.people["tina"], self.people["fiona"]
+        meta = self.state(sam)["meta"]["modules"]
+        self.assertEqual([(k, meta[k]["numbered"], meta[k]["number_label"]) for k in ("project", "enquiry", "eoi")],
+                         [("project", True, "Project number"), ("enquiry", True, "Enquiry number"), ("eoi", True, "EOI number")])
+        self.assertFalse(meta["finance"]["numbered"] or meta["office"]["numbered"])
+
+        # Stated when the item is created; the system reference is still issued behind it.
+        project = self.new_record(sam, "project", "Numbered project", number="  24-118 / Rev B ")
+        self.assertEqual(project["number"], "24-118 / Rev B")
+        self.assertRegex(project["ref"], r"^PRJ-\d{4}$")
+        self.assertEqual(self.find(self.state(tina), project["id"])["number"], "24-118 / Rev B")
+        # Optional: without one, the item simply has its system reference.
+        plain = self.new_record(sam, "project", "Unnumbered project")
+        other = self.new_record(sam, "project", "Another unnumbered project")
+        self.assertEqual((plain["number"], other["number"]), ("", ""))
+
+        # A number identifies one item in its section, whatever the capitals...
+        for clash in ["24-118 / Rev B", "24-118 / rev b"]:
+            status, data = tina.post("/api/records", {"module": "project", "title": "Clash", "number": clash})
+            self.assertEqual(status, 400, clash)
+            self.assertIn(project["ref"], data["error"])
+            self.assertIn("Project number", data["error"])
+        # ...but each section has its own numbering.
+        enquiry = self.new_record(sam, "enquiry", "Enquiry sharing a number", number="24-118 / Rev B")
+        eoi = self.new_record(sam, "eoi", "EOI sharing a number", number="24-118 / Rev B")
+        self.assertEqual((enquiry["number"], eoi["number"]), ("24-118 / Rev B", "24-118 / Rev B"))
+
+        # An existing item is given its number afterwards, by anyone who works on it.
+        status, data = tina.put("/api/records/%d" % plain["id"], {"version": 1, "number": "Q-2026/045"})
+        self.assertEqual(status, 200, data)
+        self.assertEqual((data["record"]["number"], data["record"]["ref"], data["record"]["title"]),
+                         ("Q-2026/045", plain["ref"], "Unnumbered project"))
+        self.assertEqual(sam.put("/api/records/%d" % other["id"], {"version": 1, "number": "q-2026/045"})[0], 400)
+        self.assertEqual(sam.put("/api/records/%d" % plain["id"], {"version": 2, "number": "Q-2026/045"})[1]["changed"], False)
+        history = [h["text"] for h in sam.get("/api/records/%d/history" % plain["id"])[1]["history"]]
+        self.assertIn("Project number: - \u2192 Q-2026/045", history)
+        # It can be changed or cleared again.
+        status, data = sam.put("/api/records/%d" % plain["id"], {"version": 2, "number": ""})
+        self.assertEqual((status, data["record"]["number"]), (200, ""))
+        self.assertEqual(sam.put("/api/records/%d" % other["id"], {"version": 1, "number": "Q-2026/045"})[0], 200)
+        self.assertEqual(sam.post("/api/records", {"module": "project", "title": "x", "number": "n" * 61})[0], 400)
+        self.assertEqual(sam.post("/api/records", {"module": "project", "title": "x", "number": 12345})[0], 400)
+
+        # Finance and Office Admin items are not numbered this way.
+        invoice = self.new_record(fiona, "finance", "Invoice with a number sent anyway", number="INV-9")
+        self.assertEqual(invoice["number"], "")
+
+        # The number is what the activity log and other people's updates show and find.
+        sam.post("/api/records/%d/actions" % project["id"], {"version": 1, "text": "Numbered action zq9", "date": "2026-11-26"})
+        entry = sam.get("/api/log?q=24-118")[1]["entries"][0]
+        self.assertEqual((entry["text"], entry["record"]["number"], entry["record"]["ref"]),
+                         ("Numbered action zq9", "24-118 / Rev B", project["ref"]))
+        update = [e for e in tina.get("/api/events")[1]["events"] if e["text"] == "Numbered action zq9"][0]
+        self.assertEqual(update["record"]["number"], "24-118 / Rev B")
+        recent = [a for a in tina.get("/api/activity")[1]["activity"] if a["text"] == "Numbered action zq9"][0]
+        self.assertEqual(recent["number"], "24-118 / Rev B")
+
+        # Deleting an item frees its number; it cannot then be restored on top of the new holder.
+        self.assertEqual(self.admin.delete("/api/records/%d" % project["id"])[0], 200)
+        taker = self.new_record(sam, "project", "Takes over the number", number="24-118 / Rev B")
+        status, data = self.admin.post("/api/records/%d/restore" % project["id"])
+        self.assertEqual(status, 400)
+        self.assertIn(taker["ref"], data["error"])
+        self.assertEqual(sam.put("/api/records/%d" % taker["id"], {"version": 1, "number": "24-119"})[0], 200)
+        self.assertEqual(self.admin.post("/api/records/%d/restore" % project["id"])[0], 200)
+        self.assertEqual(self.find(self.state(sam), project["id"])["number"], "24-118 / Rev B")
+
     # -- tasks ------------------------------------------------------------------
 
     def test_tasks_belong_to_people(self):
@@ -1255,11 +1325,19 @@ class UpgradeTest(unittest.TestCase):
             self.assertEqual(insys.next_ref(conn, "project"), "PRJ-0002")
             self.assertEqual(conn.execute("SELECT COUNT(*) AS n FROM subcons").fetchone()["n"], 0)
 
-    def test_data_from_1_2_1_opens_as_it_is(self):
-        """1.2.2 uses the same data layout as 1.2.1: nothing is converted or copied."""
-        build_old_database(insys.RT.db_path, 4)
+    def test_data_from_1_2_1_to_1_2_3_is_upgraded_and_kept(self):
+        self.upgrade_from(4)
+        with insys.read_db() as conn:
+            rows = conn.execute("SELECT ref, number FROM records ORDER BY id").fetchall()
+        # Existing items keep their system reference and start with no number of their own.
+        self.assertEqual([tuple(r) for r in rows], [("PRJ-0001", ""), ("FIN-0001", "")])
+
+    def test_data_already_in_the_current_layout_opens_as_it_is(self):
+        """Starting the same version again converts and copies nothing."""
+        insys.init_db()
         before = snapshot(insys.RT.db_path)
         self.assertEqual(insys.stored_schema_version(), insys.SCHEMA_VERSION)
+        insys.RT.upgraded_from = insys.RT.upgrade_backup = None
         self.assertIsNone(insys.init_db())
         self.assertIsNone(insys.RT.upgraded_from)
         self.assertEqual(snapshot(insys.RT.db_path), before)

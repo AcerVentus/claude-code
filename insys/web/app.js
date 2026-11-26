@@ -792,13 +792,38 @@
 
   function refLink(id) {
     const r = S.I.recs.get(id);
-    if (r) return h('a', { class: 'ref', href: recHref(r), text: r.ref, title: r.title });
+    if (r) return h('a', { class: 'ref', href: recHref(r), text: no(r), title: r.title });
     const stub = S.data.restricted[String(id)];
     if (stub) return h('span', { class: 'ref muted', title: 'You do not have access to this section', text: stub.ref });
     return h('span', { class: 'muted', text: '—' });
   }
 
   const refKey = (r) => r.ref.slice(0, 3) + String(r.id).padStart(12, '0');
+
+  // What an item is called on screen: the number its users gave it, or, until
+  // they do, its system reference (PRJ-0001). The system reference never changes
+  // and is what links, history and web addresses use.
+  const no = (r) => (r && r.number ? r.number : r.ref);
+  const isNumbered = (module) => !!(mods()[module] && mods()[module].numbered);
+  // For pick-lists: starts with the system reference so the choice can be read back.
+  const pickLabel = (r) => r.ref + ' — ' + (r.number ? r.number + ' — ' : '') + r.title;
+
+  /** The quick way to give an existing item its own number. */
+  function numberForm(rec) {
+    const m = mods()[rec.module];
+    formDialog({
+      title: m.number_label + ' for ' + rec.ref,
+      intro: 'Your own tracking number for "' + rec.title + '". It is shown and searched in place of the system reference ' + rec.ref + ', which carries on working behind it.',
+      fields: [{ name: 'number', label: m.number_label, full: true, maxlength: 60, value: rec.number, placeholder: 'e.g. 24-118',
+        hint: 'Must be different from every other ' + m.singular.toLowerCase() + '. Leave empty to go back to ' + rec.ref + '.' }],
+      submitLabel: 'Save number',
+      onSubmit: async (v) => {
+        await api('PUT', '/api/records/' + rec.id, { version: rec.version, number: v.number });
+        await refresh();
+        toast(v.number ? rec.ref + ' is now ' + v.number + '.' : rec.ref + ' has no number of its own now.');
+      },
+    });
+  }
 
   // Most pressing work first: open items by next-action date (overdue ones are
   // simply the earliest dates), then open items with no date, then closed items.
@@ -863,31 +888,47 @@
     setTimeout(() => URL.revokeObjectURL(url), 5000);
     toast('Exported ' + plural(lines.length - 1, 'row') + '.');
   }
+  // ---- Column sorting -------------------------------------------------
+  // One rule for every column: the first click sorts ascending (A to Z, lowest
+  // first, earliest first), the second descending, which is the exact reverse.
+  // Rows with nothing in that column stay at the bottom either way. Rows with
+  // the same value keep their order of entry (and reverse along with the rest).
+  // Text is compared the way people read it: capitals do not matter and
+  // "Job 2" comes before "Job 10".
+  const TEXT_ORDER = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
   const SORTERS = {
-    ref: refKey,
-    module: (r) => r.module,
-    title: (r) => r.title.toLowerCase(),
-    status: (r) => mods()[r.module].statuses.findIndex((s) => s[0] === r.status),
+    ref: (r) => no(r),
+    module: (r) => mods()[r.module].singular,
+    title: (r) => r.title,
+    status: (r) => mods()[r.module].statuses.findIndex((x) => x[0] === r.status),
     last: (r) => r.last_action_date,
     next: (r) => (isOpen(r) ? r.next_action_date : null),
     due: (r) => r.due_date,
     amount: (r) => r.amount,
-    owner: (r) => (r.owner_id === null ? null : userName(r.owner_id).toLowerCase()),
-    subcons: (r) => subconNames(r).toLowerCase(),
+    owner: (r) => (r.owner_id === null ? null : userName(r.owner_id)),
+    subcons: (r) => subconNames(r),
   };
+  const SORT_HINTS = {
+    ref: 'number', module: 'section', title: 'title', status: 'status, in the order work moves through them',
+    last: 'date of the last action', next: 'next action due date', due: 'date', amount: 'amount', owner: 'owner', subcons: 'subcontractor',
+  };
+
+  function compareValues(x, y) {
+    if (typeof x === 'number' && typeof y === 'number') return x - y;
+    return TEXT_ORDER.compare(String(x), String(y));
+  }
 
   function sortRows(rows, sort) {
     const get = SORTERS[sort.key] || SORTERS.next;
+    const dir = sort.dir === -1 ? -1 : 1;
+    const blank = (v) => v === null || v === undefined || v === '' || (typeof v === 'number' && isNaN(v));
     return rows.slice().sort((a, b) => {
       const x = get(a); const y = get(b);
-      const xn = x === null || x === undefined || x === '';
-      const yn = y === null || y === undefined || y === '';
-      if (xn && yn) return refKey(a) < refKey(b) ? -1 : 1;
-      if (xn) return 1;   // blanks always last
-      if (yn) return -1;
-      if (x < y) return -sort.dir;
-      if (x > y) return sort.dir;
-      return refKey(a) < refKey(b) ? -1 : 1;
+      const xb = blank(x); const yb = blank(y);
+      if (xb !== yb) return xb ? 1 : -1;          // nothing in this column: always last
+      let order = xb ? 0 : compareValues(x, y);
+      if (order === 0) order = a.id - b.id;       // same value: order of entry
+      return order * dir;
     });
   }
 
@@ -898,7 +939,7 @@
   function recordTable(rows, opts) {
     if (!rows.length) return h('div', { class: 'table-wrap' }, h('div', { class: 'empty', text: opts.empty || 'Nothing to show.' }));
     const m = opts.module ? mods()[opts.module] : null;
-    const cols = [{ key: 'ref', label: 'Ref' }];
+    const cols = [{ key: 'ref', label: m && m.numbered ? 'Number' : 'Ref' }];
     if (!m) cols.push({ key: 'module', label: 'Section' });
     // Sections that use subcontractors get a column for them; in the mixed
     // tables (Overview, My Work) they are named under the title instead.
@@ -915,15 +956,27 @@
       const on = opts.sort && opts.sort.key === c.key;
       const sortState = on ? (opts.sort.dir === 1 ? 'ascending' : 'descending') : null;
       if (!opts.onSort) return h('th', { class: c.num ? 'num' : null, scope: 'col', text: c.label });
+      // Every column sorts. The arrow shows the column in use and its direction;
+      // the faint double arrow on the others shows they can be clicked too.
       return h('th', { class: c.num ? 'num' : null, scope: 'col', 'aria-sort': sortState },
-        h('button', { type: 'button', title: 'Sort by ' + c.label.toLowerCase(), onclick: () => opts.onSort(c.key) },
-          c.label, on ? h('span', { 'aria-hidden': 'true', text: opts.sort.dir === 1 ? '▲' : '▼' }) : null));
+        h('button', {
+          type: 'button', onclick: () => opts.onSort(c.key),
+          title: 'Sort by ' + (SORT_HINTS[c.key] || c.label.toLowerCase()) + (on ? (opts.sort.dir === 1 ? ' - now ascending; click for descending' : ' - now descending; click for ascending') : ''),
+        },
+        c.label, h('span', { class: 'sort-mark' + (on ? ' on' : ''), 'aria-hidden': 'true', text: on ? (opts.sort.dir === 1 ? '▲' : '▼') : '↕' })));
     }));
 
     const body = rows.map((r) => {
       const cells = cols.map((c) => {
         switch (c.key) {
-          case 'ref': return h('td', null, h('a', { class: 'ref', href: recHref(r), text: r.ref }));
+          case 'ref': return h('td', { class: 'cell-ref' },
+            h('a', { class: 'ref', href: recHref(r), text: no(r) }),
+            r.number ? h('div', { class: 'cell-sub', title: 'System reference', text: r.ref }) : null,
+            // In its own section, the cell is also where an item is given its number.
+            m && m.numbered ? h('button', {
+              type: 'button', class: 'number-set' + (r.number ? '' : ' unset'), text: r.number ? 'Change' : 'Set number',
+              'aria-label': (r.number ? 'Change the number of ' : 'Set your own number for ') + r.ref, onclick: () => numberForm(r),
+            }) : null);
           case 'module': return h('td', { class: 'nowrap', text: mods()[r.module].singular });
           case 'title': return h('td', { class: 'cell-text' },
             h('div', { class: 'cell-title', text: r.title }),
@@ -1116,7 +1169,7 @@
 
     const feed = S.activity.slice(0, 15).map((a) => h('li', null,
       h('div', { class: 'main' },
-        h('a', { class: 'ref', href: '#/' + S.view + '/' + a.ref, text: a.ref }), ' ',
+        h('a', { class: 'ref', href: '#/' + S.view + '/' + a.ref, text: no(a) }), ' ',
         h('span', { text: a.title }),
         h('div', { class: 'small muted', text: a.text.length > 160 ? a.text.slice(0, 160) + '…' : a.text })),
       h('div', { class: 'side small muted', text: userName(a.user_id) + ' · ' + fmtDateTime(a.at) })));
@@ -1208,7 +1261,7 @@
       if (f.owner === 'none' && r.owner_id !== null) return false;
       if (f.owner && f.owner !== 'me' && f.owner !== 'none' && String(r.owner_id) !== f.owner) return false;
       if (q) {
-        const hay = [r.ref, r.title, r.organisation, r.contact_name, r.contact_info, r.category, r.last_action, r.next_action, r.description]
+        const hay = [r.ref, r.number, r.title, r.organisation, r.contact_name, r.contact_info, r.category, r.last_action, r.next_action, r.description]
           .concat(r.xrefs.map((x) => x.system + ' ' + x.ref), subconNames(r)).join(' ').toLowerCase();
         if (!hay.includes(q)) return false;
       }
@@ -1266,14 +1319,14 @@
     const rows = sortRows(filteredRecords(module), S.sort[module]);
     const cell = csvCell;
     const withSubcons = usesSubcons(module);
-    const header = ['Reference', 'Title', m.org_label, 'Contact name', 'Contact details', m.category_label, 'Status', 'Priority', 'Owner',
+    const header = ['Reference', m.numbered ? m.number_label : 'Number', 'Title', m.org_label, 'Contact name', 'Contact details', m.category_label, 'Status', 'Priority', 'Owner',
       m.amount_label, m.start_label, m.due_label, 'Last action', 'Last action date', 'Next action', 'Next action due',
       'Linked records', 'External references', 'Created', 'Last updated'];
     if (withSubcons) header.push('Subcontractors');
     const lines = [header.map(cell).join(',')];
     rows.forEach((r) => {
       const linked = (S.I.links.get(r.id) || []).map((id) => (S.I.recs.get(id) || S.data.restricted[String(id)] || {}).ref || '').filter(Boolean).join('; ');
-      const values = [r.ref, r.title, r.organisation, r.contact_name, r.contact_info, r.category, r.status, r.priority,
+      const values = [r.ref, r.number || '', r.title, r.organisation, r.contact_name, r.contact_info, r.category, r.status, r.priority,
         r.owner_id === null ? '' : userName(r.owner_id), r.amount === null ? '' : Number(r.amount).toFixed(2), r.start_date, r.due_date,
         r.last_action, r.last_action_date, r.next_action, r.next_action_date, linked,
         r.xrefs.map((x) => x.system + ': ' + x.ref).join('; '), r.created_at, r.updated_at];
@@ -1295,14 +1348,15 @@
   }
 
   function recordBody(v) {
-    return {
+    const body = v.number === undefined ? {} : { number: v.number };
+    return Object.assign(body, {
       title: v.title, organisation: v.organisation, contact_name: v.contact_name, contact_info: v.contact_info,
       category: v.category, status: v.status, priority: v.priority,
       owner_id: v.owner_id === '' ? null : Number(v.owner_id),
       amount: v.amount === '' ? null : Number(v.amount),
       start_date: v.start_date || null, due_date: v.due_date || null, description: v.description,
       next_action: v.next_action, next_action_date: v.next_action_date || null,
-    };
+    });
   }
 
   /** Create (rec = null) or edit a record. opts.prefill, opts.linkTo for "create linked". */
@@ -1311,7 +1365,12 @@
     const p = rec || opts.prefill || {};
     const cats = [{ value: '', label: '—' }].concat(m.categories.map((c) => ({ value: c, label: c })));
     if (rec && rec.category && !m.categories.includes(rec.category)) cats.push({ value: rec.category, label: rec.category });
-    const fields = [
+    const fields = [];
+    if (m.numbered) {
+      fields.push({ name: 'number', label: m.number_label, full: true, maxlength: 60, value: rec ? rec.number : '', placeholder: 'e.g. 24-118',
+        hint: 'Your own tracking number, used to find and refer to this ' + m.singular.toLowerCase() + '. Leave empty to use ' + (rec ? rec.ref : 'the reference InSys issues') + '.' });
+    }
+    fields.push(
       { name: 'title', label: 'Title', required: true, full: true, maxlength: 200, value: p.title },
       { name: 'organisation', label: m.org_label, maxlength: 200, value: p.organisation },
       { name: 'category', label: m.category_label, type: 'select', options: cats, value: p.category || '' },
@@ -1324,8 +1383,7 @@
       { name: 'start_date', label: m.start_label, type: 'date', value: rec ? rec.start_date : '' },
       { name: 'due_date', label: m.due_label, type: 'date', value: rec ? rec.due_date : '' },
       { name: 'description', label: 'Description / notes', type: 'textarea', full: true, rows: 3, value: rec ? rec.description : '' },
-      { type: 'section', label: 'Tracking' },
-    ];
+      { type: 'section', label: 'Tracking' });
     if (!rec) {
       fields.push(
         { name: 'last_action', label: 'Last action taken', full: true, maxlength: 500, placeholder: 'e.g. Sent proposal to client', hint: 'Optional. The most recent thing that was done.' },
@@ -1335,8 +1393,8 @@
       { name: 'next_action', label: 'Next action', full: true, maxlength: 500, placeholder: 'e.g. Follow up by phone', value: rec ? rec.next_action : '' },
       { name: 'next_action_date', label: 'Next action due', type: 'date', value: rec ? rec.next_action_date : '' });
     formDialog({
-      title: rec ? 'Edit ' + rec.ref : 'New ' + m.singular,
-      intro: rec ? 'To record progress, use "Log action" instead - it keeps the history.' : (opts.linkTo ? 'This will be linked to ' + opts.linkTo.ref + '.' : null),
+      title: rec ? 'Edit ' + no(rec) : 'New ' + m.singular,
+      intro: rec ? 'To record progress, use "Log action" instead - it keeps the history.' : (opts.linkTo ? 'This will be linked to ' + no(opts.linkTo) + '.' : null),
       wide: true, fields: fields, submitLabel: rec ? 'Save changes' : 'Create ' + m.singular,
       onSubmit: async (v) => {
         const body = recordBody(v);
@@ -1344,7 +1402,7 @@
           body.version = rec.version;
           await api('PUT', '/api/records/' + rec.id, body);
           await refresh();
-          toast(rec.ref + ' saved.');
+          toast(no(rec) + ' saved.');
         } else {
           body.module = module;
           body.last_action = v.last_action;
@@ -1355,7 +1413,7 @@
             catch (e) { toast('Created, but the link could not be added: ' + e.message, true); }
           }
           await refresh();
-          toast(res.record.ref + ' created.');
+          toast(no(res.record) + ' created.');
           go(viewForModule(module), res.record.ref);
         }
       },
@@ -1365,7 +1423,7 @@
   function logActionForm(rec) {
     const m = mods()[rec.module];
     formDialog({
-      title: 'Log action on ' + rec.ref,
+      title: 'Log action on ' + no(rec),
       intro: 'Record what was done. This becomes the last known action, and the full history is kept.',
       wide: true,
       fields: [
@@ -1383,14 +1441,14 @@
           next_action: v.next_action, next_action_date: v.next_action_date || null,
         });
         await refresh();
-        toast('Action logged on ' + rec.ref + '.');
+        toast('Action logged on ' + no(rec) + '.');
       },
     });
   }
 
   function noteForm(rec) {
     formDialog({
-      title: 'Add note to ' + rec.ref,
+      title: 'Add note to ' + no(rec),
       intro: 'Notes are added to the history. They do not change the last action or status.',
       fields: [{ name: 'text', label: 'Note', type: 'textarea', rows: 4, required: true, full: true, maxlength: 4000 }],
       submitLabel: 'Add note',
@@ -1400,10 +1458,10 @@
 
   function linkForm(rec) {
     const linked = new Set(S.I.links.get(rec.id) || []);
-    const options = S.data.records.filter((r) => r.id !== rec.id && !linked.has(r.id)).map((r) => r.ref + ' — ' + r.title);
+    const options = S.data.records.filter((r) => r.id !== rec.id && !linked.has(r.id)).map(pickLabel);
     if (!options.length) { toast('There are no other records to link to yet.'); return; }
     formDialog({
-      title: 'Link ' + rec.ref + ' to another record',
+      title: 'Link ' + no(rec) + ' to another record',
       intro: 'Links work across every section, so related work can be followed from either side.',
       fields: [{ name: 'target', label: 'Record', required: true, full: true, options: options, placeholder: 'Type a reference or title, e.g. ENQ-0001', hint: 'Start typing and pick from the list.' }],
       submitLabel: 'Link records',
@@ -1435,7 +1493,7 @@
   function createLinkedForm(rec) {
     const choices = S.data.meta.visible_modules.map((key) => ({ value: key, label: mods()[key].singular }));
     formDialog({
-      title: 'Create a record linked to ' + rec.ref,
+      title: 'Create a record linked to ' + no(rec),
       intro: 'For example, turn an enquiry into a project, or raise a finance item for a project. The title, organisation and contact are copied across.',
       fields: [{ name: 'module', label: 'New record type', type: 'select', options: choices, full: true, value: choices[0].value }],
       submitLabel: 'Continue',
@@ -1463,8 +1521,8 @@
     if (!hiddenRecord) {
       fields.push({
         name: 'record', label: 'Linked record (optional)', full: true,
-        options: S.data.records.map((r) => r.ref + ' — ' + r.title),
-        value: rec ? rec.ref + ' — ' + rec.title : '', placeholder: 'Type a reference or title',
+        options: S.data.records.map(pickLabel),
+        value: rec ? pickLabel(rec) : '', placeholder: 'Type a number, reference or title',
       });
     }
     const dlg = formDialog({
@@ -1574,12 +1632,12 @@
       const other = S.I.recs.get(id);
       if (other) {
         return h('li', null,
-          h('div', { class: 'main' }, h('a', { class: 'ref', href: recHref(other), text: other.ref }), ' ', h('span', { text: other.title }),
+          h('div', { class: 'main' }, h('a', { class: 'ref', href: recHref(other), text: no(other) }), ' ', h('span', { text: other.title }),
             h('div', { class: 'small muted', text: mods()[other.module].singular })),
           h('div', { class: 'side' }, statusPill(other),
             h('button', {
-              type: 'button', class: 'btn quiet dangerous', text: 'Unlink', 'aria-label': 'Remove link to ' + other.ref,
-              onclick: () => confirmDialog('Remove this link?', rec.ref + ' and ' + other.ref + ' will no longer be linked. Neither record is deleted.', 'Remove link', async () => {
+              type: 'button', class: 'btn quiet dangerous', text: 'Unlink', 'aria-label': 'Remove link to ' + no(other),
+              onclick: () => confirmDialog('Remove this link?', no(rec) + ' and ' + no(other) + ' will no longer be linked. Neither record is deleted.', 'Remove link', async () => {
                 await api('DELETE', '/api/records/' + rec.id + '/links/' + other.id);
                 await refresh();
               }),
@@ -1608,10 +1666,12 @@
     const hist = S.history.id === rec.id ? S.history.items : null;
     const kindLabel = KIND_LABELS;
 
-    const drawer = h('aside', { class: 'drawer', role: 'dialog', 'aria-label': rec.ref + ' ' + rec.title },
-      top(rec.ref + ' · ' + m.singular, rec.title),
+    const drawer = h('aside', { class: 'drawer', role: 'dialog', 'aria-label': no(rec) + ' ' + rec.title },
+      top(no(rec) + ' · ' + m.singular, rec.title),
       h('div', { class: 'badges' }, statusPill(rec), prioChip(rec.priority),
-        h('span', { class: 'muted small', text: 'Owner: ' + userName(rec.owner_id) })),
+        h('span', { class: 'muted small', text: 'Owner: ' + userName(rec.owner_id) }),
+        rec.number ? h('span', { class: 'muted small', text: '· System ref ' + rec.ref }) : null,
+        m.numbered ? h('button', { type: 'button', class: 'number-set' + (rec.number ? '' : ' unset'), text: rec.number ? 'Change number' : 'Set number', onclick: () => numberForm(rec) }) : null),
       h('div', { class: 'actions' },
         h('button', { type: 'button', class: 'btn primary', text: 'Log action', onclick: () => logActionForm(rec) }),
         h('button', { type: 'button', class: 'btn', text: 'Edit', onclick: () => recordForm(rec.module, rec, {}) }),
@@ -1619,11 +1679,11 @@
         h('button', { type: 'button', class: 'btn', text: 'Add task', onclick: () => taskForm(null, rec) }),
         isAdmin() ? h('button', {
           type: 'button', class: 'btn quiet dangerous', text: 'Delete',
-          onclick: () => confirmDialog('Delete ' + rec.ref + '?', '"' + rec.title + '" will be removed from every list. Its history is kept in the Activity log under "Deleted items", where an administrator can restore it.', 'Delete', async () => {
+          onclick: () => confirmDialog('Delete ' + no(rec) + '?', '"' + rec.title + '" will be removed from every list. Its history is kept in the Activity log under "Deleted items", where an administrator can restore it.', 'Delete', async () => {
             await api('DELETE', '/api/records/' + rec.id);
             go(S.view);
             await refresh();
-            toast(rec.ref + ' deleted.');
+            toast(no(rec) + ' deleted.');
           }, true),
         }) : null),
 
@@ -1643,6 +1703,8 @@
                 : h('span', { class: 'chip none', text: 'No date set' }))])),
 
       card('Details', null, h('div', { class: 'details' },
+        detail(m.number_label || 'Number', rec.number),
+        detail('System reference', rec.number ? rec.ref : ''),
         detail(m.org_label, rec.organisation),
         detail(m.category_label, rec.category),
         detail('Contact name', rec.contact_name),
@@ -1712,7 +1774,7 @@
 
   const eventWho = (e) => (e.actor_id === null || e.actor_id === undefined ? 'InSys' : userName(e.actor_id));
   function eventSubject(e) {
-    if (e.record) return e.record.ref + ' ' + e.record.title + (e.record.deleted ? ' (deleted)' : '');
+    if (e.record) return no(e.record) + ' ' + e.record.title + (e.record.deleted ? ' (deleted)' : '');
     if (e.subcon) return e.subcon.ref + ' ' + e.subcon.name;
     if (e.scope === 'subcons') return 'Subcontractor directory';
     if (e.scope === 'admin') return 'Administration';
@@ -1861,11 +1923,11 @@
   }
 
   function restoreRecord(record) {
-    confirmDialog('Restore ' + record.ref + '?', '"' + record.title + '" will be put back in ' + mods()[record.module].label +
+    confirmDialog('Restore ' + no(record) + '?', '"' + record.title + '" will be put back in ' + mods()[record.module].label +
       ' with its history, links and subcontractors.', 'Restore', async () => {
       await api('POST', '/api/records/' + record.id + '/restore', {});
       await refresh();
-      toast(record.ref + ' restored.');
+      toast(no(record) + ' restored.');
       go(viewForModule(record.module), record.ref);
     });
   }
@@ -1873,9 +1935,9 @@
   function exportLogCsv() {
     const data = S.log.data;
     if (!data) return;
-    const lines = [['Date done', 'Logged at (local time)', 'Who', 'Reference', 'Section', 'Title', 'Item state', 'Type', 'What was done'].map(csvCell).join(',')];
+    const lines = [['Date done', 'Logged at (local time)', 'Who', 'Reference', 'Number', 'Section', 'Title', 'Item state', 'Type', 'What was done'].map(csvCell).join(',')];
     data.entries.forEach((e) => {
-      lines.push([e.day, localStamp(e.at), userName(e.user_id), e.record ? e.record.ref : '', e.record ? mods()[e.record.module].singular : 'Task',
+      lines.push([e.day, localStamp(e.at), userName(e.user_id), e.record ? e.record.ref : '', e.record ? (e.record.number || '') : '', e.record ? mods()[e.record.module].singular : 'Task',
         e.record ? e.record.title : '', e.state === 'deleted' ? 'Deleted' : (e.state === 'closed' ? 'Completed / closed' : 'Open'),
         KIND_LABELS[e.kind] || e.kind, e.text].map(csvCell).join(','));
     });
@@ -1917,12 +1979,12 @@
           item = h('td', { class: 'muted', text: 'Task' });
         } else if (e.state === 'deleted') {
           item = h('td', { class: 'cell-text' },
-            h('span', { class: 'ref', text: r.ref }), ' ', h('span', { class: 'tag', text: 'Deleted' }),
+            h('span', { class: 'ref', text: no(r) }), ' ', h('span', { class: 'tag', text: 'Deleted' }),
             h('div', { class: 'cell-sub', text: r.title }),
-            isAdmin() && e.kind === 'deleted' ? h('button', { type: 'button', class: 'btn quiet', text: 'Restore', 'aria-label': 'Restore ' + r.ref, onclick: () => restoreRecord(r) }) : null);
+            isAdmin() && e.kind === 'deleted' ? h('button', { type: 'button', class: 'btn quiet', text: 'Restore', 'aria-label': 'Restore ' + no(r), onclick: () => restoreRecord(r) }) : null);
         } else {
           item = h('td', { class: 'cell-text' },
-            h('a', { class: 'ref', href: '#/log/' + r.ref, text: r.ref }),
+            h('a', { class: 'ref', href: '#/log/' + r.ref, text: no(r) }),
             e.state === 'closed' ? [' ', h('span', { class: 'tag', text: r.status })] : null,
             h('div', { class: 'cell-sub', text: r.title }));
         }
@@ -2116,7 +2178,7 @@
       }
     });
     dlg.appendChild(h('div', { class: 'dlg-form' },
-      h('div', { class: 'dlg-head' }, h('h2', { text: 'Add subcontractors to ' + rec.ref }),
+      h('div', { class: 'dlg-head' }, h('h2', { text: 'Add subcontractors to ' + no(rec) }),
         h('p', { text: 'Click a subcontractor to add them. You can add as many as are working on this in parallel.' })),
       h('div', { class: 'dlg-body' }, error, search, list),
       h('div', { class: 'dlg-foot split' },
@@ -2135,7 +2197,7 @@
   /** Scope, last known update and next follow-up for one subcontractor on one record. */
   function followUpForm(rec, entry) {
     formDialog({
-      title: entry.sub.name + ' on ' + rec.ref,
+      title: entry.sub.name + ' on ' + no(rec),
       intro: 'Track this subcontractor separately from the ' + mods()[rec.module].singular.toLowerCase() + ' itself: what you last heard from them, and what you need to follow up next.',
       wide: true,
       fields: [
@@ -2180,10 +2242,10 @@
               ? [entry.next_action || 'Follow up', ' ', entry.next_action_date ? (open ? dueChip(entry.next_action_date) : h('span', { class: 'muted', text: fmtDate(entry.next_action_date) })) : h('span', { class: 'chip none', text: 'No date set' })]
               : h('span', { class: 'muted', text: 'none set' }))),
         h('div', { class: 'side' },
-          h('button', { type: 'button', class: 'btn small', text: 'Update', 'aria-label': 'Update ' + entry.sub.name + ' on ' + rec.ref, onclick: () => followUpForm(rec, entry) }),
+          h('button', { type: 'button', class: 'btn small', text: 'Update', 'aria-label': 'Update ' + entry.sub.name + ' on ' + no(rec), onclick: () => followUpForm(rec, entry) }),
           h('button', {
-            type: 'button', class: 'btn quiet dangerous', text: 'Remove', 'aria-label': 'Remove ' + entry.sub.name + ' from ' + rec.ref,
-            onclick: () => confirmDialog('Remove ' + entry.sub.name + '?', entry.sub.name + ' will be taken off ' + rec.ref + '. They stay in the directory.', 'Remove', async () => {
+            type: 'button', class: 'btn quiet dangerous', text: 'Remove', 'aria-label': 'Remove ' + entry.sub.name + ' from ' + no(rec),
+            onclick: () => confirmDialog('Remove ' + entry.sub.name + '?', entry.sub.name + ' will be taken off ' + no(rec) + '. They stay in the directory.', 'Remove', async () => {
               await api('DELETE', '/api/records/' + rec.id + '/subcons/' + entry.sub.id);
               await refresh();
             }),
@@ -2196,7 +2258,7 @@
       const f = followUp(x);
       return h('li', null,
         h('div', { class: 'main' },
-          h('a', { class: 'ref', href: recHref(x.rec), text: x.rec.ref }), ' ', h('span', { class: 'cell-title', text: x.rec.title }),
+          h('a', { class: 'ref', href: recHref(x.rec), text: no(x.rec) }), ' ', h('span', { class: 'cell-title', text: x.rec.title }),
           h('div', { class: 'small muted', text: [mods()[x.rec.module].singular, x.rec.organisation, x.scope ? 'Scope: ' + x.scope : '', 'Owner: ' + userName(x.rec.owner_id)].filter(Boolean).join(' · ') }),
           x.last_update ? h('div', { class: 'small', text: 'Last update: ' + x.last_update + ' (' + fmtDate(x.last_update_date) + ')' }) : null,
           isOpen(x.rec) ? h('div', { class: 'small', text: f.text ? (f.own ? 'Follow-up: ' : 'Next: ') + f.text : 'No next action set' }) : null),
@@ -2268,9 +2330,9 @@
       const f = work.top ? followUp(work.top) : null;
       lines.push([sub.ref, sub.name, sub.discipline, sub.capabilities, sub.active ? 'Active' : 'Inactive', sub.contact_name, sub.phone, sub.email, sub.website,
         sub.registration, sub.address, sub.services, sub.notes, n('project'), n('enquiry'), n('eoi'),
-        work.open.map((x) => x.rec.ref).join('; '),
-        work.open.map((x) => x.rec.ref + ': ' + (x.rec.organisation || 'no client recorded')).join('; '),
-        work.top ? work.top.rec.ref + ': ' + (f.text || 'no next action set') : '',
+        work.open.map((x) => no(x.rec)).join('; '),
+        work.open.map((x) => no(x.rec) + ': ' + (x.rec.organisation || 'no client recorded')).join('; '),
+        work.top ? no(work.top.rec) + ': ' + (f.text || 'no next action set') : '',
         f ? f.date : ''].map(csvCell).join(','));
     });
     saveCsv('insys-subcontractors-' + today() + '.csv', lines);
@@ -2286,7 +2348,7 @@
       title: 'Add ' + plural(subs.length, 'subcontractor') + ' to…',
       intro: subs.map((sub) => sub.name).join(', '),
       fields: [{ name: 'record', label: 'Enquiry, expression of interest or project', required: true, full: true,
-        options: records.map((r) => r.ref + ' — ' + r.title), placeholder: 'Type a reference or title, e.g. ENQ-0004',
+        options: records.map(pickLabel), placeholder: 'Type a number, reference or title',
         hint: 'Start typing and pick from the list. Open items only.' }],
       submitLabel: 'Add to this item',
       onSubmit: async (v) => {
@@ -2299,7 +2361,7 @@
           await api('POST', '/api/records/' + rec.id + '/subcons', { subcon_id: sub.id });
         }
         await refresh();
-        toast(fresh.length ? plural(fresh.length, 'subcontractor') + ' added to ' + rec.ref + '.' : 'They were already on ' + rec.ref + '.');
+        toast(fresh.length ? plural(fresh.length, 'subcontractor') + ' added to ' + no(rec) + '.' : 'They were already on ' + no(rec) + '.');
         if (after) after();
         go(viewForModule(rec.module), rec.ref);
       },
@@ -2326,7 +2388,7 @@
         if (f.status === 'engaged' && !work.get(sub.id).open.length) return false;
         if (!q) return true;
         // Also match on the work they are doing, so "PRJ-0003" or a client's name finds its subcontractors.
-        return (subconHay(sub) + ' ' + work.get(sub.id).all.map((x) => x.rec.ref + ' ' + x.rec.title + ' ' + x.rec.organisation).join(' ').toLowerCase()).includes(q);
+        return (subconHay(sub) + ' ' + work.get(sub.id).all.map((x) => x.rec.ref + ' ' + x.rec.number + ' ' + x.rec.title + ' ' + x.rec.organisation).join(' ').toLowerCase()).includes(q);
       });
     };
 
@@ -2339,7 +2401,7 @@
         } else if (f.sort === 'busy' && wa.open.length !== wb.open.length) {
           return wb.open.length - wa.open.length;
         }
-        return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+        return TEXT_ORDER.compare(a.name, b.name) || (a.id - b.id);
       });
       if (!rows.length) {
         return h('div', { class: 'table-wrap' }, h('div', { class: 'empty', text: subs.length
@@ -2364,12 +2426,12 @@
               ? [h('div', { text: workSummary(w.open) }),
                 // Each item with the company, client or enquirer it is for; click the reference for the rest.
                 h('ul', { class: 'work-clients' }, w.open.slice(0, WORK_LINES).map((x) => h('li', null,
-                  h('a', { href: recHref(x.rec), text: x.rec.ref, title: x.rec.title }), ' ',
+                  h('a', { href: recHref(x.rec), text: no(x.rec), title: x.rec.title }), ' ',
                   x.rec.organisation ? h('span', { text: x.rec.organisation }) : h('span', { class: 'muted', text: 'No client recorded' })))),
                 w.open.length > WORK_LINES ? h('div', { class: 'cell-sub', text: 'and ' + (w.open.length - WORK_LINES) + ' more - open the subcontractor to see all' }) : null]
               : h('span', { class: 'muted', text: 'None' })),
             h('td', { class: 'cell-text' }, w.top
-              ? [h('div', { class: 'cell-sub' }, h('a', { class: 'ref', href: recHref(w.top.rec), text: w.top.rec.ref }), ' ', w.top.rec.title,
+              ? [h('div', { class: 'cell-sub' }, h('a', { class: 'ref', href: recHref(w.top.rec), text: no(w.top.rec) }), ' ', w.top.rec.title,
                 w.top.rec.organisation ? ' · ' + w.top.rec.organisation : ''),
                 followUpCell(w.top), ' ', prioChip(w.top.rec.priority)]
               : h('span', { class: 'muted', text: '—' })));
@@ -2391,7 +2453,7 @@
           h('td', { class: 'cell-text' }, h('a', { class: 'cell-title', href: subHref(x.sub), text: x.sub.name }),
             h('div', { class: 'cell-sub', text: [x.sub.discipline, x.scope].filter(Boolean).join(' · ') })),
           h('td', { class: 'cell-text' }, x.last_update ? [h('div', { text: x.last_update }), h('div', { class: 'cell-sub', text: fmtDate(x.last_update_date) })] : h('span', { class: 'muted', text: '—' })),
-          h('td', null, h('a', { class: 'ref', href: recHref(x.rec), text: x.rec.ref })),
+          h('td', null, h('a', { class: 'ref', href: recHref(x.rec), text: no(x.rec) })),
           h('td', { class: 'nowrap', text: mods()[x.rec.module].singular }),
           h('td', { class: 'cell-text' }, h('div', { class: 'cell-title', text: x.rec.title }),
             x.rec.organisation ? h('div', { class: 'cell-sub', text: x.rec.organisation }) : null),
@@ -2529,7 +2591,7 @@
     if (!q) { host.hidden = true; host.replaceChildren(); return; }
     const hits = [];
     for (const r of S.data.records) {
-      const refHit = r.ref.toLowerCase().includes(q);
+      const refHit = r.ref.toLowerCase().includes(q) || (r.number || '').toLowerCase().includes(q);
       const xref = r.xrefs.find((x) => (x.system + ' ' + x.ref).toLowerCase().includes(q));
       const textHit = [r.title, r.organisation, r.contact_name, r.contact_info].join(' ').toLowerCase().includes(q);
       const subHit = !refHit && !xref && !textHit && subconNames(r).toLowerCase().includes(q);
@@ -2555,8 +2617,8 @@
         go(viewForModule(x.r.module), x.r.ref);
       },
     },
-    h('span', { class: 'ref', text: x.r.ref }), ' ', h('span', { text: x.r.title }),
-    h('div', { class: 'meta', text: [mods()[x.r.module].singular, x.r.status, x.r.organisation, x.xref ? x.xref.system + ' ' + x.xref.ref : '',
+    h('span', { class: 'ref', text: no(x.r) }), ' ', h('span', { text: x.r.title }),
+    h('div', { class: 'meta', text: [mods()[x.r.module].singular, x.r.number ? x.r.ref : '', x.r.status, x.r.organisation, x.xref ? x.xref.system + ' ' + x.xref.ref : '',
       x.rank === 3 ? 'Subcon: ' + subconNames(x.r) : ''].filter(Boolean).join(' · ') }))));
     host.replaceChildren(...(shown.length ? shown : [h('div', { class: 'none', text: 'Nothing matches "' + text.trim() + '".' })]));
     host.hidden = false;

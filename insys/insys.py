@@ -42,7 +42,7 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-VERSION = "1.2.3"
+VERSION = "1.2.4"
 
 # The database layout this version reads and writes. Version 1 is InSys 1.0.0;
 # version 2 (InSys 1.1.x) adds the subcontractor directory; version 3 (InSys
@@ -50,8 +50,9 @@ VERSION = "1.2.3"
 # per-subcontractor follow-up tracking. An older database is upgraded in place
 # on start-up, after a backup copy has been made. Upgrades only ever add tables
 # and columns; nothing existing is altered or removed. Version 4 (InSys 1.2.1)
-# adds the updates feed behind the notification banners and bell.
-SCHEMA_VERSION = 4
+# adds the updates feed behind the notification banners and bell. Version 5
+# (InSys 1.2.4) adds the user's own tracking number to records.
+SCHEMA_VERSION = 5
 
 MAX_UPLOAD = 300 * 1024 * 1024  # a transferred database file
 MIN_PYTHON = (3, 9)
@@ -108,6 +109,8 @@ MODULES = {
         "start_label": "Start date",
         "due_label": "Target completion",
         "amount_label": "Project value",
+        "numbered": True,
+        "number_label": "Project number",
     },
     "enquiry": {
         "label": "Enquiries",
@@ -129,6 +132,8 @@ MODULES = {
         "start_label": "Date received",
         "due_label": "Respond by",
         "amount_label": "Estimated value",
+        "numbered": True,
+        "number_label": "Enquiry number",
     },
     "eoi": {
         "label": "Expressions of Interest",
@@ -151,6 +156,8 @@ MODULES = {
         "start_label": "Date issued",
         "due_label": "Submission deadline",
         "amount_label": "Estimated value",
+        "numbered": True,
+        "number_label": "EOI number",
     },
     "finance": {
         "label": "Finance",
@@ -175,6 +182,8 @@ MODULES = {
         "start_label": "Document date",
         "due_label": "Payment due",
         "amount_label": "Amount",
+        "numbered": False,
+        "number_label": "",
     },
     "office": {
         "label": "Office Admin",
@@ -196,6 +205,8 @@ MODULES = {
         "start_label": "Date raised",
         "due_label": "Needed by",
         "amount_label": "Cost",
+        "numbered": False,
+        "number_label": "",
     },
 }
 
@@ -583,7 +594,8 @@ CREATE TABLE IF NOT EXISTS records (
     updated_at TEXT NOT NULL,
     version INTEGER NOT NULL DEFAULT 1,
     deleted_at TEXT,
-    deleted_by INTEGER
+    deleted_by INTEGER,
+    number TEXT NOT NULL DEFAULT ''
 );
 CREATE INDEX IF NOT EXISTS idx_records_module ON records(module);
 CREATE TABLE IF NOT EXISTS activity (
@@ -699,6 +711,7 @@ CREATE TABLE IF NOT EXISTS audit (
 ADDED_COLUMNS = [
     ("records", "deleted_at", "TEXT"),
     ("records", "deleted_by", "INTEGER"),
+    ("records", "number", "TEXT NOT NULL DEFAULT ''"),
     ("tasks", "deleted_at", "TEXT"),
     ("tasks", "deleted_by", "INTEGER"),
     ("subcons", "capabilities", "TEXT NOT NULL DEFAULT ''"),
@@ -1066,9 +1079,19 @@ def next_ref(conn, module):
 # Record field handling
 # ---------------------------------------------------------------------------
 
-RECORD_FIELDS = ["title", "organisation", "contact_name", "contact_info", "category",
+RECORD_FIELDS = ["number", "title", "organisation", "contact_name", "contact_info", "category",
                  "status", "priority", "owner_id", "amount", "start_date", "due_date",
                  "description", "next_action", "next_action_date"]
+
+
+def check_number_free(conn, module, number, own_id=None):
+    """A tracking number may be used by only one live item in its section."""
+    row = conn.execute(
+        "SELECT id, ref, title FROM records WHERE module = ? AND deleted_at IS NULL "
+        "AND number = ? COLLATE NOCASE AND id != ?", (module, number, own_id or 0)).fetchone()
+    if row is not None:
+        raise ApiError(400, "%s '%s' is already used by %s (%s)."
+                       % (MODULES[module]["number_label"], number, row["ref"], row["title"]))
 
 
 def parse_record_fields(conn, body, module, existing=None):
@@ -1081,6 +1104,13 @@ def parse_record_fields(conn, body, module, existing=None):
     def present(key):
         return creating or key in body
 
+    if cfg["numbered"] and present("number"):
+        # The user's own tracking number, shown in place of the system reference.
+        # Optional; where given it must identify one item in its section.
+        number = text_field(body, "number", cfg["number_label"], 60)
+        if number:
+            check_number_free(conn, module, number, existing["id"] if existing is not None else None)
+        out["number"] = number
     if present("title"):
         out["title"] = text_field(body, "title", "Title", 200, required=True)
     if present("organisation"):
@@ -1127,6 +1157,7 @@ def parse_record_fields(conn, body, module, existing=None):
 def describe_changes(conn, module, old, new):
     cfg = MODULES[module]
     labels = {
+        "number": cfg["number_label"] or "Number",
         "title": "Title", "organisation": cfg["org_label"], "contact_name": "Contact name",
         "contact_info": "Contact details", "category": cfg["category_label"],
         "status": "Status", "priority": "Priority", "owner_id": "Owner",
@@ -1346,7 +1377,7 @@ def h_activity(ctx):
     with read_db() as conn:
         rows = conn.execute(
             "SELECT a.id, a.at, a.user_id, a.kind, a.text, a.action_date, "
-            "r.id AS record_id, r.ref, r.title, r.module "
+            "r.id AS record_id, r.ref, r.number, r.title, r.module "
             "FROM activity a JOIN records r ON r.id = a.record_id "
             "WHERE r.module IN (%s) AND r.deleted_at IS NULL ORDER BY a.id DESC LIMIT 40" % marks,
             mods).fetchall()
@@ -1362,7 +1393,8 @@ def visible_events(conn, user):
     (row, show_record): show_record is False when the user may know about a
     task but not about the record it is attached to."""
     rows = conn.execute(
-        "SELECT e.*, r.ref AS r_ref, r.title AS r_title, r.module AS r_module, r.deleted_at AS r_deleted, "
+        "SELECT e.*, r.ref AS r_ref, r.number AS r_number, r.title AS r_title, r.module AS r_module, "
+        "r.deleted_at AS r_deleted, "
         "t.assignee_id AS t_assignee, t.created_by AS t_creator, s.ref AS s_ref, s.name AS s_name "
         "FROM events e LEFT JOIN records r ON r.id = e.record_id LEFT JOIN tasks t ON t.id = e.task_id "
         "LEFT JOIN subcons s ON s.id = e.subcon_id ORDER BY e.id DESC LIMIT ?", (EVENT_WINDOW,)).fetchall()
@@ -1409,8 +1441,8 @@ def h_events(ctx):
                 "kind": e["kind"], "text": e["text"], "unread": e["id"] > seen,
                 "record": None, "subcon": None, "task": e["task_id"] is not None}
         if show_record:
-            item["record"] = {"id": e["record_id"], "ref": e["r_ref"], "title": e["r_title"],
-                              "module": e["r_module"], "deleted": bool(e["r_deleted"])}
+            item["record"] = {"id": e["record_id"], "ref": e["r_ref"], "number": e["r_number"],
+                              "title": e["r_title"], "module": e["r_module"], "deleted": bool(e["r_deleted"])}
         if e["scope"] == "subcons" and e["s_ref"]:
             item["subcon"] = {"ref": e["s_ref"], "name": e["s_name"]}
         events.append(item)
@@ -1456,7 +1488,7 @@ def h_log(ctx):
         names = {r["id"]: r["full_name"] for r in conn.execute("SELECT id, full_name FROM users")}
         rows = conn.execute(
             "SELECT a.id, a.at, a.user_id, a.kind, a.text, a.action_date, r.id AS record_id, r.ref, "
-            "r.title, r.module, r.status, r.deleted_at FROM activity a JOIN records r "
+            "r.number, r.title, r.module, r.status, r.deleted_at FROM activity a JOIN records r "
             "ON r.id = a.record_id WHERE r.module IN (%s)" % marks, mods).fetchall()
         loose_tasks = conn.execute(
             "SELECT * FROM tasks WHERE record_id IS NULL "
@@ -1469,8 +1501,8 @@ def h_log(ctx):
         entries.append({
             "id": "a%d" % r["id"], "day": day, "at": r["at"], "user_id": r["user_id"], "kind": r["kind"],
             "text": r["text"], "state": state,
-            "record": {"id": r["record_id"], "ref": r["ref"], "title": r["title"], "module": r["module"],
-                       "status": r["status"]}})
+            "record": {"id": r["record_id"], "ref": r["ref"], "number": r["number"], "title": r["title"],
+                       "module": r["module"], "status": r["status"]}})
     # Tasks that are not attached to a record have no record history to appear in.
     for t in loose_tasks:
         if not (user["role"] == "admin" or user["id"] in (t["assignee_id"], t["created_by"])):
@@ -1495,7 +1527,8 @@ def h_log(ctx):
         if q:
             record = entry["record"]
             hay = " ".join([entry["text"], names.get(entry["user_id"], ""),
-                            record["ref"] if record else "", record["title"] if record else "",
+                            record["ref"] if record else "", record["number"] if record else "",
+                            record["title"] if record else "",
                             MODULES[record["module"]]["singular"] if record else "Task"]).lower()
             if q not in hay:
                 return False
@@ -1579,6 +1612,9 @@ def h_record_delete(ctx):
 def h_record_restore(ctx):
     with write_db() as conn:
         row = get_record(conn, ctx.arg(), ctx.user, deleted=True)
+        if row["number"]:
+            # Its number may have been given to another item while it was deleted.
+            check_number_free(conn, row["module"], row["number"], row["id"])
         conn.execute("UPDATE records SET deleted_at = NULL, deleted_by = NULL, version = version + 1 "
                      "WHERE id = ?", (row["id"],))
         add_activity(conn, row["id"], ctx.user, "restored",
