@@ -18,6 +18,7 @@ the data lives in an "InSys-data" folder next to InSys.exe.
 
 import argparse
 import atexit
+import base64
 import datetime
 import hashlib
 import hmac
@@ -44,7 +45,12 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-VERSION = "1.2.5"
+try:
+    import ssl
+except ImportError:   # a Python built without OpenSSL: choice 2 will refuse to start
+    ssl = None
+
+VERSION = "1.2.6"
 
 # The database layout this version reads and writes. Version 1 is InSys 1.0.0;
 # version 2 (InSys 1.1.x) adds the subcontractor directory; version 3 (InSys
@@ -75,6 +81,11 @@ DEFAULT_PORT = 8080
 MAX_BODY = 1024 * 1024  # 1 MB per request is plenty for a tracker
 
 SESSION_COOKIE = "insys_session"
+# The cookie used on the encrypted local network. The "__Host-" beginning makes
+# a browser refuse to set it, or send it, over anything but HTTPS.
+SECURE_SESSION_COOKIE = "__Host-insys_session"
+TLS_HANDSHAKE_SECONDS = 20
+CERTIFICATE_PATH = "/InSys-certificate.crt"
 SESSION_IDLE_SECONDS = 12 * 3600
 SESSION_MAX_SECONDS = 7 * 24 * 3600
 SESSION_TOUCH_SECONDS = 60
@@ -260,7 +271,13 @@ STATIC_FILES = {
     "/styles.css": ("styles.css", "text/css; charset=utf-8"),
     "/favicon.svg": ("favicon.svg", "image/svg+xml"),
     "/robots.txt": ("robots.txt", "text/plain; charset=utf-8"),
+    "/connect": ("connect.html", "text/html; charset=utf-8"),
+    "/connect.js": ("connect.js", "text/javascript; charset=utf-8"),
 }
+# What a browser that arrived without encryption may fetch: the set-up page and its parts.
+CONNECT_FILES = ("/connect", "/connect.js", "/styles.css", "/favicon.svg", "/robots.txt")
+CONNECT_POLICY = ("default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; "
+                  "connect-src 'self' %s; form-action 'none'; base-uri 'none'; frame-ancestors 'none'")
 
 
 # ---------------------------------------------------------------------------
@@ -290,6 +307,11 @@ class Runtime:
         # that lets the internet in, or goes out to it, is conditional on this.
         self.tunnel_active = False
         self.local_names = set()   # names this computer answers to on the local network
+        # Encryption for the local network (an Encryption object) while InSys is
+        # running in choice 2; None in choices 1 and 3, where nothing InSys
+        # serves itself crosses a network.
+        self.tls = None
+        self.lan_ips = []          # this computer's local network addresses, found at start
 
     @property
     def db_path(self):
@@ -1251,7 +1273,7 @@ def h_login(ctx):
                      (now - SESSION_IDLE_SECONDS, now - SESSION_MAX_SECONDS))
         conn.execute(
             "INSERT INTO sessions (token_hash, user_id, csrf, created_at, last_seen) VALUES (?,?,?,?,?)",
-            (hashlib.sha256(token.encode()).hexdigest(), row["id"], csrf, now, now))
+            (session_hash(token, ctx.handler.channel()), row["id"], csrf, now, now))
         conn.execute("UPDATE users SET last_login = ? WHERE id = ?", (now_iso(), row["id"]))
         audit(conn, "login_ok", "", user=row, ip=ip)
     ctx.handler.set_session_cookie(token)
@@ -2196,7 +2218,27 @@ def h_admin_system(ctx):
         "platform": platform.system(),
         "packaged": PACKAGED,
         "mode": "online" if RT.tunnel_active else ("lan" if RT.lan else "local"),
+        "encryption": encryption_status(),
     }
+
+
+def encryption_status():
+    """For Admin, System: whether the local network is encrypted, the addresses
+    to give people, and the certificate each device installs once."""
+    data = stored_certificate()
+    status = {"on": RT.tls is not None and not RT.tunnel_active,
+              "certificate": describe_certificate(data) if data else None,
+              "certificate_url": CERTIFICATE_PATH, "addresses": [], "setup_addresses": []}
+    if status["on"]:
+        shown = [a for a in RT.lan_ips if a in RT.tls.covered]
+        shown += [a for a in RT.tls.addresses if a not in shown and not is_loopback(a)]
+        for address in shown:
+            where = "[%s]:%d" % (address, RT.port) if ":" in address else "%s:%d" % (address, RT.port)
+            status["addresses"].append("https://" + where)
+            status["setup_addresses"].append("http://" + where)
+        status["addresses"] += ["https://%s:%d" % (name, RT.port) for name in RT.tls.names
+                                if name != "localhost"][:1]
+    return status
 
 
 def h_admin_settings(ctx):
@@ -2368,6 +2410,725 @@ NO_TOUCH_PATHS = ("/api/version",)
 
 
 # ---------------------------------------------------------------------------
+# Encryption on the local network
+# ---------------------------------------------------------------------------
+# In choice 2 everything that crosses the network is carried over HTTPS (TLS),
+# done by the OpenSSL library that ships with Python. A local network has no
+# public authority to vouch for this computer, so InSys keeps its own:
+#
+#   * a "local certificate" (a certificate authority), made once and kept in
+#     the data folder. This is the file each device installs, once. It is
+#     marked so that it can vouch only for addresses on private networks and
+#     for local names - never for a public website;
+#   * a server certificate signed by it, replaced automatically when it nears
+#     its end or when this computer's address changes, so that a device never
+#     has to install anything a second time.
+#
+# Python's standard library can use certificates but cannot create them, so
+# the arithmetic needed to create and sign one (ECDSA on the P-256 curve, with
+# the nonce of RFC 6979) is written out below. It runs only at the moment a
+# certificate is made, on this computer, never in answer to a request. The
+# encryption of the connections themselves is entirely OpenSSL's.
+
+EC_P = 0xFFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF
+EC_N = 0xFFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551
+EC_B = 0x5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B
+EC_G = (0x6B17D1F2E12C4247F8BCE6E563A440F277037D812DEB33A0F4A13945D898C296,
+        0x4FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5)
+
+
+def ec_on_curve(point):
+    x, y = point
+    return 0 <= x < EC_P and 0 <= y < EC_P and (y * y - (x * x * x - 3 * x + EC_B)) % EC_P == 0
+
+
+def _ec_double(point):
+    if point is None:
+        return None
+    x, y, z = point
+    if y == 0:
+        return None
+    delta = z * z % EC_P
+    gamma = y * y % EC_P
+    beta = x * gamma % EC_P
+    alpha = 3 * (x - delta) * (x + delta) % EC_P
+    x3 = (alpha * alpha - 8 * beta) % EC_P
+    z3 = ((y + z) * (y + z) - gamma - delta) % EC_P
+    y3 = (alpha * (4 * beta - x3) - 8 * gamma * gamma) % EC_P
+    return x3, y3, z3
+
+
+def _ec_add(p1, p2):
+    if p1 is None:
+        return p2
+    if p2 is None:
+        return p1
+    x1, y1, z1 = p1
+    x2, y2, z2 = p2
+    z1z1 = z1 * z1 % EC_P
+    z2z2 = z2 * z2 % EC_P
+    u1 = x1 * z2z2 % EC_P
+    u2 = x2 * z1z1 % EC_P
+    s1 = y1 * z2 * z2z2 % EC_P
+    s2 = y2 * z1 * z1z1 % EC_P
+    if u1 == u2:
+        return _ec_double(p1) if s1 == s2 else None
+    h = (u2 - u1) % EC_P
+    r = (s2 - s1) % EC_P
+    h2 = h * h % EC_P
+    h3 = h * h2 % EC_P
+    v = u1 * h2 % EC_P
+    x3 = (r * r - h3 - 2 * v) % EC_P
+    y3 = (r * (v - x3) - s1 * h3) % EC_P
+    z3 = h * z1 * z2 % EC_P
+    return x3, y3, z3
+
+
+def _ec_affine(point):
+    if point is None:
+        return None
+    x, y, z = point
+    inverse = pow(z, -1, EC_P)
+    square = inverse * inverse % EC_P
+    return x * square % EC_P, y * square * inverse % EC_P
+
+
+def _ec_combine(k1, point1, k2=0, point2=None):
+    """k1*point1 + k2*point2, the points given as (x, y)."""
+    result = None
+    first = (point1[0], point1[1], 1)
+    second = (point2[0], point2[1], 1) if point2 is not None else None
+    for bit in range(max(k1.bit_length(), k2.bit_length()) - 1, -1, -1):
+        result = _ec_double(result)
+        if (k1 >> bit) & 1:
+            result = _ec_add(result, first)
+        if second is not None and (k2 >> bit) & 1:
+            result = _ec_add(result, second)
+    return _ec_affine(result)
+
+
+def ec_new_key():
+    return secrets.randbelow(EC_N - 1) + 1
+
+
+def ec_public(private):
+    point = _ec_combine(private, EC_G)
+    if point is None or not ec_on_curve(point):
+        raise ValueError("key arithmetic failed")
+    return point
+
+
+def ec_point_bytes(point):
+    return b"\x04" + point[0].to_bytes(32, "big") + point[1].to_bytes(32, "big")
+
+
+def ec_point_from_bytes(data):
+    if len(data) != 65 or data[0] != 4:
+        raise ValueError("not a P-256 public key")
+    point = (int.from_bytes(data[1:33], "big"), int.from_bytes(data[33:], "big"))
+    if not ec_on_curve(point):
+        raise ValueError("not a P-256 public key")
+    return point
+
+
+def _rfc6979_nonces(private, digest):
+    """The deterministic nonces of RFC 6979 for P-256 with SHA-256."""
+    def mac(key, data):
+        return hmac.new(key, data, hashlib.sha256).digest()
+    secret = private.to_bytes(32, "big")
+    reduced = (int.from_bytes(digest, "big") % EC_N).to_bytes(32, "big")
+    v = b"\x01" * 32
+    k = mac(b"\x00" * 32, v + b"\x00" + secret + reduced)
+    v = mac(k, v)
+    k = mac(k, v + b"\x01" + secret + reduced)
+    v = mac(k, v)
+    while True:
+        v = mac(k, v)
+        candidate = int.from_bytes(v, "big")
+        if 1 <= candidate < EC_N:
+            yield candidate
+        k = mac(k, v + b"\x00")
+        v = mac(k, v)
+
+
+def ecdsa_sign(private, message):
+    digest = hashlib.sha256(message).digest()
+    e = int.from_bytes(digest, "big")
+    for nonce in _rfc6979_nonces(private, digest):
+        point = _ec_combine(nonce, EC_G)
+        r = point[0] % EC_N
+        s = pow(nonce, -1, EC_N) * (e + r * private) % EC_N
+        if r and s:
+            return r, s
+
+
+def ecdsa_verify(public, message, signature):
+    r, s = signature
+    if not (1 <= r < EC_N and 1 <= s < EC_N and ec_on_curve(public)):
+        return False
+    e = int.from_bytes(hashlib.sha256(message).digest(), "big")
+    w = pow(s, -1, EC_N)
+    point = _ec_combine(e * w % EC_N, EC_G, r * w % EC_N, public)
+    return point is not None and point[0] % EC_N == r
+
+
+# ---- DER, the encoding certificates are written in --------------------------
+
+def der(tag, content):
+    size = len(content)
+    if size < 128:
+        return bytes([tag, size]) + content
+    length = size.to_bytes((size.bit_length() + 7) // 8, "big")
+    return bytes([tag, 0x80 | len(length)]) + length + content
+
+
+def der_seq(*parts):
+    return der(0x30, b"".join(parts))
+
+
+def der_int(value):
+    return der(0x02, value.to_bytes(value.bit_length() // 8 + 1, "big"))
+
+
+def der_oid(dotted):
+    numbers = [int(part) for part in dotted.split(".")]
+    out = bytearray([numbers[0] * 40 + numbers[1]])
+    for number in numbers[2:]:
+        chunk = [number & 0x7F]
+        number >>= 7
+        while number:
+            chunk.append(0x80 | (number & 0x7F))
+            number >>= 7
+        out.extend(reversed(chunk))
+    return der(0x06, bytes(out))
+
+
+def der_time(moment):
+    if 1950 <= moment.year < 2050:
+        return der(0x17, moment.strftime("%y%m%d%H%M%SZ").encode("ascii"))
+    return der(0x18, moment.strftime("%Y%m%d%H%M%SZ").encode("ascii"))
+
+
+def der_items(data):
+    """The items in a run of DER values, each as (tag, content, whole item)."""
+    items = []
+    pos = 0
+    while pos < len(data):
+        if pos + 2 > len(data):
+            raise ValueError("truncated")
+        tag = data[pos]
+        size = data[pos + 1]
+        start = pos + 2
+        if size & 0x80:
+            count = size & 0x7F
+            if count == 0 or count > 4 or start + count > len(data):
+                raise ValueError("bad length")
+            size = int.from_bytes(data[start:start + count], "big")
+            start += count
+        end = start + size
+        if end > len(data):
+            raise ValueError("truncated")
+        items.append((tag, data[start:end], data[pos:end]))
+        pos = end
+    return items
+
+
+def pem_encode(label, data):
+    text = base64.b64encode(data).decode("ascii")
+    lines = [text[i:i + 64] for i in range(0, len(text), 64)]
+    return "-----BEGIN %s-----\n%s\n-----END %s-----\n" % (label, "\n".join(lines), label)
+
+
+def pem_decode(label, text):
+    match = re.search(r"-----BEGIN %s-----(.*?)-----END %s-----" % (label, label), text, re.S)
+    if not match:
+        raise ValueError("no %s found" % label)
+    return base64.b64decode("".join(match.group(1).split()), validate=True)
+
+
+OID_EC_KEY = der_oid("1.2.840.10045.2.1")
+OID_P256 = der_oid("1.2.840.10045.3.1.7")
+OID_ECDSA_SHA256 = der_oid("1.2.840.10045.4.3.2")
+OID_COMMON_NAME = der_oid("2.5.4.3")
+OID_ORGANISATION = der_oid("2.5.4.10")
+OID_SUBJECT_KEY_ID = der_oid("2.5.29.14")
+OID_KEY_USAGE = der_oid("2.5.29.15")
+OID_ALT_NAME = der_oid("2.5.29.17")
+OID_BASIC_CONSTRAINTS = der_oid("2.5.29.19")
+OID_NAME_CONSTRAINTS = der_oid("2.5.29.30")
+OID_AUTHORITY_KEY_ID = der_oid("2.5.29.35")
+OID_EXT_KEY_USAGE = der_oid("2.5.29.37")
+OID_SERVER_AUTH = der_oid("1.3.6.1.5.5.7.3.1")
+SIGNATURE_ALGORITHM = der_seq(OID_ECDSA_SHA256)
+
+
+def x509_name(common_name):
+    return der_seq(
+        der(0x31, der_seq(OID_ORGANISATION, der(0x0C, b"InSys"))),
+        der(0x31, der_seq(OID_COMMON_NAME, der(0x0C, common_name.encode("utf-8")))))
+
+
+def x509_extension(oid, value, critical=False):
+    return der_seq(oid, der(0x01, b"\xff") if critical else b"", der(0x04, value))
+
+
+def general_name(value):
+    """A DNS name or an IP address (or, for a constraint, a network) as X.509 writes it."""
+    if isinstance(value, (ipaddress.IPv4Network, ipaddress.IPv6Network)):
+        return der(0x87, value.network_address.packed + value.netmask.packed)
+    if isinstance(value, (ipaddress.IPv4Address, ipaddress.IPv6Address)):
+        return der(0x87, value.packed)
+    return der(0x82, value.encode("ascii"))
+
+
+def key_identifier(public):
+    return hashlib.sha1(ec_point_bytes(public)).digest()
+
+
+def build_certificate(signing_key, issuer, subject, public, not_before, not_after, extensions):
+    tbs = der_seq(
+        der(0xA0, der_int(2)),                                    # version 3
+        der_int(int.from_bytes(secrets.token_bytes(16), "big") >> 1 | 1),   # serial number
+        SIGNATURE_ALGORITHM, issuer,
+        der_seq(der_time(not_before), der_time(not_after)),
+        subject,
+        der_seq(der_seq(OID_EC_KEY, OID_P256), der(0x03, b"\x00" + ec_point_bytes(public))),
+        der(0xA3, der_seq(*extensions)))
+    r, s = ecdsa_sign(signing_key, tbs)
+    return der_seq(tbs, SIGNATURE_ALGORITHM, der(0x03, b"\x00" + der_seq(der_int(r), der_int(s))))
+
+
+def read_certificate(data):
+    """The parts of a certificate InSys needs to read back. Raises ValueError."""
+    try:
+        (tag, body, _), = der_items(data)
+        tbs, _, signature = der_items(body)
+        fields = der_items(tbs[1])
+        if tag != 0x30 or fields[0][0] != 0xA0:
+            raise ValueError("unexpected layout")
+        _, serial, _, issuer, validity, subject, key = fields[:7]
+        moments = []
+        for kind, text, _ in der_items(validity[1]):
+            text = text.decode("ascii")
+            moments.append(datetime.datetime.strptime(
+                text, "%y%m%d%H%M%SZ" if kind == 0x17 else "%Y%m%d%H%M%SZ"))
+        extensions = {}
+        for field in fields[7:]:
+            if field[0] == 0xA3:
+                for _, extension, _ in der_items(der_items(field[1])[0][1]):
+                    parts = der_items(extension)
+                    extensions[parts[0][2]] = parts[-1][1]
+        r, s = (int.from_bytes(item[1], "big") for item in der_items(der_items(signature[1][1:])[0][1]))
+        return {"tbs": tbs[2], "issuer": issuer[2], "subject": subject[2],
+                "not_before": moments[0], "not_after": moments[1],
+                "public": ec_point_from_bytes(der_items(key[1])[1][1][1:]),
+                "extensions": extensions, "signature": (r, s)}
+    except (IndexError, KeyError, UnicodeDecodeError) as exc:
+        raise ValueError("unreadable certificate: %s" % exc)
+
+
+def read_names(value):
+    """DNS names and IP addresses out of a list of general names."""
+    names, addresses = [], []
+    for tag, content, _ in der_items(value):
+        if tag == 0x82:
+            names.append(content.decode("ascii"))
+        elif tag == 0x87 and len(content) in (4, 16):
+            addresses.append(ipaddress.ip_address(content))
+        elif tag == 0x87 and len(content) in (8, 32):
+            half = len(content) // 2
+            prefix = bin(int.from_bytes(content[half:], "big")).count("1")
+            addresses.append(ipaddress.ip_network((content[:half], prefix)))
+    return names, addresses
+
+
+def common_name_of(name):
+    for _, rdn, _ in der_items(der_items(name)[0][1]):
+        for _, pair, _ in der_items(rdn):
+            parts = der_items(pair)
+            if parts[0][2] == OID_COMMON_NAME:
+                return parts[1][1].decode("utf-8", "replace")
+    return ""
+
+
+def utc_now():
+    return datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None, microsecond=0)
+
+
+def dns_label_ok(name):
+    return bool(name) and len(name) <= 253 and all(
+        re.match(r"^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$", label) for label in name.split("."))
+
+
+class EncryptionError(Exception):
+    """Encryption for the local network could not be set up."""
+
+
+class Encryption:
+    """HTTPS for the local network: the local certificate each device installs
+    once, and the server certificate InSys presents, kept in the data folder."""
+
+    AUTHORITY_YEARS = 10
+    SERVER_DAYS = 396        # browsers refuse server certificates that last much over a year
+    RENEW_DAYS = 45          # a new one is made this long before the old one ends
+    MAX_ADDRESSES = 24
+    CERTIFICATE_FILE = "InSys-certificate.crt"
+
+    def __init__(self, folder):
+        self.folder = folder
+        self.lock = threading.RLock()
+        self.authority_key = None
+        self.authority_der = None
+        self.authority = None
+        self.context = None
+        self.covered = set()          # IP addresses the server certificate names, as text
+        self.addresses = []           # the same, most recently needed first
+        self.names = []               # DNS names it names
+        self.server_until = None
+        self.created = False          # a local certificate was made during this start
+        self.replaced = None          # why an earlier one could not be used, if so
+
+    def path(self, name):
+        return os.path.join(self.folder, name)
+
+    def _write(self, name, data, private=False):
+        os.makedirs(self.folder, exist_ok=True)
+        tmp = self.path(name + ".tmp")
+        with open(tmp, "wb") as fh:
+            fh.write(data)
+        if private:
+            try:
+                os.chmod(tmp, 0o600)
+            except OSError:
+                pass
+        for attempt in range(6):
+            try:
+                os.replace(tmp, self.path(name))
+                return
+            except PermissionError:
+                # On Windows a virus scanner may hold a new file open for a moment.
+                if attempt == 5:
+                    raise
+                time.sleep(0.25)
+
+    # -- the local certificate (installed once on each device) ---------------
+
+    def load_authority(self):
+        """Read the local certificate made earlier. Returns a reason if there is
+        one on file that cannot be used, None otherwise (whether or not there is one)."""
+        key_path, cert_path = self.path("local-certificate-key.pem"), self.path(self.CERTIFICATE_FILE)
+        if not os.path.exists(key_path) and not os.path.exists(cert_path):
+            return None
+        try:
+            with open(cert_path, "rb") as fh:
+                cert_der = fh.read()
+            with open(key_path, "r", encoding="ascii") as fh:
+                key = read_private_key(fh.read())
+            info = read_certificate(cert_der)
+            if info["public"] != ec_public(key):
+                return "its key does not belong to it"
+            if info["issuer"] != info["subject"] or not ecdsa_verify(info["public"], info["tbs"], info["signature"]):
+                return "it has been altered or damaged"
+            if info["not_after"] - utc_now() < datetime.timedelta(days=30):
+                return "it has reached the end of its life"
+        except (OSError, ValueError, UnicodeDecodeError) as exc:
+            return "its files could not be read (%s)" % exc
+        self.authority_key, self.authority_der, self.authority = key, cert_der, info
+        return None
+
+    def create_authority(self, host_label, names):
+        """Make a new local certificate. It may vouch only for private network
+        addresses, local-only names and the names given here."""
+        for name in ("local-certificate-key.pem", self.CERTIFICATE_FILE, "server-key.pem", "server.pem"):
+            if os.path.exists(self.path(name)):
+                stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+                try:
+                    os.replace(self.path(name), self.path("replaced-%s-%s" % (stamp, name)))
+                except OSError:
+                    pass
+        key = ec_new_key()
+        public = ec_public(key)
+        label = re.sub(r"[^A-Za-z0-9 ._-]", "", host_label or "")[:24] or "host"
+        name = x509_name("InSys local certificate - %s - %s" % (label, secrets.token_hex(2).upper()))
+        permitted = ["localhost"] + [suffix.lstrip(".") for suffix in LOCAL_NAME_SUFFIXES if suffix != ".localhost"]
+        permitted += [n for n in names if dns_label_ok(n) and n not in permitted]
+        subtrees = [der_seq(general_name(n)) for n in permitted] + [der_seq(general_name(n)) for n in LOCAL_NETWORKS]
+        now = utc_now()
+        cert_der = build_certificate(key, name, name, public,
+                                     now - datetime.timedelta(days=1),
+                                     now + datetime.timedelta(days=365 * self.AUTHORITY_YEARS + 2), [
+            x509_extension(OID_BASIC_CONSTRAINTS, der_seq(der(0x01, b"\xff"), der_int(0)), critical=True),
+            x509_extension(OID_KEY_USAGE, der(0x03, b"\x01\x06"), critical=True),      # sign certificates
+            x509_extension(OID_EXT_KEY_USAGE, der_seq(OID_SERVER_AUTH)),              # for web servers only
+            x509_extension(OID_SUBJECT_KEY_ID, der(0x04, key_identifier(public))),
+            x509_extension(OID_NAME_CONSTRAINTS, der_seq(der(0xA0, b"".join(subtrees))), critical=True),
+        ])
+        self._write("local-certificate-key.pem", write_private_key(key, public).encode("ascii"), private=True)
+        self._write(self.CERTIFICATE_FILE, cert_der)
+        self._write("READ-ME.txt", ENCRYPTION_READ_ME.encode("utf-8"))
+        self.authority_key, self.authority_der, self.authority = key, cert_der, read_certificate(cert_der)
+        self.created = True
+
+    def permitted(self):
+        """(names, networks) the local certificate is allowed to vouch for."""
+        value = self.authority["extensions"].get(OID_NAME_CONSTRAINTS)
+        if not value:
+            return [], []
+        names, networks = [], []
+        for tag, content, _ in der_items(der_items(value)[0][1]):
+            if tag == 0xA0:
+                for _, subtree, _ in der_items(content):
+                    found = read_names(subtree)
+                    names += found[0]
+                    networks += found[1]
+        return names, networks
+
+    def permits_name(self, name):
+        return dns_label_ok(name) and any(
+            name == base or name.endswith("." + base) for base in self.permitted()[0])
+
+    def permits_address(self, address):
+        ip = parse_ip(address)
+        return ip is not None and any(
+            ip.version == net.version and ip in net for net in self.permitted()[1])
+
+    # -- the server certificate (made and replaced automatically) ------------
+
+    def load_server(self):
+        """Use the server certificate on file if it is still good. Returns True if so."""
+        try:
+            with open(self.path("server.pem"), "r", encoding="ascii") as fh:
+                info = read_certificate(pem_decode("CERTIFICATE", fh.read()))
+            if info["issuer"] != self.authority["subject"]:
+                return False
+            if not ecdsa_verify(self.authority["public"], info["tbs"], info["signature"]):
+                return False
+            if info["not_after"] - utc_now() < datetime.timedelta(days=self.RENEW_DAYS):
+                return False
+            names, addresses = read_names(der_items(info["extensions"][OID_ALT_NAME])[0][1])
+            context = self._context()
+        except (OSError, ValueError, KeyError, IndexError, UnicodeDecodeError, ssl.SSLError):
+            return False
+        self.context, self.names = context, names
+        self.addresses = [str(a) for a in addresses]
+        self.covered = set(self.addresses)
+        self.server_until = info["not_after"]
+        return True
+
+    def previous_addresses(self):
+        try:
+            with open(self.path("server.pem"), "r", encoding="ascii") as fh:
+                info = read_certificate(pem_decode("CERTIFICATE", fh.read()))
+            return [str(a) for a in read_names(der_items(info["extensions"][OID_ALT_NAME])[0][1])[1]]
+        except (OSError, ValueError, KeyError, IndexError, UnicodeDecodeError):
+            return []
+
+    def issue_server(self, names, addresses):
+        """Make a server certificate for these names and addresses (those the
+        local certificate may vouch for), and start using it."""
+        names = [n for n in dict.fromkeys(names) if self.permits_name(n)]
+        wanted = []
+        for address in list(addresses) + self.previous_addresses():
+            ip = parse_ip(address)
+            if ip is not None and str(ip) not in wanted and self.permits_address(str(ip)):
+                wanted.append(str(ip))
+        wanted = wanted[:self.MAX_ADDRESSES]
+        key = ec_new_key()
+        public = ec_public(key)
+        now = utc_now()
+        until = min(now + datetime.timedelta(days=self.SERVER_DAYS), self.authority["not_after"])
+        alt_names = [general_name(n) for n in names] + [general_name(ipaddress.ip_address(a)) for a in wanted]
+        cert_der = build_certificate(
+            self.authority_key, self.authority["subject"], x509_name("InSys on the local network"), public,
+            now - datetime.timedelta(days=1), until, [
+                x509_extension(OID_BASIC_CONSTRAINTS, der_seq(), critical=True),
+                x509_extension(OID_KEY_USAGE, der(0x03, b"\x07\x80"), critical=True),    # digital signature
+                x509_extension(OID_EXT_KEY_USAGE, der_seq(OID_SERVER_AUTH)),
+                x509_extension(OID_ALT_NAME, der_seq(*alt_names)),
+                x509_extension(OID_SUBJECT_KEY_ID, der(0x04, key_identifier(public))),
+                x509_extension(OID_AUTHORITY_KEY_ID,
+                               der_seq(der(0x80, key_identifier(self.authority["public"])))),
+            ])
+        self._write("server-key.pem", write_private_key(key, public).encode("ascii"), private=True)
+        self._write("server.pem", pem_encode("CERTIFICATE", cert_der).encode("ascii"))
+        context = self._context()
+        self.self_test(context, wanted[0] if wanted else "localhost")
+        self.context, self.names, self.server_until = context, names, until
+        self.addresses, self.covered = wanted, set(wanted)
+
+    def _context(self):
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.minimum_version = ssl.TLSVersion.TLSv1_2
+        try:
+            context.set_ciphers("ECDHE+AESGCM:ECDHE+CHACHA20")   # (for TLS 1.2; TLS 1.3 has only strong ones)
+        except ssl.SSLError:
+            pass
+        context.load_cert_chain(self.path("server.pem"), self.path("server-key.pem"))
+        return context
+
+    def self_test(self, context, address):
+        """Prove, without touching the network, that a device which has installed
+        the local certificate will accept this server as genuine at `address`."""
+        client_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        client_context.load_verify_locations(cadata=pem_encode("CERTIFICATE", self.authority_der))
+        to_server, to_client = ssl.MemoryBIO(), ssl.MemoryBIO()
+        client = client_context.wrap_bio(to_client, to_server, server_hostname=address)
+        server = context.wrap_bio(to_server, to_client, server_side=True)
+        finished = set()
+        for _ in range(12):
+            for side in (client, server):
+                if side in finished:
+                    continue
+                try:
+                    side.do_handshake()
+                    finished.add(side)
+                except ssl.SSLWantReadError:
+                    pass
+            if len(finished) == 2:
+                return
+        raise EncryptionError("the certificate check did not complete")
+
+    # -- used by the server ---------------------------------------------------
+
+    def start(self, host_name, allowed, names, addresses):
+        """Get everything ready before the first connection: `allowed` are the
+        names a new local certificate may vouch for besides the local-only
+        endings, `names` and `addresses` what the server certificate should
+        cover. Raises EncryptionError."""
+        if ssl is None:
+            raise EncryptionError("this Python has no encryption library (the 'ssl' module is missing)")
+        with self.lock:
+            try:
+                self.replaced = self.load_authority()
+                if self.authority is None:
+                    self.create_authority(host_name, allowed)
+                wanted_names = [n for n in names if self.permits_name(n)]
+                wanted = [str(parse_ip(a)) for a in addresses if self.permits_address(a)]
+                if not (self.load_server() and set(wanted_names) <= set(self.names)
+                        and set(wanted) <= self.covered):
+                    self.issue_server(wanted_names, wanted)
+            except EncryptionError:
+                raise
+            except (OSError, ValueError, ssl.SSLError) as exc:
+                raise EncryptionError(str(exc) or exc.__class__.__name__)
+
+    def context_for(self, address):
+        """The certificate to present on a connection that arrived at `address`
+        (one of this computer's own). A new address - the network handed this
+        computer a different one - is added to the certificate on the spot."""
+        ip = parse_ip(address)
+        text = str(ip) if ip is not None else ""
+        soon = utc_now() + datetime.timedelta(days=self.RENEW_DAYS)
+        if text in self.covered and self.server_until > soon:
+            return self.context
+        with self.lock:
+            if (text not in self.covered and self.permits_address(text)) or self.server_until <= soon:
+                try:
+                    self.issue_server(self.names, [text] + self.addresses)
+                except (OSError, ValueError, ssl.SSLError, EncryptionError) as exc:
+                    log_error("The server certificate could not be renewed: %s" % exc)
+            return self.context
+
+
+
+def write_private_key(private, public):
+    return pem_encode("EC PRIVATE KEY", der_seq(
+        der_int(1), der(0x04, private.to_bytes(32, "big")),
+        der(0xA0, OID_P256), der(0xA1, der(0x03, b"\x00" + ec_point_bytes(public)))))
+
+
+def read_private_key(text):
+    parts = der_items(der_items(pem_decode("EC PRIVATE KEY", text))[0][1])
+    value = int.from_bytes(parts[1][1], "big")
+    if not (parts[1][0] == 0x04 and 1 <= value < EC_N):
+        raise ValueError("unreadable key")
+    return value
+
+
+ENCRYPTION_READ_ME = """InSys - encryption on the local network
+========================================
+
+The files in this folder let InSys encrypt everything it sends to other
+devices on your network (choice 2).
+
+  InSys-certificate.crt
+      The InSys local certificate. Each device installs this once; after
+      that its browser shows InSys as a secure site. It is not secret. It is
+      the same file as "Download certificate" under Admin, System in InSys.
+
+  local-certificate-key.pem, server-key.pem
+      Private keys. NEVER copy, email or share these. Anyone who has them
+      could pretend to be this InSys to the devices on your network.
+
+  server.pem
+      The certificate InSys presents. InSys replaces it by itself.
+
+If these files are lost or deleted InSys makes new ones, and every device
+has to install the new certificate once more. They are not part of the
+database backup or of "Download database", on purpose: another office that
+hosts a copy of the data makes its own.
+"""
+
+
+def encryption_folder():
+    return os.path.join(RT.data_dir, "encryption")
+
+
+def stored_certificate():
+    """The local certificate file (what a device installs), or None if none has been made."""
+    try:
+        with open(os.path.join(encryption_folder(), Encryption.CERTIFICATE_FILE), "rb") as fh:
+            data = fh.read()
+        read_certificate(data)
+        return data
+    except (OSError, ValueError):
+        return None
+
+
+def describe_certificate(data):
+    """What an administrator needs to recognise the local certificate."""
+    info = read_certificate(data)
+
+    def prints(algorithm):
+        digest = hashlib.new(algorithm, data).hexdigest().upper()
+        return ":".join(digest[i:i + 2] for i in range(0, len(digest), 2))
+    return {"name": common_name_of(info["subject"]),
+            "valid_until": info["not_after"].strftime("%Y-%m-%d"),
+            "sha256": prints("sha256"), "sha1": prints("sha1")}
+
+
+def constraint_safe(name):
+    """Whether the local certificate may be allowed to vouch for `name`. Such
+    a permission also covers every name ending in '.name', so a one-word name
+    is accepted only if it could never be a public ending such as 'dev' or
+    'app': those are letters only, so it must contain a digit or a hyphen."""
+    if not dns_label_ok(name) or name.startswith("xn--"):
+        return False
+    return "." in name or bool(re.search(r"[0-9-]", name))
+
+
+def certificate_names(own, extra):
+    """(names the local certificate should be allowed to vouch for,
+    names to put on the server certificate) for this computer."""
+    short = own.split(".")[0] if own else ""
+    allowed = [n for n in dict.fromkeys([own, short] + sorted(extra)) if n and constraint_safe(n)]
+    names = ["localhost"] + allowed
+    if dns_label_ok(short):
+        names += [short + suffix for suffix in LOCAL_NAME_SUFFIXES if suffix != ".localhost"]
+    return allowed, list(dict.fromkeys(names))
+
+
+def session_hash(token, channel):
+    """How a sign-in is kept in the database: never the token itself, and tied
+    to the kind of connection it was issued on ('tls' for the encrypted local
+    network, 'local' for this computer and the internet tunnel). A token is
+    therefore of no use on any other kind of connection - and a token issued
+    by an InSys older than 1.2.6, when the local network was not encrypted,
+    is of no use at all."""
+    return hashlib.sha256(("%s:%s" % (channel, token)).encode("utf-8", "replace")).hexdigest()
+
+
+# ---------------------------------------------------------------------------
 # HTTP layer
 # ---------------------------------------------------------------------------
 
@@ -2479,6 +3240,9 @@ def require_internet_mode(what):
         raise RuntimeError("%s is only done when InSys is started Online (choice 3)." % what)
 
 
+TLS_ERRORS = (ssl.SSLError,) if ssl is not None else ()
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "InSys"
     sys_version = ""
@@ -2554,31 +3318,50 @@ class Handler(BaseHTTPRequestHandler):
     def is_https(self):
         return (self.forwarded("X-Forwarded-Proto") or "").lower() == "https"
 
-    def cookie_token(self):
-        header = self.headers.get("Cookie") or ""
-        for part in header.split(";"):
+    def is_tls(self):
+        """True when this request arrived over InSys's own encrypted connection."""
+        return ssl is not None and isinstance(self.connection, ssl.SSLSocket)
+
+    def channel(self):
+        """The kind of connection, which a sign-in is tied to: see session_hash."""
+        return "tls" if self.is_tls() else "local"
+
+    def must_use_encryption(self):
+        """True for a request that crossed the network without encryption while
+        InSys is serving the network. Such a request is never given any data."""
+        return RT.tls is not None and not self.is_tls() and not is_loopback(self.client_address[0])
+
+    def cookies(self):
+        found = {}
+        for part in (self.headers.get("Cookie") or "").split(";"):
             name, _, value = part.strip().partition("=")
-            if name == SESSION_COOKIE and value:
-                return value
-        return None
+            if value:
+                found.setdefault(name, value)
+        return found
+
+    def cookie_token(self):
+        return self.cookies().get(SECURE_SESSION_COOKIE if self.is_tls() else SESSION_COOKIE)
 
     def set_session_cookie(self, token):
         cookie = "%s=%s; Path=/; HttpOnly; SameSite=Lax; Max-Age=%d" % (
-            SESSION_COOKIE, token, SESSION_MAX_SECONDS)
-        if self.is_https():
+            SECURE_SESSION_COOKIE if self.is_tls() else SESSION_COOKIE, token, SESSION_MAX_SECONDS)
+        if self.is_tls() or self.is_https():
             cookie += "; Secure"
         self.extra_headers.append(("Set-Cookie", cookie))
 
     def clear_session_cookie(self):
-        self.extra_headers.append(
-            ("Set-Cookie", "%s=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0" % SESSION_COOKIE))
+        if self.is_tls():
+            cookie = "%s=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0; Secure" % SECURE_SESSION_COOKIE
+        else:
+            cookie = "%s=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0" % SESSION_COOKIE
+        self.extra_headers.append(("Set-Cookie", cookie))
 
     def load_session(self, touch):
         """Returns (user_row, session_row) or (None, None)."""
         token = self.cookie_token()
         if not token:
             return None, None
-        token_hash = hashlib.sha256(token.encode("utf-8", "replace")).hexdigest()
+        token_hash = session_hash(token, self.channel())
         now = time.time()
         with read_db() as conn:
             session = conn.execute("SELECT * FROM sessions WHERE token_hash = ?",
@@ -2636,6 +3419,8 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(data)))
         self.send_header("Cache-Control", cache)
         for name, value in SECURITY_HEADERS:
+            if name == "Content-Security-Policy" and self.content_policy:
+                value = self.content_policy
             self.send_header(name, value)
         for name, value in (headers or []):
             self.send_header(name, value)
@@ -2653,11 +3438,14 @@ class Handler(BaseHTTPRequestHandler):
 
     def dispatch(self, method):
         self.extra_headers = []
+        self.content_policy = None
         try:
             self.handle_request(method)
         except ApiError as exc:
             self.try_send_error(exc.status, exc.message, exc.code)
         except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError, socket.timeout):
+            self.close_connection = True
+        except TLS_ERRORS:
             self.close_connection = True
         except sqlite3.OperationalError:
             log_error("Database error on %s %s:\n%s" % (method, self.path, traceback.format_exc()))
@@ -2686,6 +3474,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_bytes(403, LOCAL_ONLY_PAGE, "text/plain; charset=utf-8")
         parsed = urlparse(self.path)
         path = parsed.path
+        if self.must_use_encryption():
+            return self.answer_unencrypted(method, path)
         if not path.startswith("/api/"):
             self.read_body("GET")  # drain anything sent, keeps the connection in sync
             return self.serve_static(method, path)
@@ -2770,9 +3560,56 @@ class Handler(BaseHTTPRequestHandler):
                 pass
         self.send_json(200, result)
 
+    def answer_unencrypted(self, method, path):
+        """A request that came over the network without encryption gets no data
+        and cannot sign in. It is shown the page that explains the one-time
+        set-up and moves the browser to the encrypted address; that page, the
+        files it needs and the (public) certificate are all it can have."""
+        self.end_exposed_session()
+        if method != "GET" or path.startswith("/api/"):
+            self.close_connection = True
+            return self.send_json(403, {
+                "error": "InSys only answers on its encrypted address. Open this same address "
+                         "starting with https:// instead of http://.",
+                "code": "encrypted_only"})
+        self.read_body("GET")
+        if path == CERTIFICATE_PATH or (path in CONNECT_FILES and path != "/connect"):
+            return self.serve_static(method, path)
+        host = self.headers.get("Host") or ""
+        if re.match(r"^([A-Za-z0-9.-]+|\[[0-9A-Fa-f:]+\])(:[0-9]{1,5})?$", host):
+            # Lets the page test whether this device already trusts the encrypted address.
+            self.content_policy = CONNECT_POLICY % ("https://" + host)
+        self.serve_static(method, "/connect")
+
+    def end_exposed_session(self):
+        """A sign-in cookie that has just crossed the network unencrypted may
+        have been read on the way, so the sign-in it belongs to is ended."""
+        values = [value for name, value in self.cookies().items()
+                  if name in (SESSION_COOKIE, SECURE_SESSION_COOKIE)]
+        if not values:
+            return
+        hashes = []
+        for value in values:
+            hashes += [session_hash(value, "tls"), session_hash(value, "local"),
+                       hashlib.sha256(value.encode("utf-8", "replace")).hexdigest()]
+        marks = ",".join("?" * len(hashes))
+        with read_db() as conn:
+            found = conn.execute("SELECT 1 FROM sessions WHERE token_hash IN (%s)" % marks, hashes).fetchone()
+        if found:
+            with write_db(bump=False) as conn:
+                conn.execute("DELETE FROM sessions WHERE token_hash IN (%s)" % marks, hashes)
+                audit(conn, "session_exposed",
+                      "A sign-in was ended because its cookie was sent without encryption",
+                      ip=self.client_address[0])
+
     def serve_static(self, method, path):
         if method != "GET":
             raise ApiError(405, "Method not allowed.")
+        if path == CERTIFICATE_PATH:
+            data = stored_certificate()
+            if data is None:
+                raise ApiError(404, "No certificate has been made yet. Start InSys with choice 2 once.")
+            return self.send_bytes(200, data, "application/x-x509-ca-cert")
         entry = STATIC_FILES.get(path)
         if entry is None:
             raise ApiError(404, "Not found.")
@@ -2819,9 +3656,39 @@ class Server(ThreadingHTTPServer):
         note_blocked(peer, "A connection from %s was refused: it is not a local network address." % peer)
         return False
 
+    def finish_request(self, request, client_address):
+        """While InSys serves the network, a connection that opens with a TLS
+        handshake is answered over TLS. Any other gets the ordinary handler,
+        which gives this computer itself the full service and anything else
+        only the page that explains how to connect securely."""
+        encryption = RT.tls
+        if encryption is None:
+            return ThreadingHTTPServer.finish_request(self, request, client_address)
+        try:
+            request.settimeout(TLS_HANDSHAKE_SECONDS)
+            first = request.recv(1, socket.MSG_PEEK)
+        except OSError:
+            return
+        if not first:
+            return
+        if first != b"\x16":     # not the first byte of a TLS handshake
+            return ThreadingHTTPServer.finish_request(self, request, client_address)
+        try:
+            context = encryption.context_for(request.getsockname()[0])
+            secure = context.wrap_socket(request, server_side=True)
+        except (OSError, ValueError):
+            return    # the handshake failed, for instance a device that does not trust the certificate yet
+        try:
+            self.RequestHandlerClass(secure, client_address, self)
+        finally:
+            try:
+                secure.close()
+            except OSError:
+                pass
+
     def handle_error(self, request, client_address):
         exc = sys.exc_info()[1]
-        if isinstance(exc, (ConnectionError, socket.timeout, TimeoutError)):
+        if isinstance(exc, (ConnectionError, socket.timeout, TimeoutError) + TLS_ERRORS):
             return
         log_error("Connection error from %s:\n%s" % (client_address, traceback.format_exc()))
 
@@ -3199,7 +4066,7 @@ def start_menu(ask=read_key):
     say("  How would you like to run InSys?")
     say("")
     say("    1  This computer only                      - works offline")
-    say("    2  This computer and the office network    - works offline")
+    say("    2  This computer and the office network    - works offline, encrypted")
     say("    3  Online, from anywhere over the internet - needs internet")
     say("")
     say("    4  Reset the administrator password")
@@ -3316,6 +4183,37 @@ def lan_addresses():
     return [a for a in found if not a.startswith("127.")]
 
 
+def discard_certificate():
+    """Command-line: set the local certificate aside so that the next start in
+    choice 2 makes a new one."""
+    folder = encryption_folder()
+    if stored_certificate() is None and not os.path.exists(os.path.join(folder, "local-certificate-key.pem")):
+        say("")
+        say("  There is no certificate yet. One is made the first time InSys is")
+        say("  started for the office network (choice 2).")
+        return 0
+    stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    for name in ("local-certificate-key.pem", Encryption.CERTIFICATE_FILE, "server-key.pem", "server.pem"):
+        try:
+            os.replace(os.path.join(folder, name), os.path.join(folder, "replaced-%s-%s" % (stamp, name)))
+        except OSError:
+            pass
+    if os.path.exists(RT.db_path):
+        try:
+            with write_db(bump=False) as conn:
+                audit(conn, "certificate_discarded", "From the host computer")
+        except Exception:
+            pass
+    say("")
+    say("  The certificate has been set aside. The next time InSys is started")
+    say("  for the office network (choice 2) it makes a new one, and every")
+    say("  device has to install the new certificate once.")
+    say("")
+    say("  On each device the old one, named \"InSys local certificate ...\",")
+    say("  can then be removed from the list of trusted certificates.")
+    return 0
+
+
 def reset_admin(username):
     """Command-line recovery: give an account a new temporary password."""
     if not os.path.exists(RT.db_path):
@@ -3356,9 +4254,9 @@ def banner(first_password):
     say("  InSys is running. Open it in a web browser:")
     say("")
     say("      On this computer :  http://localhost:%d" % RT.port)
-    if RT.lan:
-        for address in lan_addresses():
-            say("      On your network  :  http://%s:%d" % (address, RT.port))
+    network = [a for a in RT.lan_ips if RT.tls is not None and a in RT.tls.covered]
+    for address in network:
+        say("      On your network  :  https://%s:%d" % (address, RT.port))
     if RT.online_requested:
         say("      Over the internet:  (being set up - the address appears below)")
     elif PACKAGED:
@@ -3372,12 +4270,31 @@ def banner(first_password):
         else:
             say("  InSys is answering this computer only.")
         say("  It makes no connection to the internet, and refuses any that arrives from it.")
-    if RT.lan and not lan_addresses():
+    if RT.lan and not network:
         say("")
-        say("  No network connection was found, so only this computer can reach")
-        say("  InSys for now. Connect to the office network and restart InSys.")
+        say("  InSys could not tell which network address this computer has. If it")
+        say("  is not connected to the office network, connect it and restart InSys.")
+        say("  If it is, other devices can reach InSys at this computer's IPv4")
+        say("  address (Windows shows it under Settings > Network & internet):")
+        say("")
+        say("      https://<that address>:%d       (encrypted)" % RT.port)
+        say("      http://<that address>:%d        (first visit: the set-up steps)" % RT.port)
     elif RT.lan:
         say("")
+        say("  Everything InSys sends to other devices on the network is encrypted.")
+        say("  Each device needs the InSys certificate installed once. On a device")
+        say("  that does not have it yet, open this address and follow the steps:")
+        say("")
+        say("      http://%s:%d" % (network[0], RT.port))
+        say("")
+        if RT.tls.created and RT.tls.replaced:
+            say("  NOTE: the certificate made earlier could not be used (%s)," % RT.tls.replaced)
+            say("  so a new one was made. Every device has to install the new one, once.")
+            say("")
+        elif RT.tls.created:
+            say("  The certificate was made just now and is kept in:")
+            say("      %s" % encryption_folder())
+            say("")
         say("  If Windows asks whether to allow InSys on the network, choose Allow.")
     say("")
     creds = read_first_login()
@@ -3431,6 +4348,9 @@ def parse_args(argv):
                         help="ask how to run at start-up (the default for InSys.exe)")
     parser.add_argument("--no-menu", action="store_true",
                         help="never ask; run for this computer only unless told otherwise")
+    parser.add_argument("--new-certificate", action="store_true",
+                        help="discard the certificate used to encrypt the local network and make a new "
+                             "one at the next start (every device must then install it again), then exit")
     parser.add_argument("--reset-admin", action="store_true",
                         help="give the administrator a new temporary password, then exit")
     parser.add_argument("--user", default="admin",
@@ -3519,6 +4439,9 @@ def run(argv=None):
         say("")
         say("  An internet connection left open by an earlier InSys session was closed.")
 
+    if args.new_certificate:
+        return discard_certificate()
+
     if not os.path.isfile(os.path.join(WEB_DIR, "index.html")):
         say("The 'web' folder is missing next to insys.py. Please extract the complete")
         say("InSys folder again and start it from there.")
@@ -3557,10 +4480,38 @@ def run(argv=None):
     RT.local_names = set(name.strip().lower().rstrip(".") for name in args.allow_host if name.strip())
     try:
         own = socket.gethostname().strip().lower().rstrip(".")   # read from this computer; no lookup is made
-        if own:
-            RT.local_names.add(own)
     except OSError:
-        pass
+        own = ""
+    if own:
+        RT.local_names.add(own)
+    RT.tls = None
+    RT.lan_ips = lan_addresses() if args.lan else []
+    if args.lan:
+        # Nothing is served to the network until encryption is ready: if it
+        # cannot be set up, InSys does not start for the network at all.
+        encryption = Encryption(encryption_folder())
+        allowed, names = certificate_names(own, RT.local_names)
+        try:
+            encryption.start(own, allowed, names,
+                             RT.lan_ips + ["127.0.0.1", "::1"])
+        except EncryptionError as exc:
+            log_error("Encryption could not be set up: %s" % exc)
+            say("")
+            say("  InSys could not set up encryption for the office network:")
+            say("")
+            say("      %s" % exc)
+            say("")
+            say("  It has not started, so nothing has been sent over the network.")
+            say("  Your data has not been changed. You can still start InSys and")
+            say("  choose 1 to use it on this computer.")
+            return 1
+        RT.tls = encryption
+        if encryption.created:
+            with write_db(bump=False) as conn:
+                audit(conn, "certificate_created",
+                      "%s%s" % (describe_certificate(encryption.authority_der)["name"],
+                                "; the earlier one could not be used: %s" % encryption.replaced
+                                if encryption.replaced else ""))
     host = "0.0.0.0" if args.lan else "127.0.0.1"
     try:
         server = bind_server(host, args.port or DEFAULT_PORT, strict=args.port is not None)

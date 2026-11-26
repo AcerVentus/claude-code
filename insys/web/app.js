@@ -2737,10 +2737,11 @@
           ? 'The online access tool could not be started. Look at the InSys window on the host computer for details.'
           : 'Setting up the secure connection. This normally takes a few seconds.' })];
     } else {
+      const reach = sys.mode === 'lan' ? 'InSys is only reachable on the host computer and the office network. ' : 'InSys is only reachable on the host computer. ';
       online = [h('span', { class: 'pill dead', text: 'Off' }),
-        h('div', { class: 'small muted', text: sys.packaged
-          ? 'InSys is only reachable on the host computer. To use it from anywhere, close InSys, start it again and choose 3 (Online).'
-          : 'InSys is only reachable on the host computer. To use it from anywhere, close InSys and start it with "Start-InSys-Online.bat".' })];
+        h('div', { class: 'small muted', text: reach + (sys.packaged
+          ? 'To use it from anywhere, close InSys, start it again and choose 3 (Online).'
+          : 'To use it from anywhere, close InSys and start it with "Start-InSys-Online.bat".') })];
     }
     return h('div', null,
       card('Where InSys is running', null, h('div', { class: 'kv' },
@@ -2749,16 +2750,63 @@
         h('div', { class: 'k', text: 'Who can reach it' }), h('div', { class: 'v', text: sys.mode === 'online'
           ? 'Anyone who has the internet address above (they still need a login).'
           : (sys.mode === 'lan'
-            ? 'This computer, and computers on a local network address. InSys makes no connection to the internet, and refuses any connection or request that comes from it or has been relayed through it.'
+            ? 'This computer, and devices on a local network address over an encrypted connection. InSys makes no connection to the internet, and refuses any connection or request that comes from it or has been relayed through it.'
             : 'This computer only. InSys makes no connection to the internet and accepts none from any other computer.') }),
         h('div', { class: 'k', text: 'Data folder' }), h('div', { class: 'v', text: sys.data_dir }),
         h('div', { class: 'k', text: 'Version' }), h('div', { class: 'v', text: 'InSys ' + sys.app_version + ' (Python ' + sys.python + ' on ' + sys.platform + ')' }))),
+      encryptionCard(sys),
       card('Backups', null,
         h('p', { class: 'muted', text: 'InSys saves an automatic backup into the "backups" folder inside the data folder once a day and keeps the latest 20. ' +
           (sys.last_backup_hours === null ? 'No automatic backup has been made yet.' : 'The most recent one was made ' + (sys.last_backup_hours < 1 ? 'less than an hour' : 'about ' + plural(Math.round(sys.last_backup_hours), 'hour')) + ' ago.') }),
         h('p', { style: { marginTop: '10px' } }, h('a', { class: 'btn', href: '/api/admin/backup', download: '', text: 'Download a backup now' })),
         h('p', { class: 'small muted', style: { marginTop: '8px' }, text: 'The backup file holds all InSys data, including (scrambled) passwords. Store it somewhere safe.' })),
       transferCard());
+  }
+
+  /** Administrator only: encryption on the office network and the certificate each device installs once. */
+  function encryptionCard(sys) {
+    const enc = sys.encryption || {};
+    const cert = enc.certificate;
+    let state;
+    if (enc.on) {
+      state = [h('span', { class: 'pill done', text: 'On' }),
+        h('div', { class: 'small muted', text: 'Everything InSys sends to other devices on the network is encrypted, so it cannot be read by anyone else on the network. A device connects once it has installed the InSys certificate, which it does one time.' })];
+    } else if (sys.mode === 'online') {
+      state = [h('span', { class: 'pill dead', text: 'Not in use' }),
+        h('div', { class: 'small muted', text: 'InSys is running Online: the internet address above is encrypted, and devices on the office network use that address too.' })];
+    } else {
+      state = [h('span', { class: 'pill dead', text: 'Not in use' }),
+        h('div', { class: 'small muted', text: 'InSys is running for this computer only, so nothing crosses the network. When it is started for the office network (choice 2), everything sent to other devices is encrypted.' })];
+    }
+    const rows = [h('div', { class: 'k', text: 'Encryption' }), h('div', { class: 'v' }, state)];
+    if (enc.on && enc.addresses && enc.addresses.length) {
+      rows.push(h('div', { class: 'k', text: 'Address for your team' }),
+        h('div', { class: 'v' }, enc.addresses.map((a) => h('div', { class: 'mono', text: a }))));
+      if (enc.setup_addresses && enc.setup_addresses.length) {
+        rows.push(h('div', { class: 'k', text: 'First visit on a device' }),
+          h('div', { class: 'v' }, h('div', { class: 'mono', text: enc.setup_addresses[0] }),
+            h('div', { class: 'small muted', text: 'Shows the set-up steps, then moves to the encrypted address by itself. No InSys data is ever sent on this address.' })));
+      }
+    } else if (enc.on) {
+      rows.push(h('div', { class: 'k', text: 'Address for your team' }),
+        h('div', { class: 'v muted', text: 'No local network connection was found when InSys started.' }));
+    }
+    if (cert) {
+      rows.push(
+        h('div', { class: 'k', text: 'Certificate' }), h('div', { class: 'v', text: cert.name }),
+        h('div', { class: 'k', text: 'Valid until' }), h('div', { class: 'v', text: fmtDate(cert.valid_until) }),
+        h('div', { class: 'k', text: 'Thumbprint (SHA-1)' }), h('div', { class: 'v mono', text: cert.sha1 }),
+        h('div', { class: 'k', text: 'Fingerprint (SHA-256)' }), h('div', { class: 'v mono', text: cert.sha256 }));
+    }
+    return card('Encryption on the office network', 'Administrators only',
+      h('div', { class: 'kv' }, rows),
+      cert
+        ? h('div', null,
+          h('p', { style: { marginTop: '14px' } },
+            h('a', { class: 'btn primary', href: enc.certificate_url, download: 'InSys-certificate.crt', text: 'Download certificate' }), ' ',
+            h('a', { class: 'btn', href: '/connect', target: '_blank', rel: 'noopener', text: 'Steps for each device' })),
+          h('p', { class: 'small muted', style: { marginTop: '8px' }, text: 'Each device installs this certificate once; it then shows InSys as a secure site and never asks again, even if this computer\u2019s address changes. Hand the file over yourself, or let people download it from the first-visit address. It is not secret, and it can only vouch for addresses on a private network, never for a public website. While installing, a device shows the thumbprint above: if it matches, the file is genuine.' }))
+        : h('p', { class: 'small muted', style: { marginTop: '10px' }, text: 'No certificate has been made yet. InSys makes one the first time it is started for the office network (choice 2).' }));
   }
 
   /** Administrator only: take the whole database to another InSys, or bring one in. */
@@ -2807,6 +2855,8 @@
       password_reset: 'Password reset', user_created: 'Login created', user_updated: 'Login changed',
       record_deleted: 'Record deleted', backup_downloaded: 'Backup downloaded', settings_changed: 'Settings changed',
       blocked: 'Refused: not local',
+      certificate_created: 'Encryption certificate made', certificate_discarded: 'Encryption certificate set aside',
+      session_exposed: 'Sign-in ended: sent unencrypted',
       upgraded: 'InSys upgraded', subcon_deleted: 'Subcontractor deleted',
       record_restored: 'Record restored', database_loaded: 'Database loaded',
     };

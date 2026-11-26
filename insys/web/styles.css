@@ -454,6 +454,25 @@ dialog.dlg::backdrop { background: rgba(11, 11, 11, .45); }
 .kv { display: grid; grid-template-columns: max-content 1fr; gap: 8px 18px; align-items: center; }
 .kv .k { color: var(--ink2); }
 .kv .v { overflow-wrap: anywhere; }
+.kv .v.mono, .kv .v .mono { font-family: ui-monospace, "Cascadia Mono", Consolas, "Liberation Mono", monospace; font-size: 13px; }
+
+/* ---------- The one-time set-up page for a device (connect.html) ---------- */
+
+.connect { max-width: 720px; margin: 0 auto; padding: 28px 16px 48px; }
+.connect-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+.connect h1 { margin-bottom: 8px; }
+.connect h2 { margin-bottom: 6px; }
+.connect p { margin: 8px 0; }
+.connect-steps { margin: 14px 0 0; padding-left: 22px; }
+.connect-steps > li { padding: 4px 0 14px; }
+.connect-steps > li::marker { font-weight: 700; color: var(--accent); }
+.connect details.device { border: 1px solid var(--line); border-radius: 8px; margin: 6px 0; background: var(--raised); }
+.connect details.device > summary { padding: 9px 12px; font-weight: 600; cursor: pointer; }
+.connect details.device[open] > summary { border-bottom: 1px solid var(--line); }
+.connect details.device ol { margin: 10px 0; padding: 0 14px 0 34px; }
+.connect details.device li { padding: 3px 0; }
+.connect details.device p { padding: 0 12px 8px; }
+.connect-note { padding: 9px 12px; border-radius: 8px; background: var(--warn-soft); color: var(--warn-ink); }
 
 #toasts { position: fixed; left: 16px; bottom: 16px; z-index: 100; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; pointer-events: none; }
 .toast {

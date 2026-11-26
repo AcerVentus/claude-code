@@ -27,11 +27,14 @@ insys.PBKDF2_ITERATIONS = 1000  # keep the tests fast; the program itself always
 class Client:
     """A minimal browser stand-in: keeps the session cookie and CSRF token."""
 
-    def __init__(self, base):
+    def __init__(self, base, context=None):
         self.base = base
         self.cookie = None
         self.csrf = ""
-        self.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        handlers = [urllib.request.ProxyHandler({})]
+        if context is not None:
+            handlers.append(urllib.request.HTTPSHandler(context=context))
+        self.opener = urllib.request.build_opener(*handlers)
 
     def request(self, method, path, body=None, headers=None, raw=False, send_csrf=True):
         data = None
@@ -257,10 +260,8 @@ class InSysTest(unittest.TestCase):
         self.assertEqual(client.get("/api/me")[0], 200)
         conn = sqlite3.connect(insys.RT.db_path)
         token = client.cookie.split("=", 1)[1]
-        import hashlib
         conn.execute("UPDATE sessions SET last_seen = ? WHERE token_hash = ?",
-                     (time.time() - insys.SESSION_IDLE_SECONDS - 5,
-                      hashlib.sha256(token.encode()).hexdigest()))
+                     (time.time() - insys.SESSION_IDLE_SECONDS - 5, insys.session_hash(token, "local")))
         conn.commit()
         conn.close()
         self.assertEqual(client.get("/api/me")[0], 401)
@@ -1820,6 +1821,618 @@ class LocalOnlyTest(unittest.TestCase):
                 proc.wait()
 
 
+def trusting(folder, strict=True):
+    """A browser stand-in's TLS settings: trusts nothing but the InSys local
+    certificate in `folder`, and checks everything a careful browser checks."""
+    import ssl
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    with open(os.path.join(folder, "InSys-certificate.crt"), "rb") as fh:
+        context.load_verify_locations(cadata=fh.read())
+    if strict:
+        context.verify_flags |= ssl.VERIFY_X509_STRICT
+    return context
+
+
+def handshake(server_context, client_context, name):
+    """A complete TLS handshake in memory, as a browser opening https://<name>
+    would do it. Raises ssl.SSLError if the browser would refuse the site."""
+    import ssl
+    to_server, to_client = ssl.MemoryBIO(), ssl.MemoryBIO()
+    client = client_context.wrap_bio(to_client, to_server, server_hostname=name)
+    server = server_context.wrap_bio(to_server, to_client, server_side=True)
+    done = set()
+    for _ in range(12):
+        for side in (client, server):
+            if side not in done:
+                try:
+                    side.do_handshake()
+                    done.add(side)
+                except ssl.SSLWantReadError:
+                    pass
+        if len(done) == 2:
+            return client
+    raise AssertionError("handshake did not finish")
+
+
+class CertificateTest(unittest.TestCase):
+    """The certificates InSys makes for encrypting the local network."""
+
+    def setUp(self):
+        self.folder = tempfile.mkdtemp(prefix="insys-enc-")
+        self.addCleanup(shutil.rmtree, self.folder, ignore_errors=True)
+
+    def start(self, addresses=("192.168.1.10", "127.0.0.1", "::1"), own="desktop-7gh2k1l", extra=()):
+        enc = insys.Encryption(self.folder)
+        allowed, names = insys.certificate_names(own, set(extra))
+        enc.start(own.upper(), allowed, names, list(addresses))
+        return enc
+
+    def test_signing_matches_the_published_test_values(self):
+        # RFC 6979, appendix A.2.5: P-256 with SHA-256.
+        key = 0xC9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721
+        public = insys.ec_public(key)
+        self.assertEqual("%064X" % public[0], "60FED4BA255A9D31C961EB74C6356D68C049B8923B61FA6CE669622E60F29FB6")
+        self.assertEqual("%064X" % public[1], "7903FE1008B8BC99A41AE9E95628BC64F2F1B20C2D7E9F5177A3C294D4462299")
+        for message, r, s in [
+                (b"sample", "EFD48B2AACB6A8FD1140DD9CD45E81D69D2C877B56AAF991C34D0EA84EAF3716",
+                 "F7CB1C942D657C41D436C7A1B6E29F65F3E900DBB9AFF4064DC4AB2F843ACDA8"),
+                (b"test", "F1ABB023518351CD71D881567B1EA663ED3EFCF6C5132B354F28D3B0B7D38367",
+                 "019F4113742A2B14BD25926B49C649155F267E60D3814B4C0CC84250E46F0083")]:
+            signature = insys.ecdsa_sign(key, message)
+            self.assertEqual(("%064X" % signature[0], "%064X" % signature[1]), (r, s))
+            self.assertTrue(insys.ecdsa_verify(public, message, signature))
+            self.assertFalse(insys.ecdsa_verify(public, message + b"!", signature))
+            self.assertFalse(insys.ecdsa_verify(public, message, (signature[0], signature[1] ^ 1)))
+        self.assertTrue(insys.ec_on_curve(insys.EC_G))
+        self.assertFalse(insys.ec_on_curve((insys.EC_G[0], insys.EC_G[1] + 1)))
+
+    def test_keys_are_different_every_time_and_well_formed(self):
+        keys = set(insys.ec_new_key() for _ in range(20))
+        self.assertEqual(len(keys), 20)
+        for key in keys:
+            self.assertTrue(1 <= key < insys.EC_N)
+            self.assertTrue(insys.ec_on_curve(insys.ec_public(key)))
+            self.assertEqual(insys.read_private_key(insys.write_private_key(key, insys.ec_public(key))), key)
+
+    def test_a_device_that_installed_the_certificate_accepts_insys(self):
+        enc = self.start()
+        browser = trusting(self.folder)
+        for name in ["192.168.1.10", "127.0.0.1", "::1", "localhost", "desktop-7gh2k1l",
+                     "desktop-7gh2k1l.local", "desktop-7gh2k1l.lan"]:
+            connection = handshake(enc.context, browser, name)
+            self.assertIn(connection.version(), ("TLSv1.3", "TLSv1.2"), name)
+        import ssl
+        # ...but not at an address the certificate does not name,
+        for name in ["192.168.1.11", "10.0.0.1", "otherpc", "desktop-7gh2k1l.example.com"]:
+            with self.assertRaises(ssl.SSLCertVerificationError, msg=name):
+                handshake(enc.context, browser, name)
+        # and a device that has not installed it refuses the connection outright.
+        stranger = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        with self.assertRaises(ssl.SSLCertVerificationError):
+            handshake(enc.context, stranger, "192.168.1.10")
+
+    def test_only_modern_encryption_is_offered(self):
+        import ssl
+        enc = self.start()
+        self.assertEqual(enc.context.minimum_version, ssl.TLSVersion.TLSv1_2)
+        import warnings
+        old = trusting(self.folder)
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", DeprecationWarning)
+                old.minimum_version = ssl.TLSVersion.TLSv1
+                old.maximum_version = ssl.TLSVersion.TLSv1_1
+        except ValueError:
+            self.skipTest("this OpenSSL cannot even attempt the old versions")
+        with self.assertRaises(ssl.SSLError):
+            handshake(enc.context, old, "192.168.1.10")
+        for cipher in enc.context.get_ciphers():
+            if cipher["protocol"] == "TLSv1.2":
+                self.assertTrue(cipher["name"].startswith("ECDHE-"), cipher["name"])   # forward secrecy
+                self.assertTrue("GCM" in cipher["name"] or "CHACHA20" in cipher["name"], cipher["name"])
+
+    def test_the_local_certificate_cannot_vouch_for_public_sites(self):
+        import datetime
+        import ipaddress
+        import ssl
+        enc = self.start()
+        browser = trusting(self.folder)
+        # Sign, with the real local certificate key, a certificate for a public
+        # site - as someone who stole the key would. A device must refuse it.
+        for label, alt in [("a public name", insys.general_name("www.example.com")),
+                           ("a public address", insys.general_name(ipaddress.ip_address("8.8.8.8"))),
+                           ("a public ending", insys.general_name("login.example.dev"))]:
+            key = insys.ec_new_key()
+            public = insys.ec_public(key)
+            now = insys.utc_now()
+            forged = insys.build_certificate(
+                enc.authority_key, enc.authority["subject"], insys.x509_name("forged"), public,
+                now - datetime.timedelta(days=1), now + datetime.timedelta(days=30), [
+                    insys.x509_extension(insys.OID_BASIC_CONSTRAINTS, insys.der_seq(), critical=True),
+                    insys.x509_extension(insys.OID_EXT_KEY_USAGE, insys.der_seq(insys.OID_SERVER_AUTH)),
+                    insys.x509_extension(insys.OID_ALT_NAME, insys.der_seq(alt)),
+                    insys.x509_extension(insys.OID_SUBJECT_KEY_ID, insys.der(0x04, insys.key_identifier(public))),
+                    insys.x509_extension(insys.OID_AUTHORITY_KEY_ID, insys.der_seq(
+                        insys.der(0x80, insys.key_identifier(enc.authority["public"])))),
+                ])
+            cert_path, key_path = os.path.join(self.folder, "forged.pem"), os.path.join(self.folder, "forged-key.pem")
+            with open(cert_path, "w") as fh:
+                fh.write(insys.pem_encode("CERTIFICATE", forged))
+            with open(key_path, "w") as fh:
+                fh.write(insys.write_private_key(key, public))
+            impostor = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            impostor.load_cert_chain(cert_path, key_path)
+            target = {"a public name": "www.example.com", "a public address": "8.8.8.8",
+                      "a public ending": "login.example.dev"}[label]
+            with self.assertRaises(ssl.SSLCertVerificationError, msg=label) as caught:
+                handshake(impostor, trusting(self.folder, strict=False), target)
+            self.assertIn("permitted subtree", str(caught.exception), label)
+        # InSys itself never puts such a name or address on its certificate.
+        enc.issue_server(["localhost", "www.example.com", "pc.local"], ["8.8.8.8", "192.168.1.10", "203.0.113.5"])
+        self.assertEqual(enc.names, ["localhost", "pc.local"])
+        self.assertEqual(enc.covered, set(["192.168.1.10", "127.0.0.1", "::1"]))
+        handshake(enc.context, browser, "192.168.1.10")
+
+    def test_which_names_the_certificate_may_be_allowed_to_vouch_for(self):
+        for name in ["desktop-7gh2k1l", "pc-01", "laptop7", "insys.office.example", "server.lan"]:
+            self.assertTrue(insys.constraint_safe(name), name)
+        # A one-word name made of letters only could be a public ending (.dev, .app, .shop ...).
+        for name in ["dev", "app", "studio", "reception", "xn--p1ai", "", "bad_name", "-pc", "a..b", "pc 1"]:
+            self.assertFalse(insys.constraint_safe(name), name)
+        allowed, names = insys.certificate_names("studio", set(["insys.office.example", "dev"]))
+        self.assertEqual(allowed, ["insys.office.example"])
+        self.assertIn("studio.local", names)
+        self.assertNotIn("studio", names)
+        self.assertNotIn("dev", names)
+        enc = self.start(own="studio")
+        self.assertNotIn("studio", enc.permitted()[0])
+        handshake(enc.context, trusting(self.folder), "studio.local")
+        # A computer whose name cannot be written in a certificate is still reachable by its address.
+        allowed, names = insys.certificate_names("büro_pc", set())
+        self.assertEqual((allowed, names), ([], ["localhost"]))
+
+    def test_installing_once_is_enough(self):
+        first = self.start()
+        with open(os.path.join(self.folder, "InSys-certificate.crt"), "rb") as fh:
+            installed = fh.read()
+        browser = trusting(self.folder)
+        self.assertTrue(first.created)
+        # InSys is restarted: the same certificate is used, nothing is made anew.
+        second = self.start()
+        self.assertFalse(second.created)
+        self.assertIsNone(second.replaced)
+        self.assertEqual(second.authority_der, installed)
+        with open(os.path.join(self.folder, "server.pem")) as fh:
+            server_before = fh.read()
+        handshake(second.context, browser, "192.168.1.10")
+        # The network hands this computer a different address: it is added on the
+        # spot, the device needs nothing new, and the old address keeps working.
+        context = second.context_for("192.168.1.57")
+        handshake(context, browser, "192.168.1.57")
+        handshake(context, browser, "192.168.1.10")
+        with open(os.path.join(self.folder, "server.pem")) as fh:
+            self.assertNotEqual(fh.read(), server_before)
+        # ...also across the next restart, when the computer has only the new address.
+        third = self.start(addresses=("192.168.1.57", "127.0.0.1", "::1"))
+        self.assertEqual(third.authority_der, installed)
+        handshake(third.context, browser, "192.168.1.57")
+        handshake(third.context, browser, "192.168.1.10")
+        # An address that is not a private one is never added.
+        self.assertIs(third.context_for("203.0.113.9"), third.context)
+        self.assertNotIn("203.0.113.9", third.covered)
+        with open(os.path.join(self.folder, "InSys-certificate.crt"), "rb") as fh:
+            self.assertEqual(fh.read(), installed)
+
+    def test_the_server_certificate_renews_itself(self):
+        import datetime
+        enc = self.start()
+        browser = trusting(self.folder)
+        original, installed = enc.SERVER_DAYS, enc.authority_der
+        try:
+            insys.Encryption.SERVER_DAYS = 20          # as if it were made long ago and is near its end
+            enc.issue_server(enc.names, enc.addresses)
+            self.assertLess(enc.server_until - insys.utc_now(), datetime.timedelta(days=insys.Encryption.RENEW_DAYS))
+        finally:
+            insys.Encryption.SERVER_DAYS = original
+        context = enc.context_for("192.168.1.10")      # the next connection finds it due and renews it
+        self.assertGreater(enc.server_until - insys.utc_now(), datetime.timedelta(days=300))
+        handshake(context, browser, "192.168.1.10")
+        try:
+            insys.Encryption.SERVER_DAYS = 20
+            enc.issue_server(enc.names, enc.addresses)
+        finally:
+            insys.Encryption.SERVER_DAYS = original
+        again = self.start()                           # and so does a restart
+        self.assertGreater(again.server_until - insys.utc_now(), datetime.timedelta(days=300))
+        self.assertEqual(again.authority_der, installed)
+        # Browsers refuse server certificates that last much more than a year.
+        self.assertLessEqual(insys.Encryption.SERVER_DAYS, 398)
+
+    def test_damaged_or_missing_files_are_replaced_and_reported(self):
+        first = self.start()
+        installed = first.authority_der
+        # The server certificate alone is lost: a new one is made, devices notice nothing.
+        os.remove(os.path.join(self.folder, "server.pem"))
+        second = self.start()
+        self.assertFalse(second.created)
+        self.assertEqual(second.authority_der, installed)
+        handshake(second.context, trusting(self.folder), "192.168.1.10")
+        with open(os.path.join(self.folder, "server-key.pem"), "w") as fh:
+            fh.write("nonsense")
+        self.assertEqual(self.start().authority_der, installed)
+        # The local certificate's key is damaged: InSys cannot keep using it, makes
+        # a new one, says why, and keeps the old files aside.
+        with open(os.path.join(self.folder, "local-certificate-key.pem"), "w") as fh:
+            fh.write("-----BEGIN EC PRIVATE KEY-----\nAAAA\n-----END EC PRIVATE KEY-----\n")
+        third = self.start()
+        self.assertTrue(third.created)
+        self.assertIn("could not be read", third.replaced)
+        self.assertNotEqual(third.authority_der, installed)
+        self.assertTrue([n for n in os.listdir(self.folder) if n.startswith("replaced-") and n.endswith(".crt")])
+        handshake(third.context, trusting(self.folder), "192.168.1.10")
+        # A certificate file swapped for another one is noticed too.
+        other = tempfile.mkdtemp(prefix="insys-enc-other-")
+        self.addCleanup(shutil.rmtree, other, ignore_errors=True)
+        stranger = insys.Encryption(other)
+        stranger.start("OTHER", [], ["localhost"], ["127.0.0.1"])
+        shutil.copy(os.path.join(other, "InSys-certificate.crt"), os.path.join(self.folder, "InSys-certificate.crt"))
+        fourth = self.start()
+        self.assertTrue(fourth.created)
+        self.assertIn("does not belong", fourth.replaced)
+
+    def test_private_keys_stay_private(self):
+        enc = self.start()
+        if os.name == "posix":
+            for name in ("local-certificate-key.pem", "server-key.pem"):
+                self.assertEqual(os.stat(os.path.join(self.folder, name)).st_mode & 0o077, 0, name)
+        with open(os.path.join(self.folder, "local-certificate-key.pem"), "rb") as fh:
+            secret = insys.pem_decode("EC PRIVATE KEY", fh.read().decode("ascii"))
+        key_bytes = enc.authority_key.to_bytes(32, "big")
+        self.assertIn(key_bytes, secret)
+        # The file a device installs holds no private key.
+        with open(os.path.join(self.folder, "InSys-certificate.crt"), "rb") as fh:
+            self.assertNotIn(key_bytes, fh.read())
+        self.assertTrue(os.path.exists(os.path.join(self.folder, "READ-ME.txt")))
+
+    def test_what_the_administrator_is_shown_matches_the_file(self):
+        import hashlib
+        enc = self.start()
+        shown = insys.describe_certificate(enc.authority_der)
+        self.assertTrue(shown["name"].startswith("InSys local certificate - DESKTOP-7GH2K1L - "), shown["name"])
+        self.assertEqual(shown["sha256"].replace(":", "").lower(), hashlib.sha256(enc.authority_der).hexdigest())
+        self.assertEqual(shown["sha1"].replace(":", "").lower(), hashlib.sha1(enc.authority_der).hexdigest())
+        self.assertRegex(shown["valid_until"], r"^20\d\d-\d\d-\d\d$")
+        self.assertGreater(int(shown["valid_until"][:4]), time.gmtime().tm_year + 8)
+
+    @unittest.skipUnless(shutil.which("openssl"), "the openssl program is not installed")
+    def test_certificates_pass_an_independent_check(self):
+        import subprocess
+        self.start()
+        ca_pem = os.path.join(self.folder, "ca.pem")
+        with open(os.path.join(self.folder, "InSys-certificate.crt"), "rb") as fh:
+            with open(ca_pem, "w") as out:
+                out.write(insys.pem_encode("CERTIFICATE", fh.read()))
+        server = os.path.join(self.folder, "server.pem")
+
+        def verify(*extra):
+            return subprocess.run(["openssl", "verify", "-x509_strict", "-purpose", "sslserver", "-CAfile", ca_pem]
+                                  + list(extra) + [server], capture_output=True, text=True)
+        self.assertEqual(verify("-verify_ip", "192.168.1.10").returncode, 0)
+        self.assertEqual(verify("-verify_hostname", "desktop-7gh2k1l.local").returncode, 0)
+        self.assertNotEqual(verify("-verify_ip", "192.168.1.99").returncode, 0)
+        text = subprocess.run(["openssl", "x509", "-in", ca_pem, "-noout", "-text"],
+                              capture_output=True, text=True).stdout
+        self.assertIn("CA:TRUE, pathlen:0", text)
+        self.assertIn("Name Constraints: critical", text)
+        self.assertIn("IP:192.168.0.0/255.255.0.0", text)
+        self.assertNotIn("Excluded", text)
+        key = subprocess.run(["openssl", "ec", "-in", os.path.join(self.folder, "server-key.pem"), "-noout", "-check"],
+                             capture_output=True, text=True)
+        self.assertEqual(key.returncode, 0, key.stderr)
+
+
+class EncryptedNetworkTest(unittest.TestCase):
+    """Choice 2: what crosses the network is encrypted, and nothing else is served."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.saved = (insys.RT.data_dir, insys.RT.lan, insys.RT.online_requested, insys.RT.tunnel_active,
+                     set(insys.RT.local_names), insys.RT.tls, insys.RT.lan_ips, insys.RT.port)
+        insys.RT.data_dir = tempfile.mkdtemp(prefix="insys-tls-")
+        insys.RT.online_requested = insys.RT.tunnel_active = False
+        insys.RT.lan = True
+        insys.RT.local_names = set(["insys-pc7"])
+        password = insys.init_db()
+        encryption = insys.Encryption(insys.encryption_folder())
+        allowed, names = insys.certificate_names("insys-pc7", set())
+        encryption.start("INSYS-PC7", allowed, names, ["192.168.1.10", "127.0.0.1", "::1"])
+        insys.RT.tls = encryption
+        insys.RT.lan_ips = ["192.168.1.10"]
+        cls.server = insys.Server(("127.0.0.1", 0), insys.Handler)
+        cls.port = insys.RT.port = cls.server.server_address[1]
+        threading.Thread(target=cls.server.serve_forever, daemon=True).start()
+        cls.secure = "https://127.0.0.1:%d" % cls.port
+        cls.plain = "http://127.0.0.1:%d" % cls.port
+        cls.trust = trusting(insys.encryption_folder())
+        cls.admin = Client(cls.secure, context=cls.trust)
+        assert cls.admin.login("admin", password)[0] == 200
+        assert cls.admin.post("/api/change-password", {"current": password, "new": "Sealed-office-2026"})[0] == 200
+        assert cls.admin.post("/api/records", {"module": "finance", "title": "Confidential fee proposal"})[0] == 200
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.shutdown()
+        cls.server.server_close()
+        shutil.rmtree(insys.RT.data_dir, ignore_errors=True)
+        (insys.RT.data_dir, insys.RT.lan, insys.RT.online_requested, insys.RT.tunnel_active,
+         insys.RT.local_names, insys.RT.tls, insys.RT.lan_ips, insys.RT.port) = cls.saved
+
+    def from_the_network(self):
+        """Makes InSys see the test's connections as coming from another device
+        on the network, not from this computer, until the test ends."""
+        original = insys.is_loopback
+        insys.is_loopback = lambda address: False
+        self.addCleanup(setattr, insys, "is_loopback", original)
+
+    def sessions(self):
+        conn = sqlite3.connect(insys.RT.db_path)
+        try:
+            return conn.execute("SELECT COUNT(*) FROM sessions").fetchone()[0]
+        finally:
+            conn.close()
+
+    def test_a_trusting_device_works_normally_over_the_encrypted_address(self):
+        self.from_the_network()
+        client = Client(self.secure, context=self.trust)
+        self.assertEqual(client.get("/api/ping")[0], 200)
+        self.assertEqual(client.login("admin", "Sealed-office-2026")[0], 200)
+        cookie = client.last_headers.get("Set-Cookie")
+        self.assertTrue(cookie.startswith("__Host-insys_session="), cookie)
+        for flag in ("Secure", "HttpOnly", "SameSite=Lax", "Path=/"):
+            self.assertIn(flag, cookie)
+        self.assertNotIn("Domain", cookie)
+        status, state = client.get("/api/state")
+        self.assertEqual(status, 200)
+        self.assertIn("Confidential fee proposal", [r["title"] for r in state["records"]])
+        self.assertEqual(client.post("/api/records", {"module": "project", "title": "Made over TLS"})[0], 200)
+        for path in ["/", "/app.js", "/styles.css", "/connect", "/connect.js", "/InSys-certificate.crt"]:
+            self.assertEqual(client.request("GET", path, raw=True)[0], 200, path)
+        self.assertEqual(client.post("/api/logout")[0], 200)
+        self.assertIn("Secure", client.last_headers.get("Set-Cookie"))
+        self.assertEqual(client.get("/api/me")[0], 401)
+
+    def test_nothing_is_served_to_the_network_without_encryption(self):
+        self.from_the_network()
+        client = Client(self.plain)
+        before = self.sessions()
+        # No data, and no way to sign in.
+        for path in ["/api/ping", "/api/state", "/api/me", "/api/version", "/api/admin/backup", "/api/admin/system"]:
+            status, data = client.get(path)
+            self.assertEqual((status, data["code"]), (403, "encrypted_only"), path)
+        status, data = client.post("/api/login", {"username": "admin", "password": "Sealed-office-2026"})
+        self.assertEqual((status, data["code"]), (403, "encrypted_only"))
+        self.assertIsNone(client.last_headers.get("Set-Cookie"))
+        self.assertEqual(self.sessions(), before)
+        self.assertEqual(client.put("/api/records/1", {"title": "x"})[0], 403)
+        self.assertEqual(client.delete("/api/records/1")[0], 403)
+        self.assertEqual(client.upload("/api/admin/restore", b"SQLite format 3\x00")[0], 403)
+        # Every page address gives the set-up page, never the application.
+        with open(os.path.join(insys.WEB_DIR, "connect.html"), "rb") as fh:
+            connect_page = fh.read()
+        for path in ["/", "/index.html", "/app.js", "/anything", "/connect"]:
+            status, body = client.request("GET", path, raw=True)
+            self.assertEqual((status, body), (200, connect_page), path)
+            self.assertNotIn(b"Confidential", body)
+        policy = client.last_headers.get("Content-Security-Policy")
+        self.assertIn("connect-src 'self' https://127.0.0.1:%d;" % self.port, policy)
+        self.assertIn("default-src 'none'", policy)
+        self.assertIn("script-src 'self'", policy)
+        # What the set-up page needs, and the certificate itself, are available.
+        for path in ["/connect.js", "/styles.css", "/favicon.svg"]:
+            self.assertEqual(client.request("GET", path, raw=True)[0], 200, path)
+        status, certificate = client.request("GET", "/InSys-certificate.crt", raw=True)
+        self.assertEqual(status, 200)
+        self.assertEqual(client.last_headers.get("Content-Type"), "application/x-x509-ca-cert")
+        self.assertEqual(certificate, insys.RT.tls.authority_der)
+        self.assertNotIn(insys.RT.tls.authority_key.to_bytes(32, "big"), certificate)
+
+    def test_this_computer_itself_is_served_as_before(self):
+        client = Client(self.plain)     # the host's own browser, on http://localhost
+        self.assertEqual(client.login("admin", "Sealed-office-2026")[0], 200)
+        cookie = client.last_headers.get("Set-Cookie")
+        self.assertTrue(cookie.startswith("insys_session="), cookie)
+        self.assertEqual(client.get("/api/state")[0], 200)
+        status, body = client.request("GET", "/", raw=True)
+        self.assertIn(b'<script src="/app.js">', body)
+
+    def test_a_sign_in_only_works_on_the_kind_of_connection_it_was_made_on(self):
+        over_tls = Client(self.secure, context=self.trust)
+        self.assertEqual(over_tls.login("admin", "Sealed-office-2026")[0], 200)
+        token = over_tls.cookie.split("=", 1)[1]
+        local = Client(self.plain)
+        self.assertEqual(local.login("admin", "Sealed-office-2026")[0], 200)
+        local_token = local.cookie.split("=", 1)[1]
+        # An encrypted sign-in presented on the unencrypted side, under either cookie name:
+        for cookie in ("insys_session=" + token, "__Host-insys_session=" + token):
+            probe = Client(self.plain)
+            probe.cookie = cookie
+            self.assertEqual(probe.get("/api/me")[0], 401, cookie)
+        # and the other way round.
+        for cookie in ("insys_session=" + local_token, "__Host-insys_session=" + local_token):
+            probe = Client(self.secure, context=self.trust)
+            probe.cookie = cookie
+            self.assertEqual(probe.get("/api/me")[0], 401, cookie)
+        self.assertEqual(over_tls.get("/api/me")[0], 200)
+        self.assertEqual(local.get("/api/me")[0], 200)
+
+    def test_sign_ins_from_before_encryption_no_longer_work(self):
+        import hashlib
+        import secrets
+        # A sign-in exactly as InSys 1.2.5 and earlier stored it, when the network was not encrypted.
+        token = secrets.token_urlsafe(32)
+        conn = sqlite3.connect(insys.RT.db_path)
+        conn.execute("INSERT INTO sessions (token_hash, user_id, csrf, created_at, last_seen) VALUES (?,?,?,?,?)",
+                     (hashlib.sha256(token.encode()).hexdigest(), 1, "c", time.time(), time.time()))
+        conn.commit()
+        conn.close()
+        for base, context in ((self.secure, self.trust), (self.plain, None)):
+            for cookie in ("insys_session=" + token, "__Host-insys_session=" + token):
+                probe = Client(base, context=context)
+                probe.cookie = cookie
+                self.assertEqual(probe.get("/api/me")[0], 401, base + " " + cookie)
+
+    def test_a_cookie_sent_without_encryption_ends_that_sign_in(self):
+        local = Client(self.plain)
+        self.assertEqual(local.login("admin", "Sealed-office-2026")[0], 200)
+        self.assertEqual(local.get("/api/me")[0], 200)
+        exposed = local.cookie
+        self.from_the_network()
+        leaky = Client(self.plain)
+        leaky.cookie = exposed
+        self.assertEqual(leaky.request("GET", "/", raw=True)[0], 200)   # (the set-up page)
+        insys.is_loopback = lambda address: address == "127.0.0.1"
+        self.assertEqual(local.get("/api/me")[0], 401)
+        status, data = self.admin.get("/api/admin/audit")
+        self.assertIn("session_exposed", [entry["event"] for entry in data["audit"]])
+
+    def test_a_device_without_the_certificate_cannot_be_fooled_or_break_anything(self):
+        import socket
+        import ssl
+        # A device that does not trust the certificate refuses the connection.
+        stranger = Client(self.secure, context=ssl.create_default_context())
+        with self.assertRaises(urllib.error.URLError) as caught:
+            stranger.get("/api/ping")
+        self.assertIn("CERTIFICATE_VERIFY_FAILED", str(caught.exception))
+        # Half-open connections, rubbish and an abandoned handshake leave the server unharmed.
+        for payload in (b"", b"\x16", b"\x16\x03\x01\x00\x05hello", b"\x00\x01\x02garbage\r\n\r\n", b"GET"):
+            with socket.create_connection(("127.0.0.1", self.port), timeout=5) as sock:
+                if payload:
+                    sock.sendall(payload)
+        self.assertEqual(Client(self.secure, context=self.trust).get("/api/ping")[0], 200)
+        self.assertEqual(Client(self.plain).get("/api/ping")[0], 200)
+
+    def test_what_is_on_the_wire_is_unreadable(self):
+        """Carries a whole encrypted session through a relay that records every
+        byte, as a sniffer on the network would see it."""
+        import socket
+        seen = []
+        relay = socket.socket()
+        relay.bind(("127.0.0.1", 0))
+        relay.listen(8)
+        relay_port = relay.getsockname()[1]
+        stop = threading.Event()
+
+        def pump(source, sink):
+            try:
+                while True:
+                    data = source.recv(65536)
+                    if not data:
+                        break
+                    seen.append(data)
+                    sink.sendall(data)
+            except OSError:
+                pass
+            finally:
+                try:
+                    sink.shutdown(socket.SHUT_WR)
+                except OSError:
+                    pass
+
+        def carry(inbound):
+            outbound = socket.create_connection(("127.0.0.1", self.port))
+            with inbound, outbound:
+                back = threading.Thread(target=pump, args=(outbound, inbound), daemon=True)
+                back.start()
+                pump(inbound, outbound)
+                back.join(10)
+
+        def accept():
+            relay.settimeout(0.2)
+            while not stop.is_set():
+                try:
+                    inbound, _ = relay.accept()
+                except OSError:
+                    continue
+                worker = threading.Thread(target=carry, args=(inbound,), daemon=True)
+                workers.append(worker)
+                worker.start()
+
+        workers = []
+        acceptor = threading.Thread(target=accept, daemon=True)
+        acceptor.start()
+        try:
+            client = Client("https://127.0.0.1:%d" % relay_port, context=self.trust)
+            self.assertEqual(client.login("admin", "Sealed-office-2026")[0], 200)
+            token = client.cookie.split("=", 1)[1]
+            title = "Tender price 4815162342 strictly private"
+            self.assertEqual(client.post("/api/records", {"module": "finance", "title": title, "amount": "98765.43"})[0], 200)
+            status, state = client.get("/api/state")
+            self.assertIn(title, [r["title"] for r in state["records"]])
+            self.assertEqual(client.request("GET", "/api/admin/backup", raw=True)[0], 200)
+        finally:
+            client.opener.close()
+            stop.set()
+            acceptor.join(5)
+            relay.close()
+            for worker in workers:
+                worker.join(10)
+        captured = b"".join(seen)
+        self.assertGreater(len(captured), 20000)
+        for secret in [b"Sealed-office-2026", b"admin", token.encode(), b"Tender price", b"4815162342", b"98765.43",
+                       b"Confidential fee proposal", b"insys_session", b"/api/", b"HTTP/1.1", b"SQLite format 3",
+                       client.csrf.encode()]:
+            self.assertNotIn(secret, captured, secret)
+
+    def test_the_administrator_sees_the_encryption_details(self):
+        status, system = self.admin.get("/api/admin/system")
+        self.assertEqual(status, 200)
+        enc = system["encryption"]
+        self.assertTrue(enc["on"])
+        self.assertEqual(enc["addresses"][0], "https://192.168.1.10:%d" % self.port)
+        self.assertEqual(enc["setup_addresses"], ["http://192.168.1.10:%d" % self.port])
+        self.assertIn("https://insys-pc7:%d" % self.port, enc["addresses"])
+        self.assertEqual(enc["certificate"], insys.describe_certificate(insys.RT.tls.authority_der))
+        self.assertEqual(enc["certificate_url"], "/InSys-certificate.crt")
+        self.assertEqual(system["mode"], "lan")
+        # Not for anyone else.
+        status, data = self.admin.post("/api/admin/users", {"username": "eng1", "full_name": "Eng One", "role": "staff"})
+        staff = Client(self.secure, context=self.trust)
+        staff.login("eng1", data["temp_password"])
+        staff.post("/api/change-password", {"current": data["temp_password"], "new": "Engineer-pass-77"})
+        self.assertEqual(staff.get("/api/admin/system")[0], 403)
+
+    def test_keys_are_not_part_of_backups_or_transfers(self):
+        status, backup = self.admin.request("GET", "/api/admin/backup", raw=True)
+        self.assertEqual(status, 200)
+        for name in ("local-certificate-key.pem", "server-key.pem"):
+            with open(os.path.join(insys.encryption_folder(), name), "rb") as fh:
+                secret = insys.pem_decode("EC PRIVATE KEY", fh.read().decode("ascii"))
+            private = insys.der_items(insys.der_items(secret)[0][1])[1][1]
+            self.assertEqual(len(private), 32)
+            self.assertNotIn(private, backup, name)
+        self.assertFalse(os.path.commonpath([insys.RT.backup_dir, insys.encryption_folder()])
+                         == insys.encryption_folder())
+
+    def test_many_devices_at_once(self):
+        results = []
+
+        def work(number):
+            try:
+                client = Client(self.secure, context=self.trust)
+                ok = client.login("admin", "Sealed-office-2026")[0] == 200
+                for _ in range(5):
+                    ok = ok and client.get("/api/state")[0] == 200
+                results.append(ok)
+            except Exception as exc:      # pragma: no cover - reported below
+                results.append(repr(exc))
+        threads = [threading.Thread(target=work, args=(n,)) for n in range(12)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join(60)
+        self.assertEqual(results, [True] * 12)
+
+
 EGRESS_PROBE = r"""
 import json, sys
 LOG, HOME = sys.argv[1], sys.argv[2]
@@ -1903,6 +2516,16 @@ class EgressTest(unittest.TestCase):
             status, backup = client.request("GET", "/api/admin/backup", raw=True)
             self.assertEqual(status, 200)
             self.assertEqual(client.upload("/api/admin/restore", backup)[0], 200)
+            if "--lan" in extra_args:
+                # The same again the way another device does it: over the encrypted
+                # address, trusting only the certificate InSys made at start-up.
+                folder = os.path.join(data, "encryption")
+                secure = Client("https://127.0.0.1:%d" % port, context=trusting(folder))
+                self.assertEqual(secure.login("admin", "Egress-check-2026")[0], 200)
+                self.assertEqual(secure.post("/api/records", {"module": "enquiry", "title": "Over TLS"})[0], 200)
+                for path in ["/api/state", "/api/admin/system", "/InSys-certificate.crt", "/connect", "/"]:
+                    self.assertEqual(secure.request("GET", path, raw=True)[0], 200, path)
+                self.assertTrue(secure.get("/api/admin/system")[1]["encryption"]["on"])
         finally:
             if proc.poll() is None:
                 if os.name == "nt":
@@ -1962,6 +2585,14 @@ class EgressTest(unittest.TestCase):
 
 
 class ToolingTest(unittest.TestCase):
+    def test_every_file_the_program_serves_is_packed_into_the_executable(self):
+        build = os.path.join(os.path.dirname(os.path.abspath(insys.__file__)), "packaging", "build_exe.py")
+        with open(build, encoding="utf-8") as fh:
+            packed = re.search(r"APP_FILES = \[(.*?)\]", fh.read(), re.S).group(1)
+        for filename, _ in insys.STATIC_FILES.values():
+            self.assertIn('"web/%s"' % filename, packed, filename)
+            self.assertTrue(os.path.isfile(os.path.join(insys.WEB_DIR, filename)), filename)
+
     def test_generated_passwords_meet_the_policy(self):
         for _ in range(200):
             password = insys.generate_password()

@@ -45,7 +45,7 @@ Both use the same data format, so you can switch between them.
    | Choice | Who can use it | Internet needed |
    |---|---|---|
    | **1** This computer only | You, on this computer | No |
-   | **2** This computer and the office network | Anyone on the same office network or Wi-Fi, at the `http://…` address shown | No |
+   | **2** This computer and the office network | Anyone on the same office network or Wi-Fi, at the `https://…` address shown — encrypted | No |
    | **3** Online | Anyone, anywhere, at the `https://…` address shown | Yes |
    | **4** Reset the administrator password | — | No |
 
@@ -63,9 +63,10 @@ Things to know:
   the first time, because the program is not code-signed. Click **More info** →
   **Run anyway**. Some antivirus products are suspicious of any unsigned program
   that unpacks files; if yours blocks InSys, allow `InSys.exe`.
-- **Choice 2** uses plain (unencrypted) HTTP inside your office network, and
-  Windows will ask once whether to allow InSys through the firewall — choose
-  **Allow** for private networks. Use it on a network you trust.
+- **Choice 2** encrypts everything it sends over your office network. Each
+  device installs the InSys certificate once — see *Encryption on the office
+  network* below. Windows will ask once whether to allow InSys through the
+  firewall — choose **Allow** for private networks.
 - **Choice 3** downloads Cloudflare's tunnel tool the first time (about 60 MB),
   so it needs the internet. If there is no connection, InSys says so and keeps
   working on the computer itself. See *Online access* below.
@@ -134,6 +135,79 @@ Engineering login cannot see Finance or Office Admin records at all — not in
 lists, searches, the activity log or exports. If one is linked to a project,
 they see only its reference number marked "Restricted". The separation is
 enforced on the server, not just hidden on the page.
+
+### Encryption on the office network
+
+With choice 2, everything InSys sends to and receives from other devices on
+the network is encrypted (HTTPS), so that nobody else on the network — on the
+same Wi-Fi, on a shared switch, at the router — can read it or pick up a
+password. Nothing is ever sent over the network unencrypted, and there is no
+setting that turns this off.
+
+A public website proves who it is with a certificate from a public authority.
+An office network has no such authority, so InSys makes its own certificate
+the first time it is started with choice 2, and **each device installs it
+once**. After that the device's browser shows InSys as a normal secure site
+and never asks again — not after a restart, not after an upgrade, and not when
+the network gives the host computer a different address.
+
+**Setting a device up (about a minute, once):**
+
+1. On the device, open the *first visit* address shown in the InSys window
+   and under **Admin → System & online access**. It looks like
+   `http://192.168.1.20:8080` — the same address people used before 1.2.6, so
+   existing bookmarks keep working.
+2. The page offers the certificate to download and shows the steps for that
+   kind of device (Windows, Android, iPhone/iPad, Mac, Firefox, Linux).
+3. Press **I have installed it – open InSys**. From then on that address moves
+   straight to the encrypted one (`https://192.168.1.20:8080`) by itself.
+   Bookmark the encrypted address.
+
+The administrator can also hand the file out directly: **Admin → System &
+online access → Download certificate**, with **Steps for each device** beside
+it. The same card shows the certificate's thumbprint; a device displays the
+thumbprint while installing, and if the two match, the file is the genuine one.
+
+Good to know:
+
+- **The host computer itself needs nothing.** `http://localhost:8080` works as
+  before; that traffic never leaves the computer.
+- **The certificate is not secret**, and it is deliberately limited: it can only
+  vouch for addresses on private networks (10.x, 172.16–31.x, 192.168.x) and
+  local-only names such as `pc.local`. It cannot be used to impersonate a
+  public website, even by someone who stole its key.
+- **The first-visit address never carries InSys data.** Over plain `http://`
+  from another device, InSys serves only the set-up page and the certificate:
+  no sign-in, no records. If a browser sends an old sign-in cookie there, that
+  sign-in is ended on the spot.
+- **Everyone signs in once more after upgrading to 1.2.6.** Sign-ins made by
+  earlier versions travelled unencrypted, so 1.2.6 does not accept them. If
+  your network is shared with people you do not fully trust, it is sensible
+  for everyone to change their password once, now that it can no longer be
+  overheard.
+- **A device you will only use once** can skip the installation and open the
+  `https://` address directly. The connection is still encrypted, but the
+  browser shows a warning page first, every time. Do not make a habit of it:
+  the warning is how a browser tells you it cannot confirm who it is talking to.
+- The certificate and its keys live in `InSys-data\encryption`. They are **not**
+  included in backups or in *Download database*: an office that receives a
+  copy of the data makes its own certificate. Keep the two `…-key.pem` files
+  private. If the folder is lost, InSys makes a new certificate and every
+  device installs the new one, once.
+- To replace the certificate on purpose (for example if the host computer was
+  stolen), run `InSys.exe --new-certificate` and start InSys again; every
+  device then installs the new one, and the old "InSys local certificate …"
+  can be removed from each device's list of trusted certificates.
+- The certificate lasts ten years. The short-lived certificate InSys presents
+  on each connection is renewed automatically.
+- If people reach the host by a name instead of a number, names ending in
+  `.local`, `.lan`, `.home`, `.internal` and similar are covered, as is the
+  computer's own name when it contains a digit or a hyphen (`DESKTOP-7GH2K1L`,
+  `PC-01`). A one-word, letters-only name such as `RECEPTION` is not — use the
+  numeric address or `reception.local`. (A certificate that covered such a name
+  would also cover every public address ending in it.)
+- If encryption cannot be set up, InSys does not start for the network at all
+  and says why; choice 1 still works.
 
 (Engineering is the role that versions 1.0 and 1.1 called "Staff". Existing
 Staff logins become Engineering automatically, with exactly the access they had.
@@ -309,6 +383,7 @@ If you use the office-network choice, Windows may ask again whether to allow
 
 | Version | What changed |
 |---|---|
+| 1.2.6 | Encryption on the office network (choice 2): HTTPS with a certificate each device installs once, downloadable from Admin (see *Encryption on the office network*). Everyone signs in once more. No change to stored data. |
 | 1.2.5 | Security hardening after a full code audit: choices 1 and 2 are closed to the internet in both directions (see *Choices 1 and 2 and the internet*). No change to stored data. |
 | 1.2.4 | Your own numbers for projects, enquiries and expressions of interest; column sorting made consistent. |
 | 1.2.3 | The Activity log and the bell show the actual date and time of each update. No change to stored data. |
@@ -356,8 +431,13 @@ Everything is stored in the `data` folder next to `insys.py`:
 - Sign-in sessions expire after 12 hours of inactivity and after 7 days at most.
   Deactivating a person or resetting their password signs them out immediately.
 - Section access is enforced on the server, not just hidden in the page.
-- Online traffic is encrypted (HTTPS) by the tunnel. On the host computer itself
+- Traffic on the office network (choice 2) is encrypted by InSys itself (HTTPS,
+  TLS 1.2 or newer, with forward secrecy); see *Encryption on the office
+  network*. Online traffic (choice 3) is encrypted by the tunnel. With choice 1
   InSys listens only on `localhost`.
+- A sign-in is tied to the kind of connection it was made on and its cookie
+  is marked so that a browser will only ever send it over the encrypted
+  connection.
 - Sign-ins, failed sign-ins, password resets, deletions and backup downloads are
   recorded under **Admin → Security log**.
 
@@ -405,8 +485,15 @@ page and need a valid login. Your web browser and Windows make their own
 connections (updates, safe-browsing checks) regardless of InSys. Links you
 click inside InSys — a subcontractor's website, an external reference, an
 email address — open that site or your mail program, as you would expect; InSys
-adds nothing to them and the site is not told where you came from. And in
-choice 2 the traffic inside your office network is not encrypted.
+adds nothing to them and the site is not told where you came from.
+
+Encryption protects what travels over the network; it does not protect the
+host computer. Anyone who can read the `InSys-data` folder has the data and
+the encryption keys, so keep that computer's Windows account locked and its
+disk encrypted (BitLocker). And a device that opens InSys without having
+installed the certificate — clicking through the browser's warning — is
+encrypted against eavesdroppers but cannot tell the real InSys from an
+impostor on the same network; installing the certificate closes that gap.
 
 This is appropriate for a pilot with ordinary business information. Before
 putting highly sensitive data in it or scaling beyond a pilot, have the
@@ -441,6 +528,10 @@ that way returns to whichever theme was chosen before.
 | Online address stopped working | The host computer slept, lost its connection, or InSys was restarted. Check the black window for the current address. |
 | Online access could not be set up | Check the internet connection. Some office networks block tunnels; `data\tunnel.log` has the detail. |
 | Someone is locked out | Admin → People & logins → **Reset password**. |
+| A device shows "Your connection is not private" | It has not installed the InSys certificate yet, or the browser has not been restarted since. Open the first-visit `http://…` address on that device and follow the steps. |
+| The certificate is installed but the warning remains | Check it went into **Trusted Root Certification Authorities** (Windows) or was switched on under **Certificate Trust Settings** (iPhone). In Firefox, import it under Settings → Privacy & Security → Certificates. Then close and reopen the browser. |
+| "InSys could not set up encryption for the office network" | The message says why. Choice 1 still works. If the files in `InSys-data\encryption` were damaged, delete that folder and start again: InSys makes a new certificate, which every device installs once. |
+| A device's old bookmark shows a set-up page | That is the first-visit page: install the certificate once and it moves to the encrypted address by itself. |
 
 ## For the technically minded
 
@@ -490,7 +581,7 @@ downloadable artifact.
 | File | Purpose |
 |---|---|
 | `insys.py` | The server: sign-in, permissions, storage, backups, online access. |
-| `web/` | The page that runs in the browser (`index.html`, `app.js`, `styles.css`). |
+| `web/` | The page that runs in the browser (`index.html`, `app.js`, `styles.css`), and the device set-up page (`connect.html`, `connect.js`). |
 | `Start-InSys.bat` | Windows launcher (this computer only). |
 | `Start-InSys-Online.bat` | Windows launcher with internet access. |
 | `Reset-Admin-Password.bat` | Administrator password recovery. |

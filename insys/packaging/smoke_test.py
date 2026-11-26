@@ -140,6 +140,61 @@ def main():
             console = fh.read()
         check("InSys has stopped" in console, "printed its shutdown message")
         check(not os.path.exists(os.path.join(data, "insys.log")), "no errors were logged")
+
+        # Started for the office network: the encryption library inside the
+        # program must work, and a certificate must be made and accepted.
+        with open(log_path, "ab") as log:
+            proc = subprocess.Popen([exe, "--no-browser", "--no-menu", "--lan", "--port", str(PORT)], cwd=home,
+                                    env=env, stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT,
+                                    creationflags=flags, start_new_session=os.name != "nt")
+        ping = None
+        for _ in range(240):
+            if proc.poll() is not None:
+                break
+            try:
+                ping = call("GET", "/api/ping")[1]
+                break
+            except (OSError, ValueError):
+                time.sleep(0.5)
+        check(ping is not None and ping.get("app") == "insys", "starts for the office network (choice 2)")
+        folder = os.path.join(data, "encryption")
+        for name in ("InSys-certificate.crt", "local-certificate-key.pem", "server.pem", "server-key.pem"):
+            check(os.path.isfile(os.path.join(folder, name)), "made %s in InSys-data/encryption" % name)
+        with open(os.path.join(folder, "InSys-certificate.crt"), "rb") as fh:
+            certificate = fh.read()
+        import ssl
+        trust = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        trust.load_verify_locations(cadata=certificate)
+        secure = urllib.request.build_opener(urllib.request.ProxyHandler({}), urllib.request.HTTPSHandler(context=trust))
+        with secure.open("https://127.0.0.1:%d/api/ping" % PORT, timeout=20) as response:
+            answer = json.loads(response.read().decode("utf-8"))
+        check(answer.get("app") == "insys", "answers over HTTPS, and a device that installed the certificate accepts it")
+        refused = False
+        try:
+            urllib.request.build_opener(urllib.request.ProxyHandler({}), urllib.request.HTTPSHandler(
+                context=ssl.create_default_context())).open("https://127.0.0.1:%d/api/ping" % PORT, timeout=20)
+        except (urllib.error.URLError, OSError):
+            refused = True
+        check(refused, "a device that has not installed it refuses the connection")
+        status, served, _ = call("GET", "/InSys-certificate.crt", raw=True)
+        check(status == 200 and served == certificate, "the certificate can be downloaded")
+        check(call("GET", "/connect", raw=True)[0] == 200 and call("GET", "/connect.js", raw=True)[0] == 200,
+              "the device set-up page is served from inside the program")
+        status, login, set_cookie = call("POST", "/api/login", {"username": "admin", "password": "Smoke-test-2026"})
+        check(status == 200, "the earlier sign-in details still work after the restart")
+        status, system, _ = call("GET", "/api/admin/system", cookie=set_cookie.split(";")[0])
+        check(status == 200 and system["encryption"]["on"] and system["mode"] == "lan",
+              "Admin reports encryption on for the office network")
+        if os.name == "nt":
+            proc.send_signal(signal.CTRL_BREAK_EVENT)
+        else:
+            os.killpg(proc.pid, signal.SIGINT)
+        try:
+            code = proc.wait(timeout=30)
+        except subprocess.TimeoutExpired:
+            code = None
+        check(code == 0, "shuts down cleanly again (exit code %r)" % code)
+        check(not os.path.exists(os.path.join(data, "insys.log")), "still no errors logged")
         ok = True
     except AssertionError:
         pass

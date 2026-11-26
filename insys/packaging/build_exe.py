@@ -47,7 +47,7 @@ SKIP_DIRS = ("tools/include/", "tools/libs/", "tools/Lib/ensurepip/", "tools/Lib
 SKIP_FILES = ("tools/pythonw.exe",)
 
 APP_FILES = ["insys.py", "web/index.html", "web/app.js", "web/styles.css",
-             "web/favicon.svg", "web/robots.txt"]
+             "web/favicon.svg", "web/robots.txt", "web/connect.html", "web/connect.js"]
 
 
 def fetch_python():

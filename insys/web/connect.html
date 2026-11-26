@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>InSys - set this device up</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<main class="connect">
+  <div class="connect-brand"><span class="brand-mark">IS</span><div><div class="brand-name">InSys</div><div class="brand-sub">Internal Systems</div></div></div>
+
+  <p id="checking" class="muted" hidden>Checking whether this device is ready&hellip;</p>
+
+  <section id="ready" class="card" hidden>
+    <h1>This device is ready</h1>
+    <p>Opening InSys on its encrypted address&hellip;</p>
+    <p><a id="open-link" class="btn primary" href="/">Open InSys</a></p>
+  </section>
+
+  <section id="steps" class="card">
+    <h1 id="steps-title">Set this device up, once</h1>
+    <p id="steps-lead">InSys encrypts everything it sends across the office network, so nobody else on the
+      network can read it. For that, each device installs the InSys certificate one time. It takes about a
+      minute, and this device will not ask again.</p>
+    <p id="guide-lead" hidden>These are the steps for a device that is using InSys over the office network for
+      the first time. Each device does this once.</p>
+
+    <ol class="connect-steps">
+      <li>
+        <h2>Download the certificate</h2>
+        <p><a class="btn primary" id="download" href="/InSys-certificate.crt" download="InSys-certificate.crt">Download the InSys certificate</a></p>
+        <p class="small muted">It is not a program and it is not secret. It can only vouch for addresses on a
+          private network such as this office's, never for a public website.</p>
+      </li>
+      <li>
+        <h2>Install it on this device</h2>
+        <details class="device" data-device="windows">
+          <summary>Windows &ndash; Chrome, Edge, Firefox</summary>
+          <ol>
+            <li>Open the downloaded file <b>InSys-certificate.crt</b>. If Windows asks, choose <b>Open</b>.</li>
+            <li>Click <b>Install Certificate&hellip;</b>, leave <b>Current User</b> selected and click <b>Next</b>.</li>
+            <li>Choose <b>Place all certificates in the following store</b>, click <b>Browse&hellip;</b>, pick
+              <b>Trusted Root Certification Authorities</b>, then <b>OK</b>, <b>Next</b> and <b>Finish</b>.</li>
+            <li>Windows shows a security warning that names <b>InSys local certificate</b>. Click <b>Yes</b>.</li>
+            <li>Close the browser completely and open it again.</li>
+          </ol>
+        </details>
+        <details class="device" data-device="android">
+          <summary>Android phone or tablet &ndash; Chrome</summary>
+          <ol>
+            <li>After the download, open the phone's <b>Settings</b> and search for <b>CA certificate</b>. (It is
+              under Security, in <b>More security settings</b> or <b>Encryption &amp; credentials</b>, then
+              <b>Install a certificate</b>.)</li>
+            <li>Tap <b>CA certificate</b>, then <b>Install anyway</b>, and confirm with your screen lock.</li>
+            <li>Choose <b>InSys-certificate.crt</b> from Downloads.</li>
+          </ol>
+          <p class="small muted">Android afterwards shows its standard notice that a certificate is installed.
+            This one can only be used for private network addresses.</p>
+        </details>
+        <details class="device" data-device="ios">
+          <summary>iPhone or iPad &ndash; Safari</summary>
+          <ol>
+            <li>After tapping Download, tap <b>Allow</b>. The iPhone says a profile was downloaded.</li>
+            <li>Open <b>Settings</b>, tap <b>Profile Downloaded</b> near the top, then <b>Install</b>
+              (enter your passcode) and <b>Install</b> again.</li>
+            <li>Still in Settings, go to <b>General &rsaquo; About &rsaquo; Certificate Trust Settings</b> and
+              switch on <b>InSys local certificate</b>.</li>
+          </ol>
+        </details>
+        <details class="device" data-device="mac">
+          <summary>Mac &ndash; Safari, Chrome</summary>
+          <ol>
+            <li>Open the downloaded file. <b>Keychain Access</b> opens; if it asks which keychain, choose <b>login</b>.</li>
+            <li>In Keychain Access, find <b>InSys local certificate</b> and double-click it.</li>
+            <li>Open <b>Trust</b>, set <b>When using this certificate</b> to <b>Always Trust</b>, close the
+              window and enter your password.</li>
+            <li>Quit the browser and open it again.</li>
+          </ol>
+        </details>
+        <details class="device" data-device="firefox">
+          <summary>Firefox, if it still shows a warning</summary>
+          <ol>
+            <li>Open the Firefox menu, then <b>Settings &rsaquo; Privacy &amp; Security</b>, scroll to
+              <b>Certificates</b> and click <b>View Certificates&hellip;</b></li>
+            <li>On the <b>Authorities</b> tab click <b>Import&hellip;</b> and choose <b>InSys-certificate.crt</b>.</li>
+            <li>Tick <b>Trust this CA to identify websites</b> and click <b>OK</b>.</li>
+          </ol>
+        </details>
+        <details class="device" data-device="linux">
+          <summary>Linux &ndash; Chrome, Chromium</summary>
+          <ol>
+            <li>Open <b>Settings &rsaquo; Privacy and security &rsaquo; Security &rsaquo; Manage certificates</b>.</li>
+            <li>Under <b>Authorities</b> (or <b>Custom &rsaquo; Trusted Certificates</b>) click <b>Import</b> and
+              choose <b>InSys-certificate.crt</b>.</li>
+            <li>Tick <b>Trust this certificate for identifying websites</b>, confirm, and restart the browser.</li>
+          </ol>
+        </details>
+        <p class="small muted">To be sure the file is the genuine one, compare the thumbprint your device
+          shows while installing it with the one your administrator sees in InSys under Admin, System.</p>
+      </li>
+      <li>
+        <h2>Open InSys</h2>
+        <p><a class="btn primary" id="continue" href="/">I have installed it &ndash; open InSys</a></p>
+        <p id="not-yet" class="connect-note" hidden>This device does not trust the certificate yet. Check the
+          steps above, and close and reopen the browser if you have not done so.</p>
+        <p id="anyway-line" class="small muted" hidden>On a device you will only use once you can
+          <a id="anyway" href="/">open the encrypted address without installing</a>. The connection is still
+          encrypted, but the browser shows a warning page first, every time.</p>
+        <p class="small muted" id="bookmark-tip">Once InSys opens, bookmark that page: its address starts with https.</p>
+      </li>
+    </ol>
+  </section>
+
+  <noscript><p class="connect-note">This page works best with JavaScript switched on. Without it, install the
+    certificate as described above, then open this same address starting with https:// instead of http://.</p></noscript>
+</main>
+<script src="/connect.js"></script>
+</body>
+</html>
