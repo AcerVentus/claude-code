@@ -2231,13 +2231,12 @@ def encryption_status():
               "certificate_url": CERTIFICATE_PATH, "addresses": [], "setup_addresses": []}
     if status["on"]:
         shown = [a for a in RT.lan_ips if a in RT.tls.covered]
-        shown += [a for a in RT.tls.addresses if a not in shown and not is_loopback(a)]
+        shown += [a for a in RT.tls.seen if a not in shown and a in RT.tls.covered]
         for address in shown:
             where = "[%s]:%d" % (address, RT.port) if ":" in address else "%s:%d" % (address, RT.port)
             status["addresses"].append("https://" + where)
             status["setup_addresses"].append("http://" + where)
-        status["addresses"] += ["https://%s:%d" % (name, RT.port) for name in RT.tls.names
-                                if name != "localhost"][:1]
+        status["also_covers"] = [name for name in RT.tls.other_names() if "." in name]
     return status
 
 
@@ -2768,7 +2767,7 @@ class Encryption:
     """HTTPS for the local network: the local certificate each device installs
     once, and the server certificate InSys presents, kept in the data folder."""
 
-    AUTHORITY_YEARS = 10
+    AUTHORITY_DAYS = 3652    # the local certificate lasts ten years
     SERVER_DAYS = 396        # browsers refuse server certificates that last much over a year
     RENEW_DAYS = 45          # a new one is made this long before the old one ends
     MAX_ADDRESSES = 24
@@ -2783,6 +2782,9 @@ class Encryption:
         self.context = None
         self.covered = set()          # IP addresses the server certificate names, as text
         self.addresses = []           # the same, most recently needed first
+        self.pinned = []              # addresses this computer had at start: never dropped
+        self.seen = []                # addresses devices have actually connected to, this run
+        self.retry_after = 0          # no new attempt to renew before this time, after a failure
         self.names = []               # DNS names it names
         self.server_until = None
         self.created = False          # a local certificate was made during this start
@@ -2794,13 +2796,15 @@ class Encryption:
     def _write(self, name, data, private=False):
         os.makedirs(self.folder, exist_ok=True)
         tmp = self.path(name + ".tmp")
-        with open(tmp, "wb") as fh:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+        # A private key is never readable by other accounts, not even for a moment.
+        handle = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0),
+                         0o600 if private else 0o644)
+        with os.fdopen(handle, "wb") as fh:
             fh.write(data)
-        if private:
-            try:
-                os.chmod(tmp, 0o600)
-            except OSError:
-                pass
         for attempt in range(6):
             try:
                 os.replace(tmp, self.path(name))
@@ -2817,24 +2821,52 @@ class Encryption:
         """Read the local certificate made earlier. Returns a reason if there is
         one on file that cannot be used, None otherwise (whether or not there is one)."""
         key_path, cert_path = self.path("local-certificate-key.pem"), self.path(self.CERTIFICATE_FILE)
-        if not os.path.exists(key_path) and not os.path.exists(cert_path):
+        # The certificate that devices have installed is only ever replaced when
+        # it is provably unusable: a file gone, or contents that are not a
+        # matching certificate and key. A file that merely cannot be read at
+        # this moment (in use by a scanner or backup program, say) is not a
+        # reason, and neither is the calendar: both stop InSys instead.
+        key_text = self._read(key_path)
+        cert_der = self._read(cert_path)
+        if key_text is None and cert_der is None:
             return None
+        if key_text is None:
+            return "its key file is missing"
+        if cert_der is None:
+            return "its certificate file is missing"
         try:
-            with open(cert_path, "rb") as fh:
-                cert_der = fh.read()
-            with open(key_path, "r", encoding="ascii") as fh:
-                key = read_private_key(fh.read())
+            key = read_private_key(key_text.decode("ascii"))
             info = read_certificate(cert_der)
-            if info["public"] != ec_public(key):
-                return "its key does not belong to it"
-            if info["issuer"] != info["subject"] or not ecdsa_verify(info["public"], info["tbs"], info["signature"]):
-                return "it has been altered or damaged"
-            if info["not_after"] - utc_now() < datetime.timedelta(days=30):
-                return "it has reached the end of its life"
-        except (OSError, ValueError, UnicodeDecodeError) as exc:
-            return "its files could not be read (%s)" % exc
+        except (ValueError, IndexError, UnicodeDecodeError) as exc:
+            return "its files are damaged (%s)" % exc
+        if info["public"] != ec_public(key):
+            return "its key does not belong to it"
+        if info["issuer"] != info["subject"] or not ecdsa_verify(info["public"], info["tbs"], info["signature"]):
+            return "it has been altered or damaged"
+        if info["not_after"] <= utc_now():
+            raise EncryptionError(
+                "the InSys certificate ended on %s (if that is not in the past, this computer's date is "
+                "wrong: correct it and start again). To make a new certificate, which every device then "
+                "installs once, start InSys with --new-certificate"
+                % info["not_after"].strftime("%d %B %Y"))
         self.authority_key, self.authority_der, self.authority = key, cert_der, info
         return None
+
+    def _read(self, path):
+        """The contents of a file, None if it does not exist. A file that
+        exists but cannot be read stops InSys rather than being taken for lost."""
+        for attempt in range(6):
+            try:
+                with open(path, "rb") as fh:
+                    return fh.read()
+            except FileNotFoundError:
+                return None
+            except OSError as exc:
+                if attempt == 5:
+                    raise EncryptionError(
+                        "the file %s could not be read (%s). Nothing has been changed. Close any "
+                        "program that may be using it and start InSys again" % (path, exc))
+                time.sleep(0.3)
 
     def create_authority(self, host_label, names):
         """Make a new local certificate. It may vouch only for private network
@@ -2856,7 +2888,7 @@ class Encryption:
         now = utc_now()
         cert_der = build_certificate(key, name, name, public,
                                      now - datetime.timedelta(days=1),
-                                     now + datetime.timedelta(days=365 * self.AUTHORITY_YEARS + 2), [
+                                     now + datetime.timedelta(days=self.AUTHORITY_DAYS), [
             x509_extension(OID_BASIC_CONSTRAINTS, der_seq(der(0x01, b"\xff"), der_int(0)), critical=True),
             x509_extension(OID_KEY_USAGE, der(0x03, b"\x01\x06"), critical=True),      # sign certificates
             x509_extension(OID_EXT_KEY_USAGE, der_seq(OID_SERVER_AUTH)),              # for web servers only
@@ -2903,11 +2935,22 @@ class Encryption:
                 return False
             if not ecdsa_verify(self.authority["public"], info["tbs"], info["signature"]):
                 return False
-            if info["not_after"] - utc_now() < datetime.timedelta(days=self.RENEW_DAYS):
+            left = info["not_after"] - utc_now()
+            if left < datetime.timedelta(days=self.RENEW_DAYS) and info["not_after"] < self.authority["not_after"]:
+                return False
+            if left <= datetime.timedelta(0):
                 return False
             names, addresses = read_names(der_items(info["extensions"][OID_ALT_NAME])[0][1])
+            # OpenSSL compares the certificate with the copy of the public key kept
+            # in the key file, not with the private key itself, so a damaged
+            # private key would only show when a device connects. Check it here,
+            # and prove the whole arrangement with a trial handshake.
+            with open(self.path("server-key.pem"), "r", encoding="ascii") as fh:
+                if ec_public(read_private_key(fh.read())) != info["public"]:
+                    return False
             context = self._context()
-        except (OSError, ValueError, KeyError, IndexError, UnicodeDecodeError, ssl.SSLError):
+            self.self_test(context, str(addresses[0]) if addresses else "localhost")
+        except (OSError, ValueError, KeyError, IndexError, UnicodeDecodeError, ssl.SSLError, EncryptionError):
             return False
         self.context, self.names = context, names
         self.addresses = [str(a) for a in addresses]
@@ -2928,7 +2971,7 @@ class Encryption:
         local certificate may vouch for), and start using it."""
         names = [n for n in dict.fromkeys(names) if self.permits_name(n)]
         wanted = []
-        for address in list(addresses) + self.previous_addresses():
+        for address in list(addresses)[:1] + self.pinned + list(addresses)[1:] + self.previous_addresses():
             ip = parse_ip(address)
             if ip is not None and str(ip) not in wanted and self.permits_address(str(ip)):
                 wanted.append(str(ip))
@@ -3004,12 +3047,13 @@ class Encryption:
                     self.create_authority(host_name, allowed)
                 wanted_names = [n for n in names if self.permits_name(n)]
                 wanted = [str(parse_ip(a)) for a in addresses if self.permits_address(a)]
+                self.pinned = list(wanted)
                 if not (self.load_server() and set(wanted_names) <= set(self.names)
                         and set(wanted) <= self.covered):
                     self.issue_server(wanted_names, wanted)
             except EncryptionError:
                 raise
-            except (OSError, ValueError, ssl.SSLError) as exc:
+            except (OSError, ValueError, IndexError, KeyError, ssl.SSLError) as exc:
                 raise EncryptionError(str(exc) or exc.__class__.__name__)
 
     def context_for(self, address):
@@ -3018,16 +3062,35 @@ class Encryption:
         computer a different one - is added to the certificate on the spot."""
         ip = parse_ip(address)
         text = str(ip) if ip is not None else ""
-        soon = utc_now() + datetime.timedelta(days=self.RENEW_DAYS)
-        if text in self.covered and self.server_until > soon:
+        if ip is not None and not ip.is_loopback and text not in self.seen:
+            self.seen.append(text)
+        if text in self.covered and not self.renewal_due():
             return self.context
         with self.lock:
-            if (text not in self.covered and self.permits_address(text)) or self.server_until <= soon:
+            needed = text not in self.covered and self.permits_address(text)
+            if (needed or self.renewal_due()) and time.time() >= self.retry_after:
                 try:
-                    self.issue_server(self.names, [text] + self.addresses)
+                    self.issue_server(self.names, ([text] if needed else []) + self.addresses)
                 except (OSError, ValueError, ssl.SSLError, EncryptionError) as exc:
-                    log_error("The server certificate could not be renewed: %s" % exc)
+                    # Carry on with the certificate in use, and do not try again on
+                    # every connection: once every ten minutes is enough.
+                    self.retry_after = time.time() + 600
+                    log_error("The server certificate could not be renewed (InSys will try again "
+                              "in ten minutes): %s" % exc)
             return self.context
+
+    def renewal_due(self):
+        """Whether the server certificate is close enough to its end to be
+        replaced - unless a new one could last no longer, because the local
+        certificate itself ends then."""
+        soon = utc_now() + datetime.timedelta(days=self.RENEW_DAYS)
+        return self.server_until <= soon and self.server_until < self.authority["not_after"]
+
+    def other_names(self):
+        """Names the local certificate may vouch for beyond the local-only
+        endings: this computer's own name and any given with --allow-host."""
+        standard = set(["localhost"] + [suffix.lstrip(".") for suffix in LOCAL_NAME_SUFFIXES])
+        return [name for name in self.permitted()[0] if name not in standard]
 
 
 
@@ -3038,9 +3101,12 @@ def write_private_key(private, public):
 
 
 def read_private_key(text):
-    parts = der_items(der_items(pem_decode("EC PRIVATE KEY", text))[0][1])
-    value = int.from_bytes(parts[1][1], "big")
-    if not (parts[1][0] == 0x04 and 1 <= value < EC_N):
+    try:
+        parts = der_items(der_items(pem_decode("EC PRIVATE KEY", text))[0][1])
+        value = int.from_bytes(parts[1][1], "big")
+        if not (parts[1][0] == 0x04 and 1 <= value < EC_N):
+            raise ValueError("unreadable key")
+    except IndexError:
         raise ValueError("unreadable key")
     return value
 
@@ -3102,9 +3168,16 @@ def constraint_safe(name):
     a permission also covers every name ending in '.name', so a one-word name
     is accepted only if it could never be a public ending such as 'dev' or
     'app': those are letters only, so it must contain a digit or a hyphen."""
-    if not dns_label_ok(name) or name.startswith("xn--"):
+    if not dns_label_ok(name) or name.startswith("xn--") or parse_ip(name) is not None:
         return False
-    return "." in name or bool(re.search(r"[0-9-]", name))
+    labels = name.split(".")
+    if labels[-1].isdigit():
+        return False               # would read as part of an address, not a name
+    if len(labels) == 1:
+        return bool(re.search(r"[0-9-]", name))
+    # A name with a public ending must be a specific computer's name
+    # (tracker.office.example), not a whole organisation's (example.com, co.uk).
+    return name.endswith(LOCAL_NAME_SUFFIXES) or len(labels) >= 3
 
 
 def certificate_names(own, extra):
@@ -3167,6 +3240,15 @@ LOCAL_ONLY_PAGE = (
     "that come from, or by way of, the internet.\r\n\r\n"
     "On the host computer use http://localhost and the port shown in the InSys window;\r\n"
     "on the office network use the 'On your network' address shown there.\r\n").encode("ascii")
+
+
+# Headers by which a proxy or forwarder announces itself.
+PROXY_HEADERS = FORWARD_IP_HEADERS + ("via", "x-forwarded-host", "x-forwarded-proto", "x-forwarded-port",
+                                      "x-forwarded-server")
+PASSED_ON_PAGE = (
+    "InSys is serving the office network over its own encrypted connection and does\r\n"
+    "not answer requests that another program has passed on to it.\r\n\r\n"
+    "Open the https:// address shown in the InSys window directly.\r\n").encode("ascii")
 
 
 def parse_ip(text):
@@ -3326,6 +3408,10 @@ class Handler(BaseHTTPRequestHandler):
         """The kind of connection, which a sign-in is tied to: see session_hash."""
         return "tls" if self.is_tls() else "local"
 
+    def passed_on(self):
+        """Whether the request carries the marks of a proxy or forwarder."""
+        return any(self.headers.get(name) for name in PROXY_HEADERS)
+
     def must_use_encryption(self):
         """True for a request that crossed the network without encryption while
         InSys is serving the network. Such a request is never given any data."""
@@ -3439,6 +3525,9 @@ class Handler(BaseHTTPRequestHandler):
     def dispatch(self, method):
         self.extra_headers = []
         self.content_policy = None
+        if self.request_version == "HTTP/0.9" or not hasattr(self.headers, "get_all"):
+            self.close_connection = True      # a bare one-line request from the 1990s: not answered
+            return
         try:
             self.handle_request(method)
         except ApiError as exc:
@@ -3472,6 +3561,14 @@ class Handler(BaseHTTPRequestHandler):
                 note_blocked(self.client_address[0], "A request from %s was refused because %s."
                              % (self.client_address[0], reason))
                 return self.send_bytes(403, LOCAL_ONLY_PAGE, "text/plain; charset=utf-8")
+        if (RT.tls is not None and not RT.tunnel_active and not self.is_tls()
+                and is_loopback(self.client_address[0]) and self.passed_on()):
+            # Another program on this computer is handing requests on to InSys.
+            # Whatever carried them to that program was not InSys's encryption.
+            self.close_connection = True
+            note_blocked(self.client_address[0], "A request passed on by another program on this "
+                         "computer was refused: InSys only serves the network over its own encryption.")
+            return self.send_bytes(403, PASSED_ON_PAGE, "text/plain; charset=utf-8")
         parsed = urlparse(self.path)
         path = parsed.path
         if self.must_use_encryption():
@@ -3602,14 +3699,30 @@ class Handler(BaseHTTPRequestHandler):
                       "A sign-in was ended because its cookie was sent without encryption",
                       ip=self.client_address[0])
 
+    def serve_certificate(self):
+        """The file a device installs. While InSys serves the office network any
+        device there may fetch it - it has to, before it can connect securely.
+        At any other time (this computer only, or online) it is for a signed-in
+        administrator: it names this computer, which is nobody else's business."""
+        if RT.tls is None or RT.tunnel_active:
+            user, _ = self.load_session(touch=False)
+            if user is None or user["role"] != "admin" or user["must_change"]:
+                raise ApiError(403, "Sign in as an administrator to download the certificate.")
+        data = stored_certificate()
+        if data is None:
+            raise ApiError(404, "No certificate has been made yet. Start InSys with choice 2 once.")
+        if "android" in (self.headers.get("User-Agent") or "").lower():
+            # Android only installs such a certificate from Settings, out of a saved
+            # file; offered under its proper type it is not saved at all.
+            return self.send_bytes(200, data, "application/octet-stream", [
+                ("Content-Disposition", 'attachment; filename="%s"' % Encryption.CERTIFICATE_FILE)])
+        return self.send_bytes(200, data, "application/x-x509-ca-cert")
+
     def serve_static(self, method, path):
         if method != "GET":
             raise ApiError(405, "Method not allowed.")
         if path == CERTIFICATE_PATH:
-            data = stored_certificate()
-            if data is None:
-                raise ApiError(404, "No certificate has been made yet. Start InSys with choice 2 once.")
-            return self.send_bytes(200, data, "application/x-x509-ca-cert")
+            return self.serve_certificate()
         entry = STATIC_FILES.get(path)
         if entry is None:
             raise ApiError(404, "Not found.")
@@ -4196,8 +4309,15 @@ def discard_certificate():
     for name in ("local-certificate-key.pem", Encryption.CERTIFICATE_FILE, "server-key.pem", "server.pem"):
         try:
             os.replace(os.path.join(folder, name), os.path.join(folder, "replaced-%s-%s" % (stamp, name)))
-        except OSError:
+        except FileNotFoundError:
             pass
+        except OSError as exc:
+            say("")
+            say("  The certificate could not be set aside: %s" % exc)
+            say("  Close InSys and any program using the files in:")
+            say("      %s" % folder)
+            say("  and try again. InSys will keep using the present certificate until then.")
+            return 1
     if os.path.exists(RT.db_path):
         try:
             with write_db(bump=False) as conn:
@@ -4287,6 +4407,14 @@ def banner(first_password):
         say("")
         say("      http://%s:%d" % (network[0], RT.port))
         say("")
+        shown = describe_certificate(RT.tls.authority_der)
+        say("  While installing, a device shows the certificate's thumbprint. It is")
+        say("  genuine only if that matches:")
+        say("")
+        say("      SHA-1    %s" % shown["sha1"])
+        say("      SHA-256  %s" % shown["sha256"][:47])
+        say("               %s" % shown["sha256"][48:])
+        say("")
         if RT.tls.created and RT.tls.replaced:
             say("  NOTE: the certificate made earlier could not be used (%s)," % RT.tls.replaced)
             say("  so a new one was made. Every device has to install the new one, once.")
@@ -4294,6 +4422,18 @@ def banner(first_password):
         elif RT.tls.created:
             say("  The certificate was made just now and is kept in:")
             say("      %s" % encryption_folder())
+            say("")
+        uncovered = sorted(name for name in RT.local_names
+                           if "." in name and name not in RT.tls.names)
+        if uncovered:
+            say("  NOTE: the certificate does not cover the name %s." % ", ".join(uncovered))
+            say("  Use the numbered address above for now. A certificate that covers it")
+            say("  can be made with --new-certificate; every device then installs it once.")
+            say("")
+        days_left = (RT.tls.authority["not_after"] - utc_now()).days
+        if days_left < 180:
+            say("  NOTE: the certificate ends in %d days. Before then, start InSys once" % days_left)
+            say("  with --new-certificate; every device then installs the new one.")
             say("")
         say("  If Windows asks whether to allow InSys on the network, choose Allow.")
     say("")

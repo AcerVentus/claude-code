@@ -473,6 +473,7 @@ dialog.dlg::backdrop { background: rgba(11, 11, 11, .45); }
 .connect details.device li { padding: 3px 0; }
 .connect details.device p { padding: 0 12px 8px; }
 .connect-note { padding: 9px 12px; border-radius: 8px; background: var(--warn-soft); color: var(--warn-ink); }
+.connect-check { padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--raised); }
 
 #toasts { position: fixed; left: 16px; bottom: 16px; z-index: 100; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; pointer-events: none; }
 .toast {

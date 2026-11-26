@@ -2797,6 +2797,11 @@
         h('div', { class: 'k', text: 'Valid until' }), h('div', { class: 'v', text: fmtDate(cert.valid_until) }),
         h('div', { class: 'k', text: 'Thumbprint (SHA-1)' }), h('div', { class: 'v mono', text: cert.sha1 }),
         h('div', { class: 'k', text: 'Fingerprint (SHA-256)' }), h('div', { class: 'v mono', text: cert.sha256 }));
+      if (enc.also_covers && enc.also_covers.length) {
+        rows.push(h('div', { class: 'k', text: 'Also vouches for' }),
+          h('div', { class: 'v' }, h('span', { class: 'mono', text: enc.also_covers.join(', ') }),
+            h('div', { class: 'small muted', text: 'Named with --allow-host when the certificate was made. The certificate covers these names and any name ending in them.' })));
+      }
     }
     return card('Encryption on the office network', 'Administrators only',
       h('div', { class: 'kv' }, rows),
@@ -2805,7 +2810,7 @@
           h('p', { style: { marginTop: '14px' } },
             h('a', { class: 'btn primary', href: enc.certificate_url, download: 'InSys-certificate.crt', text: 'Download certificate' }), ' ',
             h('a', { class: 'btn', href: '/connect', target: '_blank', rel: 'noopener', text: 'Steps for each device' })),
-          h('p', { class: 'small muted', style: { marginTop: '8px' }, text: 'Each device installs this certificate once; it then shows InSys as a secure site and never asks again, even if this computer\u2019s address changes. Hand the file over yourself, or let people download it from the first-visit address. It is not secret, and it can only vouch for addresses on a private network, never for a public website. While installing, a device shows the thumbprint above: if it matches, the file is genuine.' }))
+          h('p', { class: 'small muted', style: { marginTop: '8px' }, text: 'Each device installs this certificate once; it then shows InSys as a secure site and never asks again, even if this computer\u2019s address changes. Hand the file over yourself, or let people download it from the first-visit address. It is not secret, and it is made to vouch only for addresses on a private network and local names, not for public websites. While installing, a device shows the thumbprint above: the file is genuine only if it matches. Where the network is shared with people you do not fully trust, hand the file over yourself and have each person check the thumbprint.' }))
         : h('p', { class: 'small muted', style: { marginTop: '10px' }, text: 'No certificate has been made yet. InSys makes one the first time it is started for the office network (choice 2).' }));
   }
 

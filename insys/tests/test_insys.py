@@ -1974,10 +1974,13 @@ class CertificateTest(unittest.TestCase):
         handshake(enc.context, browser, "192.168.1.10")
 
     def test_which_names_the_certificate_may_be_allowed_to_vouch_for(self):
-        for name in ["desktop-7gh2k1l", "pc-01", "laptop7", "insys.office.example", "server.lan"]:
+        for name in ["desktop-7gh2k1l", "pc-01", "laptop7", "insys.office.example", "server.lan", "pc.home.arpa"]:
             self.assertTrue(insys.constraint_safe(name), name)
         # A one-word name made of letters only could be a public ending (.dev, .app, .shop ...).
         for name in ["dev", "app", "studio", "reception", "xn--p1ai", "", "bad_name", "-pc", "a..b", "pc 1"]:
+            self.assertFalse(insys.constraint_safe(name), name)
+        # A whole organisation's or country's names, and anything that reads as an address, are refused.
+        for name in ["example.com", "co.uk", "acme.io", "192.168.1.20", "10.0.0.1", "12345", "host.123", "::1"]:
             self.assertFalse(insys.constraint_safe(name), name)
         allowed, names = insys.certificate_names("studio", set(["insys.office.example", "dev"]))
         self.assertEqual(allowed, ["insys.office.example"])
@@ -2066,7 +2069,7 @@ class CertificateTest(unittest.TestCase):
             fh.write("-----BEGIN EC PRIVATE KEY-----\nAAAA\n-----END EC PRIVATE KEY-----\n")
         third = self.start()
         self.assertTrue(third.created)
-        self.assertIn("could not be read", third.replaced)
+        self.assertIn("damaged", third.replaced)
         self.assertNotEqual(third.authority_der, installed)
         self.assertTrue([n for n in os.listdir(self.folder) if n.startswith("replaced-") and n.endswith(".crt")])
         handshake(third.context, trusting(self.folder), "192.168.1.10")
@@ -2079,6 +2082,177 @@ class CertificateTest(unittest.TestCase):
         fourth = self.start()
         self.assertTrue(fourth.created)
         self.assertIn("does not belong", fourth.replaced)
+
+    def test_a_passing_read_error_never_replaces_the_installed_certificate(self):
+        import builtins
+        first = self.start()
+        installed = first.authority_der
+        key_path = os.path.join(self.folder, "local-certificate-key.pem")
+        failures = {"left": 0, "seen": 0}
+
+        def flaky_open(path, *args, **kwargs):
+            if path == key_path and failures["left"]:
+                failures["left"] -= 1
+                failures["seen"] += 1
+                raise PermissionError(13, "The process cannot access the file because it is being used by another process")
+            return builtins.open(path, *args, **kwargs)
+        naps = []
+        original_sleep = insys.time.sleep
+        insys.open = flaky_open
+        insys.time.sleep = naps.append
+        try:
+            # In use for a moment (a virus scanner, a backup program): InSys waits and carries on.
+            failures["left"] = 3
+            second = self.start()
+            self.assertEqual((second.created, second.authority_der, failures["seen"]), (False, installed, 3))
+            # In use for good: InSys stops and says so. It does not make a new certificate.
+            failures["left"] = 1000
+            with self.assertRaises(insys.EncryptionError) as caught:
+                self.start()
+            self.assertIn("could not be read", str(caught.exception))
+            self.assertIn("Nothing has been changed", str(caught.exception))
+        finally:
+            del insys.open
+            insys.time.sleep = original_sleep
+        self.assertFalse([n for n in os.listdir(self.folder) if n.startswith("replaced-")])
+        third = self.start()
+        self.assertEqual((third.created, third.authority_der), (False, installed))
+
+    def test_a_wrong_date_never_replaces_the_installed_certificate(self):
+        import datetime
+        first = self.start()
+        installed = first.authority_der
+        real_now = insys.utc_now
+        insys.utc_now = lambda: real_now() + datetime.timedelta(days=365 * 11)
+        try:
+            with self.assertRaises(insys.EncryptionError) as caught:
+                self.start()
+        finally:
+            insys.utc_now = real_now
+        self.assertIn("--new-certificate", str(caught.exception))
+        self.assertIn("date", str(caught.exception))
+        self.assertFalse([n for n in os.listdir(self.folder) if n.startswith("replaced-")])
+        self.assertEqual(self.start().authority_der, installed)
+
+    def test_every_kind_of_damage_is_handled_without_a_crash(self):
+        import random
+        first = self.start()
+        installed = first.authority_der
+        key_path = os.path.join(self.folder, "local-certificate-key.pem")
+        # A key file whose wrapping is intact but whose contents are not a key.
+        for body in ["MAA=", "", "AAAA", "MAMCAQE=", "not base64 !!"]:
+            with open(key_path, "w") as fh:
+                fh.write("-----BEGIN EC PRIVATE KEY-----\n%s\n-----END EC PRIVATE KEY-----\n" % body)
+            enc = self.start()
+            self.assertTrue(enc.created, body)
+            self.assertIn("damaged", enc.replaced, body)
+            handshake(enc.context, trusting(self.folder), "192.168.1.10")
+        # Only the key file is gone.
+        os.remove(key_path)
+        enc = self.start()
+        self.assertEqual((enc.created, enc.replaced), (True, "its key file is missing"))
+        # Random damage anywhere in any file: InSys either carries on or makes new files; it never crashes.
+        rng = random.Random(20261126)
+        names = ["InSys-certificate.crt", "local-certificate-key.pem", "server.pem", "server-key.pem"]
+        for _ in range(60):
+            name = rng.choice(names)
+            with open(os.path.join(self.folder, name), "rb") as fh:
+                data = bytearray(fh.read())
+            for _ in range(rng.choice([1, 1, 2, 8])):
+                data[rng.randrange(len(data))] ^= 1 << rng.randrange(8)
+            if rng.random() < 0.2:
+                data = data[:rng.randrange(len(data))]
+            with open(os.path.join(self.folder, name), "wb") as fh:
+                fh.write(bytes(data))
+            enc = self.start()
+            handshake(enc.context, trusting(self.folder), "192.168.1.10")
+        self.assertNotEqual(self.start().authority_der, installed)
+        # A server key whose private part is damaged while the copy of its public
+        # part is intact - which OpenSSL alone would not notice until a device connects.
+        enc = self.start()
+        path = os.path.join(self.folder, "server-key.pem")
+        with open(path) as fh:
+            parts = insys.der_items(insys.der_items(insys.pem_decode("EC PRIVATE KEY", fh.read()))[0][1])
+        private = bytearray(parts[1][1])
+        private[7] ^= 0x10
+        damaged = insys.der_seq(parts[0][2], insys.der(0x04, bytes(private)), parts[2][2], parts[3][2])
+        with open(path, "w") as fh:
+            fh.write(insys.pem_encode("EC PRIVATE KEY", damaged))
+        with open(os.path.join(self.folder, "server.pem")) as fh:
+            before = fh.read()
+        healed = self.start()
+        with open(os.path.join(self.folder, "server.pem")) as fh:
+            self.assertNotEqual(fh.read(), before)
+        self.assertEqual(healed.authority_der, enc.authority_der)
+        handshake(healed.context, trusting(self.folder), "192.168.1.10")
+
+    def test_a_failed_renewal_is_not_retried_on_every_connection(self):
+        enc = self.start()
+        attempts = []
+        real_issue = enc.issue_server
+
+        def failing(names, addresses):
+            attempts.append(addresses[0])
+            raise OSError(28, "No space left on device")
+        saved_dir = insys.RT.data_dir
+        insys.RT.data_dir = self.folder
+        enc.issue_server = failing
+        try:
+            before = enc.context
+            for _ in range(20):
+                self.assertIs(enc.context_for("192.168.1.99"), before)    # carries on with what it has
+            self.assertEqual(attempts, ["192.168.1.99"])
+            with open(os.path.join(self.folder, "insys.log")) as fh:
+                self.assertEqual(fh.read().count("could not be renewed"), 1)
+            enc.retry_after = 0                                            # ten minutes later
+            enc.issue_server = real_issue
+            handshake(enc.context_for("192.168.1.99"), trusting(self.folder), "192.168.1.99")
+        finally:
+            insys.RT.data_dir = saved_dir
+
+    def test_renewal_stops_when_the_local_certificate_itself_is_ending(self):
+        original = insys.Encryption.AUTHORITY_DAYS
+        insys.Encryption.AUTHORITY_DAYS = 20        # a local certificate with twenty days left
+        try:
+            enc = self.start()
+        finally:
+            insys.Encryption.AUTHORITY_DAYS = original
+        # A new server certificate could last no longer than the present one, so none is made:
+        self.assertEqual(enc.server_until, enc.authority["not_after"])
+        self.assertFalse(enc.renewal_due())
+        issued = []
+        real_issue = enc.issue_server
+        enc.issue_server = lambda names, addresses: issued.append(1) or real_issue(names, addresses)
+        for _ in range(10):
+            enc.context_for("192.168.1.10")
+        self.assertEqual(issued, [])
+        with open(os.path.join(self.folder, "server.pem")) as fh:
+            before = fh.read()
+        again = self.start()                        # nor at a restart
+        with open(os.path.join(self.folder, "server.pem")) as fh:
+            self.assertEqual(fh.read(), before)
+        self.assertFalse(again.created)
+        handshake(again.context, trusting(self.folder), "192.168.1.10")
+
+    def test_this_computers_own_addresses_are_never_pushed_out(self):
+        enc = self.start()
+        for number in range(40):
+            enc.context_for("10.20.30.%d" % number)
+        self.assertLessEqual(len(enc.addresses), insys.Encryption.MAX_ADDRESSES)
+        for address in ["192.168.1.10", "127.0.0.1", "::1", "10.20.30.39"]:
+            self.assertIn(address, enc.covered, address)
+        handshake(enc.context, trusting(self.folder), "192.168.1.10")
+        self.assertEqual(enc.seen[:2], ["10.20.30.0", "10.20.30.1"])
+        enc.context_for("127.0.0.1")
+        self.assertNotIn("127.0.0.1", enc.seen)
+
+    def test_names_given_on_purpose_are_declared(self):
+        enc = self.start(extra=["tracker.office.example", "example.com", "192.168.1.20"])
+        self.assertEqual(enc.other_names(), ["desktop-7gh2k1l", "tracker.office.example"])
+        self.assertIn("tracker.office.example", enc.names)
+        self.assertNotIn("example.com", enc.names)
+        self.assertNotIn("192.168.1.20", enc.names)
+        handshake(enc.context, trusting(self.folder), "tracker.office.example")
 
     def test_private_keys_stay_private(self):
         enc = self.start()
@@ -2388,9 +2562,10 @@ class EncryptedNetworkTest(unittest.TestCase):
         self.assertEqual(status, 200)
         enc = system["encryption"]
         self.assertTrue(enc["on"])
-        self.assertEqual(enc["addresses"][0], "https://192.168.1.10:%d" % self.port)
+        # Only addresses this computer has now, or that a device has actually used.
+        self.assertEqual(enc["addresses"], ["https://192.168.1.10:%d" % self.port])
         self.assertEqual(enc["setup_addresses"], ["http://192.168.1.10:%d" % self.port])
-        self.assertIn("https://insys-pc7:%d" % self.port, enc["addresses"])
+        self.assertEqual(enc["also_covers"], [])
         self.assertEqual(enc["certificate"], insys.describe_certificate(insys.RT.tls.authority_der))
         self.assertEqual(enc["certificate_url"], "/InSys-certificate.crt")
         self.assertEqual(system["mode"], "lan")
@@ -2400,6 +2575,65 @@ class EncryptedNetworkTest(unittest.TestCase):
         staff.login("eng1", data["temp_password"])
         staff.post("/api/change-password", {"current": data["temp_password"], "new": "Engineer-pass-77"})
         self.assertEqual(staff.get("/api/admin/system")[0], 403)
+
+    def test_a_program_on_this_computer_cannot_pass_network_requests_on(self):
+        insys._blocked_seen.clear()
+        local = Client(self.plain)
+        self.assertEqual(local.login("admin", "Sealed-office-2026")[0], 200)
+        self.assertEqual(local.get("/api/state")[0], 200)
+        # The same sign-in, but the request arrives by way of a proxy or forwarder
+        # on this computer: whatever brought it there was not InSys's encryption.
+        for headers in [{"X-Forwarded-For": "192.168.1.33"}, {"Via": "1.1 office-proxy"},
+                        {"Forwarded": "for=192.168.1.33"}, {"X-Real-IP": "10.0.0.7"},
+                        {"X-Forwarded-Proto": "https"}, {"X-Forwarded-Host": "192.168.1.10"}]:
+            for path in ["/api/state", "/", "/api/ping"]:
+                status, body = local.request("GET", path, headers=headers, raw=True)
+                self.assertEqual(status, 403, (headers, path))
+                self.assertEqual(body, insys.PASSED_ON_PAGE, (headers, path))
+                self.assertNotIn(b"Confidential", body)
+        status, data = self.admin.get("/api/admin/audit")
+        self.assertIn("passed on by another program", " ".join(e["detail"] for e in data["audit"]))
+        self.assertEqual(local.get("/api/state")[0], 200)      # the host's own browser is unaffected
+
+    def test_the_certificate_is_public_only_on_the_office_network(self):
+        # While InSys serves the office network any device may fetch it (it must, to connect).
+        self.from_the_network()
+        status, body = Client(self.plain).request("GET", "/InSys-certificate.crt", raw=True)
+        self.assertEqual((status, body), (200, insys.RT.tls.authority_der))
+        insys.is_loopback = lambda address: address == "127.0.0.1"
+        # Android is handed a file to save, since it installs certificates from Settings.
+        phone = Client(self.plain)
+        status, body = phone.request("GET", "/InSys-certificate.crt", raw=True,
+                                     headers={"User-Agent": "Mozilla/5.0 (Linux; Android 14; Pixel 8) Chrome/130.0"})
+        self.assertEqual((status, body), (200, insys.RT.tls.authority_der))
+        self.assertEqual(phone.last_headers.get("Content-Type"), "application/octet-stream")
+        self.assertEqual(phone.last_headers.get("Content-Disposition"), 'attachment; filename="InSys-certificate.crt"')
+        # In choice 1, or online, it is for a signed-in administrator only: it names this computer.
+        encryption, lan = insys.RT.tls, insys.RT.lan
+        for online in (False, True):
+            insys.RT.tls, insys.RT.lan, insys.RT.tunnel_active = (encryption if online else None), online, online
+            try:
+                self.assertEqual(Client(self.plain).request("GET", "/InSys-certificate.crt", raw=True)[0], 403)
+                admin = Client(self.plain)
+                self.assertEqual(admin.login("admin", "Sealed-office-2026")[0], 200)
+                self.assertEqual(admin.request("GET", "/InSys-certificate.crt", raw=True),
+                                 (200, encryption.authority_der))
+                self.assertFalse(admin.get("/api/admin/system")[1]["encryption"]["on"])
+            finally:
+                insys.RT.tls, insys.RT.lan, insys.RT.tunnel_active = encryption, lan, False
+
+    def test_a_bare_one_line_request_is_dropped_quietly(self):
+        import socket
+        log = os.path.join(insys.RT.data_dir, "insys.log")
+        before = os.path.getsize(log) if os.path.exists(log) else 0
+        for line in (b"GET /api/state\r\n\r\n", b"GET /\r\n", b"GET /api/ping\r\n\r\n"):
+            with socket.create_connection(("127.0.0.1", self.port), timeout=5) as sock:
+                sock.sendall(line)
+                sock.settimeout(5)
+                self.assertEqual(sock.recv(4096), b"")          # no answer, connection closed
+        time.sleep(0.2)
+        self.assertEqual(os.path.getsize(log) if os.path.exists(log) else 0, before)
+        self.assertEqual(Client(self.plain).get("/api/ping")[0], 200)
 
     def test_keys_are_not_part_of_backups_or_transfers(self):
         status, backup = self.admin.request("GET", "/api/admin/backup", raw=True)

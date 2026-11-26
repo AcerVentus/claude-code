@@ -41,7 +41,6 @@
   }
 
   $('open-link').href = secureAddress;
-  $('anyway').href = secureAddress;
 
   /** Resolves true if this device already trusts InSys's encrypted address. */
   function trusted() {
@@ -49,7 +48,7 @@
     var options = { mode: 'no-cors', cache: 'no-store', credentials: 'omit' };
     var timer = null;
     if (window.AbortController) {
-      var stop = new AbortController();
+      var stop = new window.AbortController();
       options.signal = stop.signal;
       timer = setTimeout(function () { stop.abort(); }, 8000);
     }
@@ -79,7 +78,6 @@
     trusted().then(function (yes) {
       if (yes) return go();
       show('not-yet', true);
-      show('anyway-line', true);
     });
   });
 }());

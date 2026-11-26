@@ -165,17 +165,30 @@ the network gives the host computer a different address.
 
 The administrator can also hand the file out directly: **Admin → System &
 online access → Download certificate**, with **Steps for each device** beside
-it. The same card shows the certificate's thumbprint; a device displays the
-thumbprint while installing, and if the two match, the file is the genuine one.
+it.
+
+**Check the thumbprint — this is the one moment that needs care.** Encryption
+stops anyone *listening* on the network. Installing the certificate is what
+lets a device tell the real InSys from an impostor, so the device must get the
+real certificate. Each certificate has a thumbprint, shown in the InSys window
+at start-up and on the Admin card. A device shows the thumbprint while
+installing (Windows shows it in its warning box) or in the certificate's
+details afterwards. If the two match, the file is genuine. Where the network
+is shared with people you do not fully trust, hand the file over yourself
+(USB stick, or in person) rather than relying on the download, and have each
+person check the thumbprint.
 
 Good to know:
 
 - **The host computer itself needs nothing.** `http://localhost:8080` works as
   before; that traffic never leaves the computer.
-- **The certificate is not secret**, and it is deliberately limited: it can only
-  vouch for addresses on private networks (10.x, 172.16–31.x, 192.168.x) and
-  local-only names such as `pc.local`. It cannot be used to impersonate a
-  public website, even by someone who stole its key.
+- **The certificate is not secret**, and it is deliberately limited: it is marked
+  as able to vouch only for addresses on private networks (10.x, 172.16–31.x,
+  192.168.x) and local-only names such as `pc.local`, not for public websites.
+  Current Chrome, Edge, Firefox and Safari enforce that limit; some older
+  phone software may not, which is one more reason to keep the key files
+  private. While InSys serves the office network any device there can
+  download the certificate; in choice 1 or 3 only a signed-in administrator can.
 - **The first-visit address never carries InSys data.** Over plain `http://`
   from another device, InSys serves only the set-up page and the certificate:
   no sign-in, no records. If a browser sends an old sign-in cookie there, that
@@ -185,10 +198,11 @@ Good to know:
   your network is shared with people you do not fully trust, it is sensible
   for everyone to change their password once, now that it can no longer be
   overheard.
-- **A device you will only use once** can skip the installation and open the
-  `https://` address directly. The connection is still encrypted, but the
-  browser shows a warning page first, every time. Do not make a habit of it:
-  the warning is how a browser tells you it cannot confirm who it is talking to.
+- **Do not click through browser warnings.** A device that has not installed
+  the certificate shows "Your connection is not private" at the `https://`
+  address. Going on regardless is still encrypted against listeners, but the
+  device then cannot tell InSys from an impostor. Install the certificate
+  instead; it takes a minute.
 - The certificate and its keys live in `InSys-data\encryption`. They are **not**
   included in backups or in *Download database*: an office that receives a
   copy of the data makes its own certificate. Keep the two `…-key.pem` files
@@ -198,14 +212,32 @@ Good to know:
   stolen), run `InSys.exe --new-certificate` and start InSys again; every
   device then installs the new one, and the old "InSys local certificate …"
   can be removed from each device's list of trusted certificates.
-- The certificate lasts ten years. The short-lived certificate InSys presents
-  on each connection is renewed automatically.
+- **InSys never replaces the certificate by itself while the one it has can
+  still be read.** If its files are in use by another program at start-up, or
+  the computer's date is wrong, InSys stops and says so rather than making a
+  new certificate that every device would have to install. It makes a new one
+  only if the files are missing or damaged, and then says so in its window
+  and in the Security log.
+- The certificate lasts ten years; InSys reminds you in its window during the
+  last six months. The short-lived certificate InSys presents on each
+  connection is renewed automatically.
+- Android phones save the certificate as a file and install it from Settings;
+  iPhones install it as a profile. The set-up page shows the steps for each.
 - If people reach the host by a name instead of a number, names ending in
   `.local`, `.lan`, `.home`, `.internal` and similar are covered, as is the
   computer's own name when it contains a digit or a hyphen (`DESKTOP-7GH2K1L`,
   `PC-01`). A one-word, letters-only name such as `RECEPTION` is not — use the
   numeric address or `reception.local`. (A certificate that covered such a name
-  would also cover every public address ending in it.)
+  would also cover every public address ending in it.) An internal DNS name
+  given with `--allow-host` is covered if it names one computer
+  (`tracker.office.example`, three parts or more) and was given before the
+  certificate was first made; the Admin card lists such names under "Also
+  vouches for". Given later, InSys says the name is not covered and how to
+  make a certificate that does.
+- A proxy or port-forwarder running on the host computer cannot be used to
+  pass network requests to InSys in choice 2: InSys refuses requests that
+  carry a proxy's marks, since whatever brought them to the proxy was not
+  InSys's encryption.
 - If encryption cannot be set up, InSys does not start for the network at all
   and says why; choice 1 still works.
 
@@ -490,10 +522,17 @@ adds nothing to them and the site is not told where you came from.
 Encryption protects what travels over the network; it does not protect the
 host computer. Anyone who can read the `InSys-data` folder has the data and
 the encryption keys, so keep that computer's Windows account locked and its
-disk encrypted (BitLocker). And a device that opens InSys without having
-installed the certificate — clicking through the browser's warning — is
-encrypted against eavesdroppers but cannot tell the real InSys from an
-impostor on the same network; installing the certificate closes that gap.
+disk encrypted (BitLocker). On Windows the key files are protected by the
+folder's permissions, as the database is. A device that opens InSys without
+having installed the certificate — clicking through the browser's warning —
+is encrypted against eavesdroppers but cannot tell the real InSys from an
+impostor on the same network; installing the genuine certificate (check the
+thumbprint) closes that gap. The first-visit page and the certificate
+download travel unencrypted, because a device has nothing to trust yet: a
+listener learns nothing from them, but someone able to tamper with network
+traffic could substitute their own, which is exactly what the thumbprint
+check catches. A program on the host that forwards raw network connections
+without marking them cannot be told apart from the host's own browser.
 
 This is appropriate for a pilot with ordinary business information. Before
 putting highly sensitive data in it or scaling beyond a pilot, have the
@@ -530,7 +569,7 @@ that way returns to whichever theme was chosen before.
 | Someone is locked out | Admin → People & logins → **Reset password**. |
 | A device shows "Your connection is not private" | It has not installed the InSys certificate yet, or the browser has not been restarted since. Open the first-visit `http://…` address on that device and follow the steps. |
 | The certificate is installed but the warning remains | Check it went into **Trusted Root Certification Authorities** (Windows) or was switched on under **Certificate Trust Settings** (iPhone). In Firefox, import it under Settings → Privacy & Security → Certificates. Then close and reopen the browser. |
-| "InSys could not set up encryption for the office network" | The message says why. Choice 1 still works. If the files in `InSys-data\encryption` were damaged, delete that folder and start again: InSys makes a new certificate, which every device installs once. |
+| "InSys could not set up encryption for the office network" | The message says why: usually a file in `InSys-data\encryption` is in use by another program (close it and start again) or the computer's date is wrong. Choice 1 still works meanwhile. As a last resort run `InSys.exe --new-certificate`: InSys then makes a new certificate, which every device installs once. |
 | A device's old bookmark shows a set-up page | That is the first-visit page: install the certificate once and it moves to the encrypted address by itself. |
 
 ## For the technically minded

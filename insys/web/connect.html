@@ -32,8 +32,8 @@
       <li>
         <h2>Download the certificate</h2>
         <p><a class="btn primary" id="download" href="/InSys-certificate.crt" download="InSys-certificate.crt">Download the InSys certificate</a></p>
-        <p class="small muted">It is not a program and it is not secret. It can only vouch for addresses on a
-          private network such as this office's, never for a public website.</p>
+        <p class="small muted">It is not a program and it is not secret. It is made to vouch only for this
+          office's InSys on a private network, not for public websites.</p>
       </li>
       <li>
         <h2>Install it on this device</h2>
@@ -98,17 +98,17 @@
             <li>Tick <b>Trust this certificate for identifying websites</b>, confirm, and restart the browser.</li>
           </ol>
         </details>
-        <p class="small muted">To be sure the file is the genuine one, compare the thumbprint your device
-          shows while installing it with the one your administrator sees in InSys under Admin, System.</p>
+        <p class="connect-check"><b>Check that it is the genuine one.</b> While installing, or in the
+          certificate's details afterwards, your device shows a <b>thumbprint</b> (also called a fingerprint).
+          It must match the one your administrator has: it is shown in the InSys window on the host computer
+          and in InSys under Admin, System. If it does not match, remove the certificate and tell your
+          administrator.</p>
       </li>
       <li>
         <h2>Open InSys</h2>
         <p><a class="btn primary" id="continue" href="/">I have installed it &ndash; open InSys</a></p>
         <p id="not-yet" class="connect-note" hidden>This device does not trust the certificate yet. Check the
           steps above, and close and reopen the browser if you have not done so.</p>
-        <p id="anyway-line" class="small muted" hidden>On a device you will only use once you can
-          <a id="anyway" href="/">open the encrypted address without installing</a>. The connection is still
-          encrypted, but the browser shows a warning page first, every time.</p>
         <p class="small muted" id="bookmark-tip">Once InSys opens, bookmark that page: its address starts with https.</p>
       </li>
     </ol>
