@@ -1255,6 +1255,16 @@ class UpgradeTest(unittest.TestCase):
             self.assertEqual(insys.next_ref(conn, "project"), "PRJ-0002")
             self.assertEqual(conn.execute("SELECT COUNT(*) AS n FROM subcons").fetchone()["n"], 0)
 
+    def test_data_from_1_2_1_opens_as_it_is(self):
+        """1.2.2 uses the same data layout as 1.2.1: nothing is converted or copied."""
+        build_old_database(insys.RT.db_path, 4)
+        before = snapshot(insys.RT.db_path)
+        self.assertEqual(insys.stored_schema_version(), insys.SCHEMA_VERSION)
+        self.assertIsNone(insys.init_db())
+        self.assertIsNone(insys.RT.upgraded_from)
+        self.assertEqual(snapshot(insys.RT.db_path), before)
+        self.assertFalse([f for f in os.listdir(insys.RT.backup_dir) if f.startswith("before-upgrade")])
+
     def test_data_from_1_2_0_is_upgraded_and_kept(self):
         self.upgrade_from(3)
         with insys.read_db() as conn:

@@ -392,21 +392,42 @@
   // The alternative look, remembered per browser. It is switched from the
   // sidebar, by clicking the logo five times, or by typing "samaritan" in the
   // search box and pressing Enter.
+  // "auto" follows the computer's own light/dark setting and is the default.
   const THEME_KEY = 'insys-theme';
+  const THEMES = [['auto', 'Match this computer'], ['light', 'Light'], ['dark', 'Dark'], ['samaritan', 'Samaritan']];
+  const themeLabel = (name) => (THEMES.find((x) => x[0] === name) || THEMES[0])[1];
+  const stored = (key) => { try { return window.localStorage.getItem(key); } catch (e) { return null; } };
   function savedTheme() {
-    try { return window.localStorage.getItem(THEME_KEY) === 'samaritan' ? 'samaritan' : 'standard'; } catch (e) { return 'standard'; }
+    const value = stored(THEME_KEY);
+    // InSys 1.2.0 and 1.2.1 stored "standard" for what is now "auto".
+    return THEMES.some((x) => x[0] === value) ? value : 'auto';
+  }
+  /** The last choice other than Samaritan, which is what the Easter egg returns to. */
+  function plainTheme() {
+    const value = stored(THEME_KEY + '-plain');
+    return ['auto', 'light', 'dark'].includes(value) ? value : 'auto';
   }
   function setTheme(name, announce) {
-    if (name === 'samaritan') document.documentElement.setAttribute('data-theme', 'samaritan');
-    else document.documentElement.removeAttribute('data-theme');
-    try { window.localStorage.setItem(THEME_KEY, name); } catch (e) { /* stays for this visit only */ }
-    const button = document.getElementById('theme-toggle');
-    if (button) button.textContent = 'Theme: ' + (name === 'samaritan' ? 'Samaritan' : 'Standard');
-    if (announce) toast(name === 'samaritan' ? 'Samaritan theme on. Click the InSys logo five times to switch back.' : 'Standard theme restored.');
+    if (name === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', name);
+    try {
+      window.localStorage.setItem(THEME_KEY, name);
+      if (name !== 'samaritan') window.localStorage.setItem(THEME_KEY + '-plain', name);
+    } catch (e) { /* stays for this visit only */ }
+    document.querySelectorAll('select.theme-select').forEach((el) => { el.value = name; });
+    if (announce) toast(name === 'samaritan' ? 'Samaritan theme on. Click the InSys logo five times to switch back.'
+      : 'Back to the ' + (name === 'auto' ? 'standard' : themeLabel(name).toLowerCase()) + ' theme.');
   }
-  const currentTheme = () => (document.documentElement.getAttribute('data-theme') === 'samaritan' ? 'samaritan' : 'standard');
-  const toggleTheme = () => setTheme(currentTheme() === 'samaritan' ? 'standard' : 'samaritan', true);
+  const currentTheme = () => document.documentElement.getAttribute('data-theme') || 'auto';
+  const toggleTheme = () => setTheme(currentTheme() === 'samaritan' ? plainTheme() : 'samaritan', true);
   setTheme(savedTheme(), false);
+
+  /** The theme chooser (sidebar on a computer, foot of the page on a phone). */
+  function themeControl() {
+    return h('label', { class: 'theme-pick' }, h('span', { text: 'Theme' }),
+      h('select', { class: 'theme-select', 'aria-label': 'Theme', value: currentTheme(), onchange: (e) => setTheme(e.target.value, false) },
+        THEMES.map((x) => h('option', { value: x[0], text: x[1] }))));
+  }
 
   let logoClicks = [];
   function logoClicked() {
@@ -617,7 +638,8 @@
               h('div', { class: 'who', id: 'who' }),
               h('button', { class: 'btn small', type: 'button', text: 'Password', title: 'Change your password', onclick: changePasswordDialog }),
               h('button', { class: 'btn small', type: 'button', text: 'Sign out', onclick: signOut }))),
-          h('main', { id: 'main' }))),
+          h('main', { id: 'main' }),
+          h('div', { class: 'mobile-foot' }, themeControl()))),
       h('div', { id: 'drawer-host' }));
     setSync(S.synced);
   }
@@ -676,8 +698,7 @@
     const org = S.data.meta.org_name;
     document.getElementById('side-foot').replaceChildren(
       h('div', { text: (org ? org + ' · ' : '') + 'InSys ' + S.data.meta.app_version }),
-      h('button', { id: 'theme-toggle', type: 'button', class: 'theme-toggle', title: 'Switch between the standard look and the Samaritan look',
-        text: 'Theme: ' + (currentTheme() === 'samaritan' ? 'Samaritan' : 'Standard'), onclick: toggleTheme }));
+      themeControl());
     document.title = (org ? org + ' - ' : '') + 'InSys';
   }
 
@@ -2171,7 +2192,7 @@
       return h('li', null,
         h('div', { class: 'main' },
           h('a', { class: 'ref', href: recHref(x.rec), text: x.rec.ref }), ' ', h('span', { class: 'cell-title', text: x.rec.title }),
-          h('div', { class: 'small muted', text: [mods()[x.rec.module].singular, x.scope ? 'Scope: ' + x.scope : '', 'Owner: ' + userName(x.rec.owner_id)].filter(Boolean).join(' · ') }),
+          h('div', { class: 'small muted', text: [mods()[x.rec.module].singular, x.rec.organisation, x.scope ? 'Scope: ' + x.scope : '', 'Owner: ' + userName(x.rec.owner_id)].filter(Boolean).join(' · ') }),
           x.last_update ? h('div', { class: 'small', text: 'Last update: ' + x.last_update + ' (' + fmtDate(x.last_update_date) + ')' }) : null,
           isOpen(x.rec) ? h('div', { class: 'small', text: f.text ? (f.own ? 'Follow-up: ' : 'Next: ') + f.text : 'No next action set' }) : null),
         h('div', { class: 'side' },
@@ -2234,7 +2255,7 @@
   function exportSubconsCsv(subs) {
     const header = ['Reference', 'Subcontractor', 'Discipline', 'Capabilities', 'Status', 'Contact person', 'Phone', 'Email', 'Website',
       'Registration / licence', 'Address', 'Services', 'Notes', 'Open projects', 'Open enquiries', 'Open EOIs',
-      'Current work', 'Most urgent action', 'Most urgent action due'];
+      'Current work', 'Clients on current work', 'Most urgent action', 'Most urgent action due'];
     const lines = [header.map(csvCell).join(',')];
     subs.forEach((sub) => {
       const work = subconWork(sub);
@@ -2243,6 +2264,7 @@
       lines.push([sub.ref, sub.name, sub.discipline, sub.capabilities, sub.active ? 'Active' : 'Inactive', sub.contact_name, sub.phone, sub.email, sub.website,
         sub.registration, sub.address, sub.services, sub.notes, n('project'), n('enquiry'), n('eoi'),
         work.open.map((x) => x.rec.ref).join('; '),
+        work.open.map((x) => x.rec.ref + ': ' + (x.rec.organisation || 'no client recorded')).join('; '),
         work.top ? work.top.rec.ref + ': ' + (f.text || 'no next action set') : '',
         f ? f.date : ''].map(csvCell).join(','));
     });
@@ -2279,6 +2301,8 @@
     });
   }
 
+  const WORK_LINES = 6;   // items listed per subcontractor in the directory before "and N more"
+
   function viewSubcons() {
     const f = S.filters.subcons || (S.filters.subcons = { q: '', status: 'active', mode: 'directory', sort: 'urgent', need: '', picked: new Set() });
     const t = today();
@@ -2296,8 +2320,8 @@
         if (f.status === 'inactive' && sub.active) return false;
         if (f.status === 'engaged' && !work.get(sub.id).open.length) return false;
         if (!q) return true;
-        // Also match on the work they are doing, so "PRJ-0003" finds its subcontractors.
-        return (subconHay(sub) + ' ' + work.get(sub.id).all.map((x) => x.rec.ref + ' ' + x.rec.title).join(' ').toLowerCase()).includes(q);
+        // Also match on the work they are doing, so "PRJ-0003" or a client's name finds its subcontractors.
+        return (subconHay(sub) + ' ' + work.get(sub.id).all.map((x) => x.rec.ref + ' ' + x.rec.title + ' ' + x.rec.organisation).join(' ').toLowerCase()).includes(q);
       });
     };
 
@@ -2318,7 +2342,7 @@
           : 'The directory is empty. Use "+ Add subcontractor" to add the first one.' }));
       }
       return h('div', { class: 'table-wrap' }, h('table', null,
-        h('thead', null, h('tr', null, ['Ref', 'Subcontractor', 'Contact', 'Current work', 'Most urgent action'].map((x) => h('th', { scope: 'col', text: x })))),
+        h('thead', null, h('tr', null, ['Ref', 'Subcontractor', 'Contact', 'Current work and client', 'Most urgent action'].map((x) => h('th', { scope: 'col', text: x })))),
         h('tbody', null, rows.map((sub) => {
           const w = work.get(sub.id);
           return h('tr', { class: 'clickable', onclick: (e) => { if (!e.target.closest('a, button, input')) go('subcons', sub.ref); } },
@@ -2331,11 +2355,17 @@
             h('td', { class: 'cell-text' },
               sub.contact_name ? h('div', { text: sub.contact_name }) : null,
               h('div', { class: 'cell-sub', text: [sub.phone, sub.email].filter(Boolean).join(' · ') || (sub.contact_name ? '' : '—') })),
-            h('td', { class: 'cell-text' }, w.open.length
-              ? [h('div', { text: workSummary(w.open) }), h('div', { class: 'cell-sub' }, w.open.map((x, i) => [i ? ', ' : '', h('a', { href: recHref(x.rec), text: x.rec.ref, title: x.rec.title })]))]
+            h('td', { class: 'cell-work' }, w.open.length
+              ? [h('div', { text: workSummary(w.open) }),
+                // Each item with the company, client or enquirer it is for; click the reference for the rest.
+                h('ul', { class: 'work-clients' }, w.open.slice(0, WORK_LINES).map((x) => h('li', null,
+                  h('a', { href: recHref(x.rec), text: x.rec.ref, title: x.rec.title }), ' ',
+                  x.rec.organisation ? h('span', { text: x.rec.organisation }) : h('span', { class: 'muted', text: 'No client recorded' })))),
+                w.open.length > WORK_LINES ? h('div', { class: 'cell-sub', text: 'and ' + (w.open.length - WORK_LINES) + ' more - open the subcontractor to see all' }) : null]
               : h('span', { class: 'muted', text: 'None' })),
             h('td', { class: 'cell-text' }, w.top
-              ? [h('div', { class: 'cell-sub' }, h('a', { class: 'ref', href: recHref(w.top.rec), text: w.top.rec.ref }), ' ', w.top.rec.title),
+              ? [h('div', { class: 'cell-sub' }, h('a', { class: 'ref', href: recHref(w.top.rec), text: w.top.rec.ref }), ' ', w.top.rec.title,
+                w.top.rec.organisation ? ' · ' + w.top.rec.organisation : ''),
                 followUpCell(w.top), ' ', prioChip(w.top.rec.priority)]
               : h('span', { class: 'muted', text: '—' })));
         }))));

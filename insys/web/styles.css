@@ -29,8 +29,10 @@
   --shadow: 0 1px 2px rgba(11, 11, 11, .06), 0 8px 24px rgba(11, 11, 11, .08);
 }
 
+/* Dark values. Used when the computer is in dark mode and no theme has been
+   chosen ("Match this computer"), or when the Dark theme is chosen. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
     color-scheme: dark;
     --bg: #0d0d0d;
     --surface: #1a1a19;
@@ -59,6 +61,36 @@
     --shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 8px 24px rgba(0, 0, 0, .5);
   }
 }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d0d0d;
+  --surface: #1a1a19;
+  --raised: #222221;
+  --ink: #f0efec;
+  --ink2: #c3c2b7;
+  --muted: #9b9992;
+  --line: #2c2c2a;
+  --line-strong: #454541;
+  --accent: #3987e5;
+  --accent-ink: #ffffff;
+  --accent-hover: #5598e7;
+  --accent-soft: #17293f;
+  --bar: #3987e5;
+  --focus: #6da7ec;
+  --good: #0ca30c;
+  --good-ink: #5fd05f;
+  --good-soft: #14301a;
+  --warn: #fab219;
+  --warn-ink: #fbc84f;
+  --warn-soft: #3a2e0c;
+  --crit: #d03b3b;
+  --crit-ink: #f08a8a;
+  --crit-soft: #3b1a1a;
+  --neutral-soft: #2c2c2a;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 8px 24px rgba(0, 0, 0, .5);
+}
+/* The Light theme is the default values above, whatever the computer is set to. */
+:root[data-theme="light"] { color-scheme: light; }
 
 * { box-sizing: border-box; }
 
@@ -498,7 +530,7 @@ dialog.dlg::backdrop { background: rgba(11, 11, 11, .45); }
 .month-index .count { padding: 0 6px; border-radius: 10px; background: var(--neutral-soft); color: var(--ink2); font-size: 12px; font-weight: 600; }
 tr.month-row th { background: var(--neutral-soft); color: var(--ink); font-size: 13px; }
 .log-text { min-width: 220px; overflow-wrap: anywhere; }
-.filters input#flt-log-q { flex: 1 1 320px; max-width: 460px; }
+.filters input#flt-log-q, .filters input#flt-subcons-q { flex: 1 1 320px; max-width: 460px; }
 .log-text .text { white-space: pre-wrap; }
 
 /* ---------- Subcontractor extras ---------- */
@@ -523,8 +555,13 @@ tr.month-row th { background: var(--neutral-soft); color: var(--ink); font-size:
 .role-list dt { font-weight: 650; }
 .role-list dd { margin: 0; color: var(--ink2); }
 .side-foot { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
-.theme-toggle { padding: 0; border: 0; background: none; color: var(--muted); font: inherit; font-size: 12px; text-decoration: underline; cursor: pointer; }
-.theme-toggle:hover { color: var(--ink); }
+.theme-pick { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; }
+.theme-pick select { width: auto; min-height: 26px; padding: 2px 6px; font-size: 12px; }
+.mobile-foot { display: none; padding: 0 12px 28px; }
+.cell-work { min-width: 200px; max-width: 340px; overflow-wrap: anywhere; }
+.work-clients { list-style: none; margin: 3px 0 0; padding: 0; font-size: 13px; }
+.work-clients li { padding: 1px 0; }
+.work-clients a { font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .brand { cursor: default; user-select: none; }
 
 /* ---------- Samaritan theme ----------
@@ -616,6 +653,7 @@ tr.month-row th { background: var(--neutral-soft); color: var(--ink); font-size:
   }
   .sidebar .brand { padding: 0 10px 0 0; }
   .sidebar .brand-sub, .side-foot, .nav-group { display: none; }
+  .mobile-foot { display: flex; }
   .nav { flex-direction: row; }
   .nav a { white-space: nowrap; }
   .topbar { padding: 8px 12px; flex-wrap: wrap; position: static; }

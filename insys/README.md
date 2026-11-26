@@ -194,7 +194,10 @@ from the host computer only.
   have a **Subcons** column naming everyone on each item; click a name to open
   that subcontractor, or the column heading to sort by it. A subcontractor not yet in the directory can be added from the
   same pop-up. The directory shows, for each subcontractor, the open work they
-  are on across all three sections and their most urgent action; *Work by
+  are on across all three sections — each item with the company, client or
+  enquirer it is for — and their most urgent action; click an item's reference
+  for its full details, or search the directory by a client's name to see who
+  is working for them. *Work by
   priority* lists every subcontractor's open work in one list, soonest next
   action first (overdue first; on the same date, higher priority first; items
   with no next-action date last). Marking a subcontractor *Inactive* keeps
@@ -281,6 +284,7 @@ If you use the office-network choice, Windows may ask again whether to allow
 
 | Version | What changed |
 |---|---|
+| 1.2.2 | Client names beside each item on the Subcontractors summary; a theme chooser with a Dark theme. No change to stored data. |
 | 1.2.1 | Banners announcing other people's changes, and a bell listing the latest updates, each limited to what that person's role may see. |
 | 1.2.0 | Activity log by month with completed and deleted items; deleted items kept and restorable; per-subcontractor last update and next follow-up; capability search; Administration and Engineering roles; database transfer between systems; optional Samaritan look. |
 | 1.1.1 | A Subcons column in the Projects, Enquiries and Expressions of Interest lists. No change to stored data. |
@@ -333,13 +337,22 @@ This is appropriate for a pilot with ordinary business information. Before
 putting highly sensitive data in it or scaling beyond a pilot, have the
 deployment reviewed and plan for a fixed address and off-site backups.
 
-## The Samaritan look
+## Themes
 
-InSys has a second appearance: stark white, black monospace type and a single
-red mark. Switch with **Theme** at the bottom of the sidebar, by clicking the
-InSys logo five times, or by typing `samaritan` in the search box and pressing
-Enter. The same actions switch back to the standard look. It is remembered per
-browser and affects only the person who chose it.
+**Theme**, at the bottom of the sidebar (at the foot of the page on a phone),
+changes how InSys looks for you:
+
+| Theme | Look |
+|---|---|
+| Match this computer | Light or dark, following the computer's own setting. This is the default. |
+| Light | Always light. |
+| Dark | Always dark. |
+| Samaritan | Stark white, black monospace type and a single red mark. |
+
+The choice is remembered per browser and affects only the person who made it.
+Samaritan can also be switched on and off by clicking the InSys logo five times,
+or by typing `samaritan` in the search box and pressing Enter; switching it off
+that way returns to whichever theme was chosen before.
 
 ## Troubleshooting
 
