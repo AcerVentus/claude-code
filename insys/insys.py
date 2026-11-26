@@ -42,7 +42,7 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-VERSION = "1.2.2"
+VERSION = "1.2.3"
 
 # The database layout this version reads and writes. Version 1 is InSys 1.0.0;
 # version 2 (InSys 1.1.x) adds the subcontractor directory; version 3 (InSys

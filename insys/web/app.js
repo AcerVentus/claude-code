@@ -66,6 +66,16 @@
     return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() + ', ' +
       pad(d.getHours()) + ':' + pad(d.getMinutes());
   }
+  function fmtTime(iso) {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+  /** Timestamp for a spreadsheet: 2026-11-26 14:05, in the viewer's local time. */
+  function localStamp(iso) {
+    const day = localDay(iso);
+    return day ? day + ' ' + fmtTime(iso) : '';
+  }
   function localDay(iso) {
     const d = new Date(iso);
     if (isNaN(d.getTime())) return '';
@@ -1700,15 +1710,6 @@
     return svg;
   }
 
-  function timeAgo(iso) {
-    const seconds = (Date.now() - new Date(iso).getTime()) / 1000;
-    if (isNaN(seconds)) return '';
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return Math.floor(seconds / 60) + ' min ago';
-    if (seconds < 86400) return Math.floor(seconds / 3600) + ' h ago';
-    return fmtDateTime(iso);
-  }
-
   const eventWho = (e) => (e.actor_id === null || e.actor_id === undefined ? 'InSys' : userName(e.actor_id));
   function eventSubject(e) {
     if (e.record) return e.record.ref + ' ' + e.record.title + (e.record.deleted ? ' (deleted)' : '');
@@ -1780,7 +1781,7 @@
     const items = E.list.map((e) => h('button', { type: 'button', class: 'bell-item' + (e.unread ? ' unread' : ''), onclick: () => openEvent(e) },
       h('span', { class: 'bell-meta' },
         h('span', { text: eventWho(e) + ' · ' + (KIND_LABELS[e.kind] || 'Update') }),
-        h('span', { text: (e.unread ? 'New · ' : '') + timeAgo(e.at) })),
+        h('span', { text: (e.unread ? 'New · ' : '') + fmtDateTime(e.at) })),
       h('span', { class: 'bell-what', text: eventSubject(e) }),
       h('span', { class: 'bell-text', text: snippet(e.text) })));
     panel.replaceChildren(
@@ -1872,9 +1873,9 @@
   function exportLogCsv() {
     const data = S.log.data;
     if (!data) return;
-    const lines = [['Date', 'Logged at', 'Who', 'Reference', 'Section', 'Title', 'Item state', 'Type', 'What was done'].map(csvCell).join(',')];
+    const lines = [['Date done', 'Logged at (local time)', 'Who', 'Reference', 'Section', 'Title', 'Item state', 'Type', 'What was done'].map(csvCell).join(',')];
     data.entries.forEach((e) => {
-      lines.push([e.day, e.at, userName(e.user_id), e.record ? e.record.ref : '', e.record ? mods()[e.record.module].singular : 'Task',
+      lines.push([e.day, localStamp(e.at), userName(e.user_id), e.record ? e.record.ref : '', e.record ? mods()[e.record.module].singular : 'Task',
         e.record ? e.record.title : '', e.state === 'deleted' ? 'Deleted' : (e.state === 'closed' ? 'Completed / closed' : 'Open'),
         KIND_LABELS[e.kind] || e.kind, e.text].map(csvCell).join(','));
     });
@@ -1926,14 +1927,18 @@
             h('div', { class: 'cell-sub', text: r.title }));
         }
         rows.push(h('tr', null,
-          h('td', { class: 'nowrap', text: fmtDate(e.day) }),
+          // The day it was done and the time it was entered. An action entered
+          // later than it was done (back-dated) shows both, so neither is lost.
+          h('td', { class: 'nowrap' }, localDay(e.at) === e.day
+            ? fmtDate(e.day) + ', ' + fmtTime(e.at)
+            : [h('div', { text: fmtDate(e.day) }), h('div', { class: 'cell-sub', text: 'Logged ' + fmtDateTime(e.at) })]),
           item,
           h('td', { class: 'log-text' }, h('span', { class: 'tag', text: KIND_LABELS[e.kind] || 'Update' }), ' ', h('span', { class: 'text', text: e.text })),
           h('td', { class: 'nowrap', text: userName(e.user_id) })));
       });
       body = h('div', null,
         h('div', { class: 'table-wrap' }, h('table', null,
-          h('thead', null, h('tr', null, ['Date', 'Item', 'What was done', 'By'].map((x) => h('th', { scope: 'col', text: x })))),
+          h('thead', null, h('tr', null, ['Date and time', 'Item', 'What was done', 'By'].map((x) => h('th', { scope: 'col', text: x })))),
           h('tbody', null, rows))),
         data.truncated ? h('p', { class: 'muted small', style: { marginTop: '8px' }, text: 'Showing the newest ' + data.entries.length + ' of ' + data.total + '. Pick a month or search to narrow it down.' }) : null);
     }

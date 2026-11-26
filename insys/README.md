@@ -236,6 +236,9 @@ from the host computer only.
   on the left, or search across all months by what was done, a reference, a
   title or a person. Switch between *Actions done*, *Tasks* and *All
   activity*, and between open, completed/closed and deleted items.
+  Each entry shows the date and the time it was entered, in your own local
+  time. An action that was entered later than it was done shows both: the day
+  it was done, and "Logged" with the date and time it was entered.
 - **Deleting does not destroy.** A deleted project, enquiry, EOI, finance or
   office item disappears from every list, but it and its whole history stay
   in the Activity log under *Deleted items*, where an administrator can
@@ -284,6 +287,7 @@ If you use the office-network choice, Windows may ask again whether to allow
 
 | Version | What changed |
 |---|---|
+| 1.2.3 | The Activity log and the bell show the actual date and time of each update. No change to stored data. |
 | 1.2.2 | Client names beside each item on the Subcontractors summary; a theme chooser with a Dark theme. No change to stored data. |
 | 1.2.1 | Banners announcing other people's changes, and a bell listing the latest updates, each limited to what that person's role may see. |
 | 1.2.0 | Activity log by month with completed and deleted items; deleted items kept and restorable; per-subcontractor last update and next follow-up; capability search; Administration and Engineering roles; database transfer between systems; optional Samaritan look. |
