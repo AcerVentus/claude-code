@@ -139,7 +139,7 @@ export function renderSun(el, { v, settings }) {
   const polar_ = s.polar === 'day' ? 'Midnight sun: the Sun stays up all day.' : s.polar === 'night' ? 'Polar night: the Sun stays below the horizon today.' : '';
   const rows = [
     ['First light', s.civilDawn, 'civil dawn'], ['Sunrise', s.sunrise, ''], ['Solar noon', s.solarNoon, `${fmt(s.noonAltitude)}° high`],
-    ['Sunset', s.sunset, ''], ['Last light', s.civilDusk, 'civil dusk'],
+    ['Sunset', s.sunset, s.sunsetNextDay ? 'after midnight' : ''], ['Last light', s.civilDusk, 'civil dusk'],
   ].map(([label, time, note]) => `<div class="stat"><span class="label">${label}</span><b>${t(time)}</b><i>${note}</i></div>`).join('');
   const golden = [];
   if (isNum(s.sunrise) && isNum(s.goldenMorningEnd)) golden.push(`${t(s.sunrise)}–${t(s.goldenMorningEnd)}`);
@@ -149,7 +149,8 @@ export function renderSun(el, { v, settings }) {
   const level = !checks.length ? 'single' : checks.some((c) => c.level === 'low') ? 'low' : checks.some((c) => c.level === 'medium') ? 'medium' : checks.every((c) => c.level === 'high') ? 'high' : 'single';
   const names = worst ? [...new Set(checks.flatMap((c) => c.entries.map((e) => e.id)))].filter((n) => n !== 'Isobar') : [];
   let verify;
-  if (worst && worst.n > 1 && checks.every((c) => c.none)) verify = `Computed on this device. MET Norway also reports no sunrise or sunset here today.`;
+  if (checks.some((c) => c.missing)) verify = 'An outside service reports a sunrise or sunset today that the built-in calculation does not show. Treat today\'s sun times with caution.';
+  else if (worst && worst.n > 1 && checks.every((c) => c.none)) verify = `Computed on this device. MET Norway also reports no sunrise or sunset here today.`;
   else if (worst && worst.n > 1) verify = `Computed on this device and checked against ${names.join(' and ')}: all within ${worst.maxDiffMin < 1 ? 'a minute' : `${fmt(Math.ceil(worst.maxDiffMin))} min`}.`;
   else verify = 'Computed on this device from the Sun\'s position; no outside service was reachable to compare.';
   el.innerHTML = `${head('h-sun', 'Sun', `<span class="p-note">Now ${fmt(A.sunPos.altitude)}° ${A.sunPos.altitude >= 0 ? 'above' : 'below'} horizon · bearing ${fmt(A.sunPos.azimuth)}° ${compass(A.sunPos.azimuth)}</span>`)}
@@ -397,7 +398,8 @@ export function renderSpace(el, { state, v, settings }) {
   const peak = ahead.reduce((a, b) => (b.kp > (a?.kp ?? -1) ? b : a), null);
   const desc = kpDescription(latest.kp);
   const gm = geomagneticLatitude(place.lat, place.lon);
-  const aur = auroraChance(peak?.kp ?? latest.kp, gm);
+  const kpForAurora = Math.max(peak?.kp ?? 0, latest.kp);
+  const aur = auroraChance(kpForAurora, gm);
   const w = innerWidth(el), h = 120, padL = 22, padR = 4, top = 8, base = 88;
   const sy = scale(0, 9, base, top);
   const bw = (w - padL - padR) / Math.max(1, series.length);
@@ -415,7 +417,7 @@ export function renderSpace(el, { state, v, settings }) {
       <div class="stat"><span class="label">Peak next 3 days</span><b>${peak ? fmt(peak.kp, 1) : '—'}</b><i>${peak ? `${fmtWeekday(peak.t, tz)} ${fmtTime(peak.t, tz, settings.h12)} · ${kpDescription(peak.kp).label}${kpDescription(peak.kp).g ? ` (${kpDescription(peak.kp).g})` : ''}` : ''}</i></div></div>
     <div class="chart-box">${svg}</div>
     <div class="legend"><span><i class="band" style="background:var(--series-5)"></i>observed</span><span><i class="band" style="background:color-mix(in srgb, var(--series-5) 45%, transparent)"></i>NOAA forecast</span></div>
-    <p class="sub">${peak && peak.kp > latest.kp ? `At the forecast peak (Kp ${fmt(peak.kp, 1)}): ` : 'At the current level: '}${aur.label.charAt(0).toLowerCase()}${aur.label.slice(1)}.</p>
+    <p class="sub">${peak && peak.kp > latest.kp ? `At the forecast peak (Kp ${fmt(kpForAurora, 1)}): ` : `At the current level (Kp ${fmt(kpForAurora, 1)}): `}${aur.label.charAt(0).toLowerCase()}${aur.label.slice(1)}.</p>
     <p class="p-note">Geomagnetic latitude here is ${fmt(Math.abs(gm))}°${gm < 0 ? 'S' : 'N'}. The aurora line is a rule of thumb from Kp; cloud and daylight still decide. Source: NOAA Space Weather Prediction Center.</p>`;
   attachHover(el.querySelector('.chart-box'), hover, { top, bottom: base });
 }

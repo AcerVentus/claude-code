@@ -3,7 +3,7 @@
 // and place search. All requests are metric and use Unix timestamps (UTC).
 
 import { getJson, coord, qs } from '../lib/http.js';
-import { dateKey, HOUR } from '../lib/time.js';
+import { dateKey, keyToStart, HOUR } from '../lib/time.js';
 import { fromWmo } from '../lib/conditions.js';
 import { isNum } from '../lib/units.js';
 import { quantile } from '../lib/consensus.js';
@@ -32,6 +32,12 @@ export const WAVE_MODELS = [
 ];
 
 const toMs = (arr) => arr.map((s) => s * 1000);
+/**
+ * Local dates of Open-Meteo's daily rows. It stamps every row with one fixed UTC
+ * offset, so after a clock change in the window "midnight" lands at 23:00 or
+ * 01:00; reading the date at the row's midday is immune to that.
+ */
+export const dailyKeys = (seconds, tz) => seconds.map((s) => dateKey(s * 1000 + 12 * HOUR, tz));
 const col = (obj, key) => obj?.[key] ?? null;
 /** Open-Meteo sums precipitation over the hour *ending* at the timestamp; shift to the hour *starting* there. */
 const shiftBack = (arr) => (arr ? arr.slice(1).concat([null]) : null);
@@ -76,7 +82,7 @@ export async function fetchForecast(lat, lon, opts) {
         code: h.weather_code.map(fromWmo),
       },
       daily: {
-        key: dy.time.map((s) => dateKey(s * 1000, tz)),
+        key: dailyKeys(dy.time, tz),
         tmax: dy.temperature_2m_max, tmin: dy.temperature_2m_min, precip: dy.precipitation_sum,
         windMax: dy.wind_speed_10m_max, gustMax: dy.wind_gusts_10m_max, code: dy.weather_code.map(fromWmo),
       },
@@ -88,12 +94,12 @@ export async function fetchForecast(lat, lon, opts) {
       cloudLow: h.cloud_cover_low, cloudMid: h.cloud_cover_mid, cloudHigh: h.cloud_cover_high,
     },
     daily: {
-      key: dy.time.map((s) => dateKey(s * 1000, tz)),
-      start: toMs(dy.time),
+      key: dailyKeys(dy.time, tz),
+      start: dailyKeys(dy.time, tz).map((k) => keyToStart(k, tz)),
       code: dy.weather_code.map(fromWmo),
       tmax: dy.temperature_2m_max, tmin: dy.temperature_2m_min,
       feelsMax: dy.apparent_temperature_max, feelsMin: dy.apparent_temperature_min,
-      sunrise: dy.sunrise.map((s) => (s ? s * 1000 : null)), sunset: dy.sunset.map((s) => (s ? s * 1000 : null)),
+      sunrise: dy.sunrise.map((s, i) => (s && s !== dy.sunset[i] ? s * 1000 : null)), sunset: dy.sunset.map((s, i) => (s && s !== dy.sunrise[i] ? s * 1000 : null)),
       daylight: dy.daylight_duration, sunshine: dy.sunshine_duration, uvMax: dy.uv_index_max,
       precip: dy.precipitation_sum, snowfall: dy.snowfall_sum, precipHours: dy.precipitation_hours,
       popMax: dy.precipitation_probability_max, windMax: dy.wind_speed_10m_max, gustMax: dy.wind_gusts_10m_max,
@@ -114,7 +120,7 @@ export async function fetchModels(lat, lon, opts) {
   const d = res.data;
   const tz = d.timezone;
   const t = toMs(d.hourly.time);
-  const keys = d.daily.time.map((s) => dateKey(s * 1000, tz));
+  const keys = dailyKeys(d.daily.time, tz);
   const sources = [];
   for (const m of MODELS) {
     // With a single model Open-Meteo drops the suffix; with several it adds one.

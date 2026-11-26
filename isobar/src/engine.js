@@ -82,6 +82,7 @@ export function createEngine({ tideIndex, onChange }) {
     const { lat, lon } = place;
     const opts = force ? { force: true } : undefined;
     state.place = place;
+    state.tz = safeTz(place.tz);
     state.raw = {};
     state.status = {};
     state.view = null;
@@ -99,7 +100,11 @@ export function createEngine({ tideIndex, onChange }) {
     jobs.push(run('nws', my, () => fetchNws(lat, lon, opts), { skip: inNwsCoverage(lat, lon) ? null : 'United States only' }));
     jobs.push(run('dwd', my, () => fetchBrightSky(lat, lon, Date.now(), opts)));
     jobs.push(run('dwdObs', my, async () => {
-      const [obs, alerts] = await Promise.all([fetchBrightSkyObservation(lat, lon, opts), fetchBrightSkyAlerts(lat, lon, opts).catch(() => [])]);
+      // Two separate calls: one failing must not discard what the other returned.
+      const [o, a] = await Promise.allSettled([fetchBrightSkyObservation(lat, lon, opts), fetchBrightSkyAlerts(lat, lon, opts)]);
+      if (o.status === 'rejected' && a.status === 'rejected') throw o.reason;
+      const obs = o.status === 'fulfilled' ? o.value : null;
+      const alerts = a.status === 'fulfilled' ? a.value : [];
       if (!obs && !alerts.length) return null;
       return { ...(obs || { fetchedAt: Date.now(), stale: false, ms: 0 }), alerts };
     }, { skip: nearGermany(lat, lon) ? null : 'Germany and neighbours only' }));
@@ -116,7 +121,7 @@ export function createEngine({ tideIndex, onChange }) {
 
     // These need the place's time zone, which the forecast response settles.
     jobs.push(fc.then((res) => {
-      const tz = res?.tz || place.tz || Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const tz = safeTz(res?.tz) || safeTz(place.tz) || Intl.DateTimeFormat().resolvedOptions().timeZone;
       state.tz = tz;
       const key = dateKey(Date.now(), tz);
       return Promise.all([
@@ -143,13 +148,19 @@ export function createEngine({ tideIndex, onChange }) {
   return { state, load, tick };
 }
 
+/** The zone name if this browser knows it, else null (an unknown name would throw on every use). */
+export function safeTz(tz) {
+  if (!tz) return null;
+  try { new Intl.DateTimeFormat('en-GB', { timeZone: tz }); return tz; } catch { return null; }
+}
+
 // ---------------------------------------------------------------- derivation
 
 export function derive(state) {
   const { raw, place } = state;
   const now = Date.now();
   const fc = raw.forecast;
-  const tz = fc?.tz || state.tz || place.tz || 'UTC';
+  const tz = safeTz(fc?.tz) || safeTz(state.tz) || safeTz(place.tz) || 'UTC';
   const { lat, lon } = place;
   const v = { now, tz, place, elevation: fc?.elevation ?? place.elevation ?? null };
 
@@ -166,12 +177,14 @@ export function derive(state) {
   v.observations = observations;
 
   if (sources.length) {
-    v.current = buildNow(sources, observations, now, fc?.current?.code ?? null);
+    const current = buildNow(sources, observations, now, fc?.current?.code ?? null);
+    // No source covering "now" (a badly wrong device clock, or every series out of range) means no current reading.
+    v.current = current.vars.temp ? current : null;
     const popSeries = [];
     if (fc) popSeries.push({ t: fc.source.hourly.t, values: fc.source.hourly.pop });
     if (raw.ensemble) popSeries.push({ t: raw.ensemble.t, values: raw.ensemble.precipProb });
     for (const s of sources) if (s.hourly?.pop?.some?.(isNum)) popSeries.push({ t: s.hourly.t, values: s.hourly.pop });
-    v.hourly = buildHourly(sources, now, 168, { preferSource: fc?.source ?? null, popSeries });
+    v.hourly = buildHourly(sources, now, 168, { preferSource: fc?.source ?? null, popSeries, tz });
     v.days = buildDaily(sources, dayKeys(now, tz, 10), tz, fc?.source ?? null);
     v.popSources = popSeries.length;
   }
@@ -192,12 +205,17 @@ export function derive(state) {
   const met = raw.astroMet;
   const i0 = fc ? fc.daily.key.indexOf(key) : -1;
   const checks = [];
-  const addCheck = (label, mine, others) => {
+  const addCheck = (label, mine, others, dayFrom = start, dayTo = end) => {
     const answered = others.filter((o) => o.asked);
-    // "It does not happen today" is also something sources can agree on (polar day and night, moonless days).
-    if (mine == null && answered.length && answered.every((o) => o.t == null)) {
-      checks.push({ label, n: answered.length + 1, maxDiffMin: 0, level: 'high', none: true, entries: [{ id: 'Isobar', t: null }, ...answered] });
-      return;
+    if (mine == null) {
+      // "It does not happen today" is also something sources can agree on (polar day and night, moonless days).
+      if (answered.length && answered.every((o) => o.t == null)) {
+        checks.push({ label, n: answered.length + 1, maxDiffMin: 0, level: 'high', none: true, entries: [{ id: 'Isobar', t: null }, ...answered] });
+      } else if (others.some((o) => isNum(o.t) && o.t >= dayFrom && o.t < dayTo)) {
+        // An outside service has the event inside this day and the local computation does not: a real disagreement.
+        checks.push({ label, n: 2, maxDiffMin: Infinity, level: 'low', missing: true, entries: others.filter((o) => isNum(o.t)) });
+      }
+      return; // otherwise the outside time belongs to a neighbouring day; nothing to compare
     }
     const cmp = compareTimes([{ id: 'Isobar', t: mine }, ...others]);
     if (cmp) checks.push({ label, ...cmp });
@@ -246,7 +264,7 @@ export function derive(state) {
     v.sea = {
       marine: m, waveSources,
       now: waveSources.length ? buildSea(waveSources, now) : null,
-      hourly: waveSources.length ? buildSeaHourly(waveSources, now, 120) : null,
+      hourly: waveSources.length ? buildSeaHourly(waveSources, now, 120, tz) : null,
       sst: consensus(sstEntries, 'seaTemp'),
     };
   }

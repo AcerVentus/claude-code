@@ -49,8 +49,18 @@ export async function fetchWttr(lat, lon, tz, opts) {
   }
 
   const c = d.current_condition?.[0];
+  // "08:47 AM" is the observation's UTC clock time; date it to the most recent such moment
+  // so that a stale report is recognised as stale instead of passing as current.
+  let observedAt = res.fetchedAt;
+  const om = /^(\d{1,2}):(\d{2})\s*([AP]M)$/i.exec(c?.observation_time || '');
+  if (om) {
+    const hh = (+om[1] % 12) + (om[3].toUpperCase() === 'PM' ? 12 : 0);
+    const day = new Date(res.fetchedAt);
+    observedAt = Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate(), hh, +om[2]);
+    if (observedAt > res.fetchedAt + 10 * 60e3) observedAt -= 24 * 3600e3;
+  }
   const now = c ? {
-    t: res.fetchedAt,
+    t: observedAt,
     temp: num(c.temp_C), feels: num(c.FeelsLikeC), rh: num(c.humidity),
     wind: num(c.windspeedKmph), dir: num(c.winddirDegree), pressure: num(c.pressure),
     cloud: num(c.cloudcover), code: fromWwo(c.weatherCode),

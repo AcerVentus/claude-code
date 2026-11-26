@@ -168,3 +168,122 @@ test('service worker pre-caches every file the page loads', async () => {
   for (const f of need) assert.ok(listed.has(f), `sw.js is missing ${f}`);
   for (const f of listed) assert.doesNotThrow(() => readFileSync(new URL(f, root)), `sw.js lists ${f}, which does not exist`);
 });
+
+// ---- regressions for defects found in review
+
+test('half-hour time zones: hourly rain and its chance survive (Asia/Kolkata, Asia/Kathmandu)', async () => {
+  const { buildHourly } = await import('../../src/lib/model.js');
+  const { hourStart, zonedParts } = await import('../../src/lib/time.js');
+  for (const [tz, offMin] of [['Asia/Kolkata', 330], ['Asia/Kathmandu', 345], ['America/St_Johns', -210], ['UTC', 0]]) {
+    const now = Date.UTC(2026, 10, 26, 9, 17);
+    const start = hourStart(now, tz);
+    assert.equal(zonedParts(start, tz).min, 0, `${tz}: grid starts on a local hour`);
+    assert.ok(start <= now && now - start < HOUR);
+    // Open-Meteo style: samples on local hours. MET Norway style: samples on UTC hours.
+    const local = Array.from({ length: 60 }, (_, i) => start - 3 * HOUR + i * HOUR);
+    const utc = Array.from({ length: 60 }, (_, i) => Math.floor(now / HOUR) * HOUR - 3 * HOUR + i * HOUR);
+    const mk = (id, t, rain) => ({ id, hourly: { t, temp: t.map(() => 20), feels: null, rh: null, dew: null, wind: t.map(() => 10), gust: null, dir: null, pressure: null, cloud: t.map(() => 50), precip: t.map(() => rain), pop: null, code: t.map(() => 'rain') } });
+    const sources = [mk('a', local, 5), mk('b', local, 5), mk('c', local, 5), mk('utc', utc, 0)];
+    const h = buildHourly(sources, now, 24, { tz, popSeries: [{ t: local, values: local.map(() => 80) }] });
+    assert.equal(h.t[0], start);
+    assert.equal(h.precip.value[0], 5, `${tz}: rain consensus comes from the models, not from the lone UTC-hour source`);
+    assert.ok(h.precip.n[0] >= 3, `${tz}: ${h.precip.n[0]} rain sources`);
+    assert.equal(h.pop[0], 80, `${tz}: chance of rain present`);
+    assert.equal(h.temp.n[0], 4, `${tz}: instantaneous values still use every source`);
+    assert.equal(offMin % 60 === 0 ? h.precip.n[0] : 3, h.precip.n[0]);
+  }
+});
+
+test('daily rows keep their dates across a clock change (Sydney, April 2026)', async () => {
+  const { dailyKeys } = await import('../../src/providers/openmeteo.js');
+  // Open-Meteo stamps every row with the offset in force when asked (+11 h here); DST ends on 5 April.
+  const stamps = [3, 4, 5, 6, 7, 8].map((d) => Date.UTC(2026, 3, d, 0, 0) / 1000 - 11 * 3600);
+  assert.deepEqual(dailyKeys(stamps, 'Australia/Sydney'), ['2026-04-03', '2026-04-04', '2026-04-05', '2026-04-06', '2026-04-07', '2026-04-08']);
+  // and the other way round: asked in winter (+10 h), window crossing into summer time on 4 October
+  const spring = [2, 3, 4, 5, 6].map((d) => Date.UTC(2026, 9, d, 0, 0) / 1000 - 10 * 3600);
+  assert.deepEqual(dailyKeys(spring, 'Australia/Sydney'), ['2026-10-02', '2026-10-03', '2026-10-04', '2026-10-05', '2026-10-06']);
+});
+
+test('polar boundary: a Sun that never clears the horizon is polar night, not midnight sun', () => {
+  // Tromsø, 28 November 2026: no sunrise; the refracted noon Sun sits just below the horizon.
+  const s = sunDay(Date.UTC(2026, 10, 27, 23, 0), Date.UTC(2026, 10, 28, 23, 0), 69.65, 18.96);
+  assert.equal(s.sunrise, null);
+  assert.equal(s.polar, 'night');
+  assert.equal(s.dayLength, 0);
+  assert.ok(s.noonAltitude > -0.833 && s.noonAltitude < 0, `refracted noon altitude ${s.noonAltitude}`);
+  const jan = sunDay(Date.UTC(2027, 0, 13, 23, 0), Date.UTC(2027, 0, 14, 23, 0), 69.65, 18.96);
+  assert.equal(jan.polar, 'night');
+});
+
+test('high latitudes: a sunset after midnight still belongs to its day', () => {
+  // Tromsø, 17 May 2026 (CEST, UTC+2): the Sun sets shortly after local midnight.
+  const start = Date.UTC(2026, 4, 16, 22, 0), end = Date.UTC(2026, 4, 17, 22, 0);
+  const s = sunDay(start, end, 69.65, 18.96);
+  assert.ok(s.sunrise != null && s.sunset != null, JSON.stringify(s));
+  assert.ok(s.sunset > s.sunrise && s.sunset >= end && s.sunsetNextDay);
+  assert.ok(s.dayLength > 22 * HOUR && s.dayLength < 24 * HOUR);
+});
+
+test('clock changes at midnight: the day starts at its first real instant', async () => {
+  const { keyToStart, zonedToUtc, dateKey } = await import('../../src/lib/time.js');
+  // Santiago springs forward at 00:00 → 01:00 on 6 September 2026: midnight does not exist.
+  const santiago = keyToStart('2026-09-06', 'America/Santiago');
+  assert.equal(dateKey(santiago, 'America/Santiago'), '2026-09-06');
+  assert.equal(dateKey(santiago - 1, 'America/Santiago'), '2026-09-05');
+  // Havana falls back at 01:00 → 00:00 on 1 November 2026: midnight happens twice; take the first.
+  const havana = keyToStart('2026-11-01', 'America/Havana');
+  assert.equal(dateKey(havana, 'America/Havana'), '2026-11-01');
+  assert.equal(dateKey(havana - 1, 'America/Havana'), '2026-10-31');
+  // an ordinary ambiguous hour resolves to its first occurrence
+  assert.equal(zonedToUtc(2026, 11, 1, 1, 30, 'America/New_York'), Date.UTC(2026, 10, 1, 5, 30));
+  // and every day in a year still has a start strictly after the previous one
+  for (const tz of ['America/Santiago', 'America/Havana', 'Australia/Lord_Howe', 'Europe/London', 'Asia/Tehran']) {
+    let prev = keyToStart('2026-01-01', tz);
+    for (let d = 1; d < 366; d++) {
+      const key = new Date(Date.UTC(2026, 0, 1 + d)).toISOString().slice(0, 10);
+      const t = keyToStart(key, tz);
+      assert.ok(t - prev >= 23 * HOUR && t - prev <= 25 * HOUR, `${tz} ${key}: ${(t - prev) / HOUR} h`);
+      assert.equal(dateKey(t, tz), key, `${tz} ${key}`);
+      prev = t;
+    }
+  }
+});
+
+test('tide extrema continue after a gap in the series', async () => {
+  const { findExtrema } = await import('../../src/lib/tides.js');
+  const step = 15 * 60e3;
+  const times = [], heights = [];
+  for (let t = 0; t <= 3 * DAY; t += step) { times.push(t); heights.push(Math.round(Math.cos((2 * Math.PI * t) / (12.42 * HOUR)) * 100) / 100); }
+  const whole = findExtrema(times, heights).length;
+  const holed = [...heights]; holed[60] = null;
+  const found = findExtrema(times, holed);
+  assert.ok(whole >= 10);
+  assert.ok(found.length >= whole - 2, `${found.length} of ${whole} events survive one missing sample`);
+});
+
+test('dissent caps confidence: dropping more than 15% of sources is never "high"', async () => {
+  const { consensus } = await import('../../src/lib/consensus.js');
+  const mk = (vals) => consensus(vals.map((value, i) => ({ id: `s${i}`, value })), 'temp');
+  const split = mk([10, 10, 10, 10, 10, 25, 25]);
+  assert.equal(split.used.filter((u) => u.outlier).length, 2);
+  assert.notEqual(split.level, 'high');
+  const lone = mk([10, 10.2, 9.9, 10.1, 10, 10.1, 9.8, 10.2, 10, 10.1, 25]); // one stray among eleven
+  assert.equal(lone.used.filter((u) => u.outlier).length, 1);
+  assert.equal(lone.level, 'high');
+  assert.ok(lone.score < mk([10, 10.2, 9.9, 10.1, 10, 10.1, 9.8, 10.2, 10, 10.1]).score);
+});
+
+test('engine: unknown time-zone names fall back instead of throwing; no reading for "now" means no current block', async () => {
+  const { safeTz } = await import('../../src/engine.js');
+  assert.equal(safeTz('Europe/Oslo'), 'Europe/Oslo');
+  assert.equal(safeTz('Mars/Olympus_Mons'), null);
+  assert.equal(safeTz(null), null);
+  const place = { name: 'X', lat: 10, lon: 20, tz: 'Mars/Olympus_Mons' };
+  const v = derive({ raw: {}, place, tz: 'Not/AZone' });
+  assert.equal(v.tz, 'UTC');
+  // a source whose series ended long ago cannot say anything about now
+  const t = Array.from({ length: 24 }, (_, i) => Date.UTC(2020, 0, 1) + i * HOUR);
+  const old = { id: 'metno', name: 'Old', kind: 'service', via: 'x', hourly: { t, temp: t.map(() => 5), feels: null, rh: null, dew: null, wind: null, gust: null, dir: null, pressure: null, cloud: null, precip: null, pop: null, code: t.map(() => null) }, blocks6: [], daily: null };
+  const stale = derive({ raw: { metno: { source: old } }, place: { ...place, tz: 'UTC' }, tz: 'UTC' });
+  assert.equal(stale.current, null);
+});

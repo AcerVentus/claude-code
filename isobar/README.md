@@ -15,6 +15,10 @@ Everything is metric: °C, km/h (or m/s), mm, hPa, km, m, µg/m³.
 
 No accounts, no API keys, no build step, no tracking.
 
+![Local view: consensus temperature, source agreement and the 48-hour chart](docs/local-desktop.png)
+
+![Globe view: wave height with isobars](docs/globe.png)
+
 ## Run it
 
 **Open one file.** `dist/isobar.html` is the whole app in a single file. Double-click

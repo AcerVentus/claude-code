@@ -39,14 +39,29 @@ export function tzOffsetMs(ms, tz) {
   return asUtc - Math.floor(ms / 1000) * 1000;
 }
 
-/** UTC instant of a wall-clock time in a zone (DST-safe; gaps resolve forward). */
+/**
+ * UTC instant of a wall-clock time in a zone. A time that happens twice (clocks
+ * going back) resolves to its first occurrence; a time that never happens
+ * (clocks going forward) resolves to the instant the clocks jump, so the start
+ * of a day is always the first instant that carries that date.
+ */
 export function zonedToUtc(y, m, d, h, min, tz) {
   const guess = Date.UTC(y, m - 1, d, h, min);
-  const off = tzOffsetMs(guess, tz);
-  let t = guess - off;
-  const off2 = tzOffsetMs(t, tz);
-  if (off2 !== off) t = guess - off2;
-  return t;
+  const a = guess - tzOffsetMs(guess, tz);
+  const b = guess - tzOffsetMs(a, tz);
+  if (a === b) return a;
+  const matches = (t) => { const p = zonedParts(t, tz); return p.y === y && p.m === m && p.d === d && p.h === h && p.min === min; };
+  const okA = matches(a), okB = matches(b);
+  if (okA && okB) return Math.min(a, b);
+  if (okA) return a;
+  if (okB) return b;
+  return Math.max(a, b);
+}
+
+/** Start of the current local hour (zones with :30 and :45 offsets do not share UTC's hour marks). */
+export function hourStart(ms, tz) {
+  const off = tz ? tzOffsetMs(ms, tz) : 0;
+  return Math.floor((ms + off) / HOUR) * HOUR - off;
 }
 
 const pad = (n) => String(n).padStart(2, '0');

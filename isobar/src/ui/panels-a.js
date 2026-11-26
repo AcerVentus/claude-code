@@ -59,7 +59,7 @@ const spreadText = (key, r, settings) => {
 // ------------------------------------------------------------------ hero
 
 export function renderHero(el, { state, v, settings }) {
-  if (!v?.current) {
+  if (!v?.current?.vars.temp) {
     const failed = !state.loading && !!state.loadedAt;
     el.innerHTML = `<div class="hero-skeleton"><div class="hero-meta">${failed ? 'No forecast source could be reached' : 'Gathering sources…'}</div>
       <div class="hero-place">${esc(state.place?.name || '')}</div>
@@ -112,7 +112,7 @@ export function renderHero(el, { state, v, settings }) {
     </div>
     <div class="hero-side">
       <div class="glass agree">
-        <div class="agree-head"><span class="agree-title">Source agreement · temperature now</span>${conf(c.overall, { detail: 'temp', text: `${LEVELS[c.overall.level].label} · ${c.count} sources` })}</div>
+        <div class="agree-head"><span class="agree-title">Source agreement · temperature now</span>${conf(T, { detail: 'temp', text: `${LEVELS[T.level].label} · ${T.n} source${T.n === 1 ? '' : 's'}` })}</div>
         ${agreementStrip(c, v.ensemble, now)}
         <p class="agree-text">${agreementText(c, voteTxt)}</p>
       </div>
@@ -481,7 +481,7 @@ export function renderNowcast(el, ctx) {
   svg += `<text class="c-tick" x="${padL - 6}" y="${top - 9}" text-anchor="end">mm</text></svg>`;
 
   // 24-hour total per source, then the usual consensus
-  const start = Math.floor(now / HOUR) * HOUR;
+  const start = v.hourly?.t[0] ?? Math.floor(now / HOUR) * HOUR;
   const totals = (v.sources || []).map((s) => {
     if (!s.hourly?.precip) return null;
     let sum = 0, got = 0;
@@ -591,7 +591,11 @@ export function renderVisibility(el, { state, v }) {
   const km = Math.min(...live.map((x) => x.value)) / 1000;
   const snow = valueAt(e.t, e.snowDepth, v.now, HOUR);
   const fz = valueAt(e.t, e.freezingLevel, v.now, HOUR);
-  el.innerHTML = `${head('h-visibility', 'Visibility', conf(live.length > 1 ? 'medium' : 'single', { text: live.length > 1 ? `${live.length} sources` : undefined }))}
+  // Services cap what they report (10 km, 16 km, 24 km…), so agreement is judged below the lowest cap.
+  const capped = live.map((x) => Math.min(x.value, 10000));
+  const gapKm = (Math.max(...capped) - Math.min(...capped)) / 1000;
+  const visLevel = live.length < 2 ? 'single' : gapKm > 3 ? 'low' : live.length >= 3 && gapKm <= 1.5 ? 'high' : 'medium';
+  el.innerHTML = `${head('h-visibility', 'Visibility', conf(visLevel, { text: live.length > 1 ? `${LEVELS[visLevel].short} · ${live.length} sources` : undefined }))}
     <p class="big">${km >= 10 ? fmt(km) : fmt(km, 1)}<small>km</small></p>
     <p class="sub">${visibilityLabel(km)}${live.length > 1 ? ' · lowest of the reports' : ''}</p>
     <div class="chips">${live.map((x) => `<span class="chip">${esc(x.id)} <b>${fmt(x.value / 1000, x.value < 10000 ? 1 : 0)} km</b></span>`).join('')}</div>

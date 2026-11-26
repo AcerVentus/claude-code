@@ -3,7 +3,7 @@
 
 import { consensus, overall, valueAt, nearestAt, vote, median, VARS } from './consensus.js';
 import { condGroup, CONDITIONS } from './conditions.js';
-import { HOUR, dateKey, keyToStart, addDays } from './time.js';
+import { HOUR, dateKey, keyToStart, addDays, hourStart } from './time.js';
 import { isNum, dewPoint } from './units.js';
 
 export const NOW_VARS = ['temp', 'feels', 'rh', 'dew', 'wind', 'gust', 'dir', 'pressure', 'cloud'];
@@ -74,9 +74,15 @@ export function buildNow(sources, observations, now, preferCode = null) {
 
 const HOURLY_VARS = ['temp', 'feels', 'rh', 'dew', 'wind', 'gust', 'dir', 'pressure', 'cloud', 'precip'];
 
-/** Hour-by-hour consensus on a regular UTC grid starting at the current hour. */
+/**
+ * Hour-by-hour consensus on a grid of local clock hours starting at the current
+ * one. Local, because that is what the strip labels, and because Open-Meteo
+ * serves its hours on the place's own clock: in a :30 or :45 zone those do not
+ * fall on UTC hours. Sources published on UTC hours are interpolated there for
+ * instantaneous values and left out of hourly rain totals.
+ */
 export function buildHourly(sources, now, hours = 168, extra = {}) {
-  const start = Math.floor(now / HOUR) * HOUR;
+  const start = hourStart(now, extra.tz);
   const out = { t: [], code: [], codeShare: [], pop: [], popN: [], confidence: [] };
   for (const v of HOURLY_VARS) out[v] = { value: [], sigma: [], n: [], level: [], min: [], max: [] };
 
@@ -247,8 +253,8 @@ export function buildSea(waveSources, now) {
 }
 
 /** Hourly consensus wave height for charts. */
-export function buildSeaHourly(waveSources, now, hours = 120) {
-  const start = Math.floor(now / HOUR) * HOUR;
+export function buildSeaHourly(waveSources, now, hours = 120, tz = null) {
+  const start = hourStart(now, tz);
   const out = { t: [], value: [], min: [], max: [], n: [] };
   for (let i = 0; i < hours; i++) {
     const T = start + i * HOUR;

@@ -85,6 +85,10 @@ export async function fetchNws(lat, lon, opts) {
     const times = [...maps.temp.keys()].sort((a, b) => a - b);
     const hourly = { t: times, pressure: times.map(() => null), precip: times.map(() => null), code: times.map(() => null) };
     for (const k of Object.keys(maps)) hourly[k] = times.map((t) => maps[k].get(t) ?? null);
+    // NWS states the chance of precipitation per forecast period (often 6–12 hours, sometimes days).
+    // That is not an hourly chance, so it is kept apart from the hourly consensus.
+    hourly.popPeriod = hourly.pop;
+    hourly.pop = null;
     result.source = {
       id: 'nws', name: 'US National Weather Service', short: 'NWS', origin: 'United States', kind: 'service', via: 'api.weather.gov',
       hourly, daily: null,

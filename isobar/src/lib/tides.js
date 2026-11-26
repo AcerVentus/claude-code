@@ -42,7 +42,8 @@ export function findExtrema(times, heights, opts = {}) {
     // Walk across any plateau to find the far side of the turning point.
     let j = i;
     while (j < n - 1 && isNum(s[j + 1]) && s[j + 1] === s[i]) j++;
-    if (j >= n - 1 || !isNum(s[j + 1])) break;
+    if (j >= n - 1) break;
+    if (!isNum(s[j + 1])) { i = j + 2; continue; } // a gap in the series: carry on after it
     const before = s[i] - s[i - 1];
     const after = s[j + 1] - s[j];
     if (before !== 0 && after !== 0 && Math.sign(before) !== Math.sign(after)) {

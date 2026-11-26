@@ -56,10 +56,11 @@ export function sunDay(dayStart, dayEnd, lat, lon, elev = 0) {
   const noonAltitude = noonEv.hor.altitude;
 
   const sunrise = within(ms(A.SearchRiseSet(S, obs, +1, start, span)), dayStart, dayEnd);
-  // The first sunset after local midnight can belong to the previous day at
-  // high latitudes; the day's sunset is the one that follows its sunrise.
-  const setFrom = sunrise ?? dayStart;
-  const sunset = within(ms(A.SearchRiseSet(S, obs, -1, new Date(setFrom), (dayEnd - setFrom) / DAY)), dayStart, dayEnd);
+  // The day's sunset is the one that follows its sunrise. At high latitudes that can be
+  // after midnight (and the first sunset after midnight belongs to the day before).
+  let sunset;
+  if (sunrise != null) sunset = within(ms(A.SearchRiseSet(S, obs, -1, new Date(sunrise), 1)), sunrise, sunrise + DAY);
+  else sunset = within(ms(A.SearchRiseSet(S, obs, -1, start, span)), dayStart, dayEnd);
 
   const up = (altitude) => within(ms(A.SearchAltitude(S, obs, +1, start, span, altitude)), dayStart, dayEnd);
   const down = (altitude) => {
@@ -74,10 +75,16 @@ export function sunDay(dayStart, dayEnd, lat, lon, elev = 0) {
     astroDawn: up(-18), astroDusk: down(-18),
     goldenMorningEnd: up(6), goldenEveningStart: down(6),
     dayLength: sunrise != null && sunset != null && sunset > sunrise ? sunset - sunrise : null,
+    sunsetNextDay: sunset != null && sunset >= dayEnd,
     polar: null,
   };
   if (sunrise == null && sunset == null) {
-    result.polar = noonAltitude > -0.833 ? 'day' : 'night';
+    // Rise and set are defined on the unrefracted centre of the Sun at −0.833° (upper limb
+    // on the horizon, standard refraction), so the same quantity decides which side we are on.
+    const noonAt = noonEv.time.date;
+    const eq = A.Equator(S, noonAt, obs, true, true);
+    const geometric = A.Horizon(noonAt, obs, eq.ra, eq.dec).altitude; // no refraction argument = geometric
+    result.polar = geometric > -0.833 ? 'day' : 'night';
     result.dayLength = result.polar === 'day' ? dayEnd - dayStart : 0;
   }
   return result;

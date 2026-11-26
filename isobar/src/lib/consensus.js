@@ -10,7 +10,8 @@
 //                80+ reads as high confidence, 50+ as medium, below as low
 //   4. caps    = one source can never be more than "single source";
 //                two sources can never be "high"
-//   5. penalty = each outlier that had to be dropped costs confidence
+//   5. penalty = each outlier that had to be dropped costs confidence, and
+//                dropping more than 15% of the sources rules out "high"
 //
 // Tolerances are per variable and listed in VARS so they can be audited.
 
@@ -165,6 +166,9 @@ export function consensus(entries, varKey) {
   }
   let score = scoreFromSpread(sigma, tol);
   score *= 1 - 0.5 * (outlierIds.size / n);
+  // One stray source among many is what the median is for. More than that (over 15% of
+  // the sources set aside) is real dissent, however tightly the rest agree: never "high".
+  if (outlierIds.size / n > 0.15) score = Math.min(score, 74);
   if (n === 2) score = Math.min(score, 74);
   result.score = Math.round(score);
   result.level = levelFromScore(result.score);
