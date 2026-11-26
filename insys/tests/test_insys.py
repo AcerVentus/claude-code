@@ -5,6 +5,7 @@ Run from the insys folder:   python -m unittest discover -s tests -v
 
 import json
 import os
+import re
 import shutil
 import sqlite3
 import sys
@@ -15,10 +16,12 @@ import unittest
 import urllib.error
 import urllib.request
 
-os.environ["INSYS_PBKDF2_ITERATIONS"] = "1000"  # keep the tests fast
+# (password hashing is slowed for real use; the tests turn it down after loading the program)
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 import insys  # noqa: E402
+
+insys.PBKDF2_ITERATIONS = 1000  # keep the tests fast; the program itself always uses its full setting
 
 
 class Client:
@@ -399,6 +402,33 @@ class InSysTest(unittest.TestCase):
         self.assertEqual(sam.post("/api/records/%d/actions" % rec["id"],
                                   {"version": 1, "text": "x"})[0], 400)
         self.assertEqual(sam.get("/api/records/99999999/history")[0], 404)
+
+    def test_extra_or_protected_fields_in_a_request_are_ignored(self):
+        """Only the fields the program knows are ever written; a request cannot
+        name its own columns, forge a reference, or reach other tables."""
+        sam = self.people["sam"]
+        hostile = {"module": "project", "title": "Plain item", "ref": "PRJ-9999", "id": 999999, "version": 50,
+                   "deleted_at": "2020-01-01", "created_by": 1, "module ": "finance",
+                   "title = 'x', status": "boo", "x); DROP TABLE users; --": 1, "pw_hash": "x", "role": "admin"}
+        status, data = sam.post("/api/records", hostile)
+        self.assertEqual(status, 200, data)
+        rec = data["record"]
+        self.assertRegex(rec["ref"], r"^PRJ-\d{4}$")
+        self.assertNotEqual(rec["ref"], "PRJ-9999")
+        self.assertEqual((rec["version"], rec["deleted_at"], rec["created_by"], rec["module"]), (1, None, sam.user_id, "project"))
+        status, data = sam.put("/api/records/%d" % rec["id"], {"version": 1, "title": "Still plain", "ref": "HACK-1",
+                                                               "deleted_at": "x", "owner_id = 1, title": "y"})
+        self.assertEqual((status, data["record"]["ref"], data["record"]["deleted_at"], data["record"]["title"]),
+                         (200, rec["ref"], None, "Still plain"))
+        task = sam.post("/api/tasks", {"title": "T", "assignee_id": sam.user_id, "deleted_at": "x", "created_by": 1,
+                                       "version": 9, "id": 5, "title, status": "z"})[1]["task"]
+        self.assertEqual((task["deleted_at"], task["created_by"], task["version"]), (None, sam.user_id, 1))
+        sub = sam.post("/api/subcons", {"name": "Plain Subcon Co", "ref": "SUB-9999", "version": 9, "created_by": 1,
+                                        "name = 'x', notes": "y"})[1]["subcon"]
+        self.assertRegex(sub["ref"], r"^SUB-\d{4}$")
+        self.assertNotEqual(sub["ref"], "SUB-9999")
+        self.assertEqual(sam.get("/api/me")[1]["user"]["role"], "staff")
+        self.assertEqual(self.state(self.admin)["me"]["role"], "admin")   # the users table is intact
 
     def test_text_is_stored_exactly_not_interpreted(self):
         sam = self.people["sam"]
@@ -1567,6 +1597,370 @@ class TransferTest(unittest.TestCase):
         self.assertEqual(len(self.admin.get("/api/log?scope=deleted&kind=all&month=all")[1]["entries"]), 1)
 
 
+class FakeConnection:
+    """Stands in for an accepted network connection in the connection-filter tests."""
+
+    def __init__(self, arrived_on):
+        self.arrived_on = arrived_on
+
+    def getsockname(self):
+        return (self.arrived_on, 8080)
+
+
+class LocalOnlyTest(unittest.TestCase):
+    """Choices 1 and 2 must not serve, or reach, the internet."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.saved = (insys.RT.data_dir, insys.RT.lan, insys.RT.online_requested, insys.RT.tunnel_active,
+                     set(insys.RT.local_names))
+        insys.RT.data_dir = tempfile.mkdtemp(prefix="insys-local-")
+        insys.RT.lan = insys.RT.online_requested = insys.RT.tunnel_active = False
+        insys.RT.local_names = set(["insys-pc"])
+        password = insys.init_db()
+        cls.server = insys.Server(("127.0.0.1", 0), insys.Handler)
+        cls.port = cls.server.server_address[1]
+        cls.base = "http://127.0.0.1:%d" % cls.port
+        threading.Thread(target=cls.server.serve_forever, daemon=True).start()
+        cls.admin = Client(cls.base)
+        cls.admin.login("admin", password)
+        cls.admin.post("/api/change-password", {"current": password, "new": "Local-only-pass-1"})
+        cls.admin.post("/api/records", {"module": "project", "title": "Confidential tender price"})
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.shutdown()
+        cls.server.server_close()
+        shutil.rmtree(insys.RT.data_dir, ignore_errors=True)
+        (insys.RT.data_dir, insys.RT.lan, insys.RT.online_requested, insys.RT.tunnel_active,
+         insys.RT.local_names) = cls.saved
+
+    def setUp(self):
+        insys.RT.lan = insys.RT.online_requested = insys.RT.tunnel_active = False
+        insys._blocked_seen.clear()   # the security log limits repeats; each test starts fresh
+
+    def fetch(self, path, headers, client=None):
+        """GET with extra headers; returns (status, body bytes)."""
+        client = client or Client(self.base)
+        return client.request("GET", path, headers=headers, raw=True)
+
+    # -- what counts as local ------------------------------------------------------
+
+    def test_which_addresses_are_local(self):
+        for address in ["127.0.0.1", "127.8.9.1", "10.0.0.1", "10.255.255.254", "172.16.0.1", "172.31.255.255",
+                        "192.168.0.1", "192.168.1.20", "169.254.10.10", "::1", "fd00::1", "fe80::1",
+                        "::ffff:192.168.1.5", "192.168.1.20:8080", "[::1]:8080", "fe80::1%eth0"]:
+            self.assertTrue(insys.is_local_address(address), address)
+        for address in ["8.8.8.8", "1.1.1.1", "172.15.255.255", "172.32.0.1", "192.169.0.1", "100.64.0.1",
+                        "203.0.113.9", "198.51.100.17", "2001:4860:4860::8888", "::ffff:8.8.8.8", "0.0.0.0",
+                        "255.255.255.255", "", "not-an-address", "192.168.1", None]:
+            self.assertFalse(insys.is_local_address(address), address)
+
+    def test_which_site_addresses_are_local(self):
+        for host in ["localhost", "localhost:8080", "LOCALHOST", "127.0.0.1", "127.0.0.1:8080", "192.168.1.20:8080",
+                     "10.0.0.5", "[::1]:8080", "[fd00::2]", "insys-pc", "INSYS-PC:8080", "fileserver", "office.local",
+                     "pc7.lan:8080", "tracker.internal", "box.home.arpa", "app.localhost"]:
+            self.assertTrue(insys.is_local_host_name(host), host)
+        for host in ["example.com", "quiet-maple-site.trycloudflare.com", "0.tcp.ngrok.io:12345", "8.8.8.8",
+                     "203.0.113.9:8080", "[2001:4860:4860::8888]:80", "insys.mycompany.com", "local.evil.com",
+                     "localhost.evil.com", "evil.com.", "", "   ", "bad host", "a_b!c", None]:
+            self.assertFalse(insys.is_local_host_name(host), host)
+        # The address a connection actually arrived on is acceptable; any other public one is not.
+        self.assertTrue(insys.is_local_host_name("203.0.113.9:8080", arrived_on="203.0.113.9"))
+        self.assertFalse(insys.is_local_host_name("203.0.113.10:8080", arrived_on="203.0.113.9"))
+        insys.RT.local_names.add("tracker.mycompany.example")   # as given with --allow-host
+        try:
+            self.assertTrue(insys.is_local_host_name("Tracker.MyCompany.example:8080"))
+        finally:
+            insys.RT.local_names.discard("tracker.mycompany.example")
+
+    # -- who may connect -----------------------------------------------------------
+
+    def test_choice_1_serves_this_computer_only(self):
+        verify = self.server.verify_request
+        self.assertTrue(verify(FakeConnection("127.0.0.1"), ("127.0.0.1", 50000)))
+        for peer in ["192.168.1.5", "10.0.0.9", "8.8.8.8", "203.0.113.9", "2001:4860:4860::8888"]:
+            self.assertFalse(verify(FakeConnection("192.168.1.20"), (peer, 50000)), peer)
+
+    def test_choice_2_serves_local_network_addresses_and_nothing_else(self):
+        insys.RT.lan = True
+        verify = self.server.verify_request
+        for peer in ["127.0.0.1", "192.168.1.5", "10.20.30.40", "172.20.1.1", "169.254.3.3"]:
+            self.assertTrue(verify(FakeConnection("192.168.1.20"), (peer, 50000)), peer)
+        for peer in ["8.8.8.8", "203.0.113.9", "100.64.0.7", "172.32.0.1", "2001:4860:4860::8888"]:
+            self.assertFalse(verify(FakeConnection("192.168.1.20"), (peer, 50000)), peer)
+        # Even on a computer that has a public address of its own: outsiders are
+        # refused, while the computer reaching itself by that address is not.
+        self.assertFalse(verify(FakeConnection("203.0.113.9"), ("198.51.100.4", 50000)))
+        self.assertTrue(verify(FakeConnection("203.0.113.9"), ("203.0.113.9", 50000)))
+        entries = [a for a in self.admin.get("/api/admin/audit")[1]["audit"] if a["event"] == "blocked"]
+        self.assertTrue(entries and "not a local network address" in entries[0]["detail"])
+
+    # -- requests that have been through the internet --------------------------------
+
+    def test_requests_relayed_from_the_internet_are_refused_in_choices_1_and_2(self):
+        relayed = [
+            {"CF-Connecting-IP": "203.0.113.50"}, {"CF-Ray": "8a1b2c3d4e5f-LHR"}, {"Cdn-Loop": "cloudflare"},
+            {"CF-Visitor": '{"scheme":"https"}'}, {"Ngrok-Agent-Ips": "203.0.113.50"}, {"True-Client-IP": "203.0.113.50"},
+            {"X-Forwarded-For": "203.0.113.50"}, {"X-Forwarded-For": "192.168.1.5, 203.0.113.50"},
+            {"X-Forwarded-For": "2001:4860:4860::8888"}, {"X-Real-IP": "198.51.100.17"},
+            {"Forwarded": 'for=198.51.100.17;proto=https'}, {"Forwarded": 'for="[2001:db8:cafe::17]:4711"'},
+            {"Host": "quiet-maple-site.trycloudflare.com"}, {"Host": "0.tcp.ngrok.io:12345"},
+            {"Host": "insys.mycompany.com"}, {"Host": "203.0.113.9:8080"},
+            {"X-Forwarded-Host": "quiet-maple-site.trycloudflare.com"},
+        ]
+        for lan in (False, True):
+            insys.RT.lan = lan
+            for headers in relayed:
+                for path, client in [("/", None), ("/app.js", None), ("/api/ping", None),
+                                     ("/api/state", self.admin), ("/api/admin/backup", self.admin)]:
+                    status, body = self.fetch(path, headers, client)
+                    self.assertEqual(status, 403, (lan, headers, path))
+                    self.assertEqual(body, insys.LOCAL_ONLY_PAGE, (headers, path))
+                    self.assertNotIn(b"Confidential", body)
+            # Signing in through a relay is refused too, before the password is even looked at.
+            relay = Client(self.base)
+            status, body = relay.request("POST", "/api/login", {"username": "admin", "password": "Local-only-pass-1"},
+                                         headers={"CF-Connecting-IP": "203.0.113.50"}, raw=True)
+            self.assertEqual((status, body), (403, insys.LOCAL_ONLY_PAGE))
+            self.assertIsNone(relay.cookie)
+        self.assertEqual(self.admin.get("/api/state")[0], 200)   # the real local session is unaffected
+        events = [a for a in self.admin.get("/api/admin/audit")[1]["audit"] if a["event"] == "blocked"]
+        self.assertTrue(any("relayed by an internet service" in a["detail"] or "public address" in a["detail"]
+                            or "not a local address" in a["detail"] for a in events))
+
+    def test_ordinary_local_requests_are_served(self):
+        for headers in [{}, {"Host": "localhost:%d" % self.port}, {"Host": "insys-pc:%d" % self.port},
+                        {"Host": "192.168.1.20:%d" % self.port}, {"Host": "office-server.local"},
+                        {"X-Forwarded-For": "192.168.1.5"}, {"Via": "1.1 office-proxy"},
+                        {"Forwarded": "for=192.168.1.5;by=10.0.0.1"}]:
+            status, body = self.fetch("/api/state", headers, self.admin)
+            self.assertEqual(status, 200, headers)
+            self.assertIn(b"Confidential tender price", body)
+
+    def test_forwarding_headers_are_never_believed_in_choices_1_and_2(self):
+        Client(self.base).request("POST", "/api/login", {"username": "admin", "password": "wrong-password-zz"},
+                                  headers={"X-Forwarded-For": "192.168.77.77"})
+        failed = [a for a in self.admin.get("/api/admin/audit")[1]["audit"] if a["event"] == "login_failed"][0]
+        self.assertEqual(failed["ip"], "127.0.0.1")   # where it really came from, not what it claimed
+
+    def test_choice_3_is_the_only_mode_that_accepts_the_tunnel(self):
+        insys.RT.online_requested = insys.RT.tunnel_active = True
+        headers = {"CF-Connecting-IP": "203.0.113.50", "X-Forwarded-Proto": "https",
+                   "Host": "quiet-maple-site.trycloudflare.com"}
+        status, body = self.fetch("/api/state", headers, self.admin)
+        self.assertEqual(status, 200)
+        Client(self.base).request("POST", "/api/login", {"username": "admin", "password": "wrong-password-zz"},
+                                  headers=headers)
+        failed = [a for a in self.admin.get("/api/admin/audit")[1]["audit"] if a["event"] == "login_failed"][0]
+        self.assertEqual(failed["ip"], "203.0.113.50")
+        # The tunnel connects from this computer; nothing else may connect even then.
+        self.assertFalse(self.server.verify_request(FakeConnection("192.168.1.20"), ("192.168.1.5", 50000)))
+
+    # -- nothing goes out -----------------------------------------------------------
+
+    def test_code_that_reaches_the_internet_cannot_run_outside_choice_3(self):
+        target = os.path.join(insys.RT.data_dir, "should-never-exist.bin")
+        for lan in (False, True):
+            insys.RT.lan = lan
+            with self.assertRaises(RuntimeError):
+                insys.download_file("https://example.invalid/file", target)
+            with self.assertRaises(RuntimeError):
+                insys.ensure_cloudflared(interactive=False)
+            with self.assertRaises(RuntimeError):
+                insys.Tunnel("cloudflared", self.port).run_once()
+            with self.assertRaises(RuntimeError):
+                insys.require_internet_mode("Anything")
+        self.assertFalse(os.path.exists(target) or os.path.exists(target + ".part"))
+        self.assertFalse(os.path.exists(insys.tunnel_pid_path()))
+
+    def test_the_menu_never_goes_online_by_itself(self):
+        waits = []
+
+        def ask(valid, default, seconds):
+            waits.append((default, seconds))
+            return default
+
+        for remembered, expect_timer in [("1", True), ("2", True), ("3", False)]:
+            insys.remember_mode(remembered)
+            insys.start_menu(ask=ask)
+            default, seconds = waits[-1]
+            self.assertEqual(default, remembered)
+            if expect_timer:
+                self.assertEqual(seconds, insys.MENU_SECONDS)
+            else:
+                self.assertGreater(seconds, 24 * 3600)   # waits for a person; no countdown into Online
+        insys.remember_mode("1")
+
+    @unittest.skipUnless(os.name == "posix", "process handling is checked on POSIX here")
+    def test_a_tunnel_left_running_by_an_earlier_session_is_closed(self):
+        import subprocess
+        fake = os.path.join(insys.RT.data_dir, "cloudflared")
+        with open(fake, "w") as fh:     # one process, so nothing outlives the test
+            fh.write("import time\ntime.sleep(300)\n")
+        quiet = dict(stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        leftover = subprocess.Popen([sys.executable, fake, "tunnel", "--url", "http://127.0.0.1:8080"], **quiet)
+        unrelated = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(300)"], **quiet)
+        try:
+            time.sleep(0.3)
+            insys.write_tunnel_pid(leftover.pid)
+            self.assertTrue(insys.stop_leftover_tunnel())
+            self.assertIsNotNone(leftover.wait(timeout=10))
+            self.assertFalse(os.path.exists(insys.tunnel_pid_path()))
+            # A stale number that now belongs to some other program is left alone.
+            insys.write_tunnel_pid(unrelated.pid)
+            self.assertFalse(insys.stop_leftover_tunnel())
+            self.assertIsNone(unrelated.poll())
+            self.assertFalse(os.path.exists(insys.tunnel_pid_path()))
+            self.assertFalse(insys.stop_leftover_tunnel())   # nothing on file: nothing to do
+        finally:
+            for proc in (leftover, unrelated):
+                if proc.poll() is None:
+                    proc.kill()
+                proc.wait()
+
+
+EGRESS_PROBE = r"""
+import json, sys
+LOG, HOME = sys.argv[1], sys.argv[2]
+WATCH = ("socket.connect", "socket.bind", "socket.sendto", "socket.sendmsg", "socket.getaddrinfo",
+         "socket.gethostbyname", "socket.gethostbyaddr", "subprocess.Popen", "os.system", "os.exec",
+         "os.posix_spawn", "os.startfile", "urllib.Request", "webbrowser.open", "ftplib.connect",
+         "smtplib.connect", "http.client.connect")
+
+def hook(event, args):
+    if event not in WATCH:
+        return
+    detail = args[1:] if event in ("socket.connect", "socket.bind", "socket.sendto", "socket.sendmsg") else args
+    with open(LOG, "a") as fh:
+        fh.write(json.dumps([event, repr(detail)]) + "\n")
+
+sys.addaudithook(hook)
+sys.path.insert(0, HOME)
+import insys
+sys.exit(insys.main(sys.argv[3:]))
+"""
+
+
+class EgressTest(unittest.TestCase):
+    """Runs the real program under Python's audit hooks, uses it, and inspects
+    every network and process action it took."""
+
+    def run_program(self, extra_args, leave_stale_lock=False):
+        import signal
+        import socket
+        import subprocess
+        work = tempfile.mkdtemp(prefix="insys-egress-")
+        self.addCleanup(shutil.rmtree, work, ignore_errors=True)
+        data = os.path.join(work, "data")
+        log = os.path.join(work, "audit.jsonl")
+        probe = os.path.join(work, "probe.py")
+        with open(probe, "w") as fh:
+            fh.write(EGRESS_PROBE)
+        with socket.socket() as s:
+            s.bind(("127.0.0.1", 0))
+            port = s.getsockname()[1]
+        if leave_stale_lock:   # as if an earlier run had been cut off without tidying up
+            os.makedirs(data)
+            with open(os.path.join(data, "insys.lock"), "w") as fh:
+                json.dump({"port": port, "instance": "gone", "pid": 1}, fh)
+        home = os.path.dirname(os.path.abspath(insys.__file__))
+        env = dict(os.environ)
+        for name in ("HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy", "ALL_PROXY", "all_proxy"):
+            env.pop(name, None)
+        flags = subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
+        out = open(os.path.join(work, "console.txt"), "wb")
+        self.addCleanup(out.close)
+        proc = subprocess.Popen([sys.executable, probe, log, home, "--no-browser", "--no-menu", "--data-dir", data,
+                                 "--port", str(port)] + extra_args, stdin=subprocess.DEVNULL, stdout=out,
+                                stderr=subprocess.STDOUT, env=env, creationflags=flags,
+                                start_new_session=os.name != "nt")
+        try:
+            client = Client("http://127.0.0.1:%d" % port)
+            for _ in range(200):
+                try:
+                    if client.get("/api/ping")[0] == 200:
+                        break
+                except (urllib.error.URLError, ConnectionError):
+                    time.sleep(0.1)
+            else:
+                self.fail("the program did not start")
+            # A realistic session: first sign-in, records, a subcontractor, a person, the log, a backup.
+            with open(os.path.join(data, "ADMIN-FIRST-LOGIN.txt"), encoding="utf-8") as fh:
+                password = re.search(r"Password:\s*(\S+)", fh.read()).group(1)
+            self.assertEqual(client.login("admin", password)[0], 200)
+            self.assertEqual(client.post("/api/change-password", {"current": password, "new": "Egress-check-2026"})[0], 200)
+            rec = client.post("/api/records", {"module": "project", "title": "Egress check", "number": "E-1"})[1]["record"]
+            client.post("/api/records/%d/actions" % rec["id"], {"version": 1, "text": "Did it", "date": "2026-11-26"})
+            client.post("/api/records/%d/xrefs" % rec["id"], {"system": "CRM", "ref": "X-1", "url": "https://crm.example.com/x/1"})
+            sub = client.post("/api/subcons", {"name": "Egress Subcon", "website": "www.example.org", "email": "a@example.org"})[1]["subcon"]
+            client.post("/api/records/%d/subcons" % rec["id"], {"subcon_id": sub["id"]})
+            client.post("/api/admin/users", {"username": "eve", "full_name": "Eve Engineer", "role": "staff"})
+            client.post("/api/tasks", {"title": "A task", "assignee_id": 1})
+            for path in ["/api/state", "/api/activity", "/api/events", "/api/log?month=all&kind=all", "/api/admin/system",
+                         "/api/admin/audit", "/", "/app.js", "/styles.css"]:
+                self.assertEqual(client.request("GET", path, raw=True)[0], 200, path)
+            status, backup = client.request("GET", "/api/admin/backup", raw=True)
+            self.assertEqual(status, 200)
+            self.assertEqual(client.upload("/api/admin/restore", backup)[0], 200)
+        finally:
+            if proc.poll() is None:
+                if os.name == "nt":
+                    proc.send_signal(signal.CTRL_BREAK_EVENT)
+                else:
+                    os.killpg(proc.pid, signal.SIGINT)
+                try:
+                    proc.wait(timeout=30)
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+                    proc.wait()
+        with open(log) as fh:
+            return port, [json.loads(line) for line in fh]
+
+    def check_nothing_left_the_network(self, events, port, listen_on, allow_route_probe):
+        binds = [detail for event, detail in events if event == "socket.bind"]
+        self.assertEqual(binds, ["(('%s', %d),)" % (listen_on, port)], binds)
+        for event, detail in events:
+            if event == "socket.bind":
+                continue
+            if event == "socket.connect":
+                address = re.search(r"\('([^']+)', (\d+)\)", detail)
+                self.assertIsNotNone(address, detail)
+                self.assertTrue(insys.is_local_address(address.group(1)), "connected to %s" % detail)
+                if address.group(1) != "127.0.0.1":
+                    # Only the route probe that reads this computer's own LAN address (no packet is sent).
+                    self.assertTrue(allow_route_probe and address.group(1) == "10.255.255.255", detail)
+                continue
+            if event == "urllib.Request":
+                self.assertIn("http://127.0.0.1:%d/api/ping" % port, detail)   # "is InSys already running here?"
+                continue
+            if event == "socket.getaddrinfo":
+                # Only ever the numeric address of this computer, which needs no lookup.
+                self.assertTrue(detail.startswith("('127.0.0.1', %d," % port), detail)
+                continue
+            if event == "http.client.connect":
+                self.assertIn("'127.0.0.1', %d)" % port, detail)               # the same check, one layer down
+                continue
+            self.fail("unexpected %s %s" % (event, detail))
+
+    def test_choice_1_makes_no_network_connection_of_any_kind(self):
+        port, events = self.run_program([])
+        self.check_nothing_left_the_network(events, port, "127.0.0.1", allow_route_probe=False)
+        self.assertFalse([e for e in events if e[0] != "socket.bind"], events)   # it listened, and nothing else
+
+    def test_choice_2_makes_no_network_connection_either(self):
+        port, events = self.run_program(["--lan"])
+        self.check_nothing_left_the_network(events, port, "0.0.0.0", allow_route_probe=True)
+        names = set(e[0] for e in events)
+        self.assertFalse(names & set(["socket.getaddrinfo", "socket.gethostbyname", "socket.gethostbyaddr",
+                                      "socket.sendto", "socket.sendmsg", "subprocess.Popen", "webbrowser.open"]), names)
+
+    def test_checking_for_a_copy_already_running_stays_on_this_computer(self):
+        port, events = self.run_program([], leave_stale_lock=True)
+        self.check_nothing_left_the_network(events, port, "127.0.0.1", allow_route_probe=False)
+        self.assertTrue([e for e in events if e[0] == "urllib.Request"])   # the check did happen
+
+
 class ToolingTest(unittest.TestCase):
     def test_generated_passwords_meet_the_policy(self):
         for _ in range(200):
@@ -1574,6 +1968,15 @@ class ToolingTest(unittest.TestCase):
             insys.check_password_policy(password, "someone")
             self.assertRegex(password, r"^[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}$")
             self.assertFalse(set(password) & set("0O1lI"))
+
+    def test_password_strength_cannot_be_turned_down_from_outside(self):
+        import subprocess
+        home = os.path.dirname(os.path.abspath(insys.__file__))
+        env = dict(os.environ, INSYS_PBKDF2_ITERATIONS="1")   # the switch earlier versions honoured
+        out = subprocess.run([sys.executable, "-c", "import insys; print(insys.PBKDF2_ITERATIONS, "
+                              "insys.hash_password('x').split('$')[1])"], cwd=home, env=env,
+                             capture_output=True, text=True, timeout=120)
+        self.assertEqual(out.stdout.split(), ["600000", "600000"], out.stderr)
 
     def test_password_hashing(self):
         stored = insys.hash_password("correct horse 1")

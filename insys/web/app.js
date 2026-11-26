@@ -804,7 +804,6 @@
   // they do, its system reference (PRJ-0001). The system reference never changes
   // and is what links, history and web addresses use.
   const no = (r) => (r && r.number ? r.number : r.ref);
-  const isNumbered = (module) => !!(mods()[module] && mods()[module].numbered);
   // For pick-lists: starts with the system reference so the choice can be read back.
   const pickLabel = (r) => r.ref + ' — ' + (r.number ? r.number + ' — ' : '') + r.title;
 
@@ -829,17 +828,11 @@
   // simply the earliest dates), then open items with no date, then closed items.
   // On the same date the higher priority wins.
   const PRIORITY_RANK = { Urgent: 0, High: 1, Normal: 2, Low: 3 };
-  function urgencyKey(r) {
-    const rank = PRIORITY_RANK[r.priority] === undefined ? 2 : PRIORITY_RANK[r.priority];
-    if (!isOpen(r)) return '3';
-    if (!r.next_action_date) return '2' + rank;
-    return '1' + r.next_action_date + rank;
-  }
-  function byUrgency(a, b) {
-    const x = urgencyKey(a); const y = urgencyKey(b);
-    if (x !== y) return x < y ? -1 : 1;
-    return refKey(a) < refKey(b) ? -1 : 1;
-  }
+
+  // Stored text is never trusted as a link target: a link is made only for a
+  // plain web address, and an email link only for a plain email address.
+  const webAddress = (url) => (/^https?:\/\/[^\s"'<>]+$/i.test(url || '') ? url : null);
+  const emailAddress = (text) => (/^[^\s@<>"',;:]+@[^\s@<>"',;:]+$/.test(text || '') ? text : null);
 
   const usesSubcons = (module) => (S.data.meta.subcon_modules || []).includes(module);
   const subconNames = (r) => (S.I.subsByRec.get(r.id) || []).map((x) => x.sub.name).join(', ');
@@ -1653,7 +1646,7 @@
 
     const xrefs = rec.xrefs.map((x) => h('li', null,
       h('div', { class: 'main' }, h('span', { class: 'tag', text: x.system }), ' ',
-        x.url ? h('a', { href: x.url, target: '_blank', rel: 'noopener noreferrer', text: x.ref }) : h('span', { class: 'cell-title', text: x.ref })),
+        webAddress(x.url) ? h('a', { href: webAddress(x.url), target: '_blank', rel: 'noopener noreferrer', text: x.ref }) : h('span', { class: 'cell-title', text: x.ref })),
       h('div', { class: 'side' }, h('button', {
         type: 'button', class: 'btn quiet dangerous', text: 'Remove', 'aria-label': 'Remove reference ' + x.system + ' ' + x.ref,
         onclick: () => confirmDialog('Remove this reference?', x.system + ' ' + x.ref + ' will be removed from ' + rec.ref + '.', 'Remove', async () => {
@@ -2307,8 +2300,8 @@
         detail('Contact person', sub.contact_name),
         detail('Capabilities and specialised studies', caps.length ? h('div', { class: 'tag-row' }, caps.map((c) => h('span', { class: 'tag', text: c }))) : '', true),
         detail('Phone', sub.phone ? h('a', { href: 'tel:' + sub.phone.replace(/[^0-9+]/g, ''), text: sub.phone }) : ''),
-        detail('Email', sub.email ? h('a', { href: 'mailto:' + sub.email, text: sub.email }) : ''),
-        detail('Website', sub.website ? link(sub.website, sub.website) : ''),
+        detail('Email', emailAddress(sub.email) ? h('a', { href: 'mailto:' + sub.email, text: sub.email }) : sub.email),
+        detail('Website', webAddress(sub.website) ? link(webAddress(sub.website), sub.website) : sub.website),
         detail('Registration / licence number', sub.registration),
         detail('Address', sub.address, true, true),
         detail('Engineering services provided', sub.services, true, true),
@@ -2493,7 +2486,7 @@
       const bar = h('div', { class: 'select-bar' });
       const drawBar = () => {
         const chosen = scored.map((x) => x.sub).filter((sub) => f.picked.has(sub.id));
-        const emails = chosen.map((sub) => sub.email).filter(Boolean);
+        const emails = chosen.map((sub) => emailAddress(sub.email)).filter(Boolean);
         bar.replaceChildren(
           h('span', { class: 'cell-title', text: chosen.length ? plural(chosen.length, 'subcontractor') + ' selected' : 'Tick the subcontractors to approach' }),
           h('button', { type: 'button', class: 'btn primary small', disabled: !chosen.length, text: 'Add selected to an enquiry…',
@@ -2736,7 +2729,7 @@
         type: 'button', class: 'btn small', text: 'Copy address',
         onclick: async () => { try { await navigator.clipboard.writeText(sys.public_url); copy.textContent = 'Copied'; } catch (e) { toast('Select the address and copy it.', true); } },
       });
-      online = [h('span', { class: 'pill done', text: 'On' }), ' ', h('a', { href: sys.public_url, target: '_blank', rel: 'noopener noreferrer', text: sys.public_url }), ' ', copy,
+      online = [h('span', { class: 'pill done', text: 'On' }), ' ', h('a', { href: webAddress(sys.public_url) || '#', target: '_blank', rel: 'noopener noreferrer', text: sys.public_url }), ' ', copy,
         h('div', { class: 'small muted', text: 'Share this address with your team. It changes each time InSys is restarted.' })];
     } else if (sys.online_requested) {
       online = [h('span', { class: 'pill waiting', text: sys.tunnel_status === 'unavailable' ? 'Unavailable' : 'Connecting' }),
@@ -2753,6 +2746,11 @@
       card('Where InSys is running', null, h('div', { class: 'kv' },
         h('div', { class: 'k', text: 'On the host computer' }), h('div', { class: 'v', text: sys.local_url }),
         h('div', { class: 'k', text: 'Over the internet' }), h('div', { class: 'v' }, online),
+        h('div', { class: 'k', text: 'Who can reach it' }), h('div', { class: 'v', text: sys.mode === 'online'
+          ? 'Anyone who has the internet address above (they still need a login).'
+          : (sys.mode === 'lan'
+            ? 'This computer, and computers on a local network address. InSys makes no connection to the internet, and refuses any connection or request that comes from it or has been relayed through it.'
+            : 'This computer only. InSys makes no connection to the internet and accepts none from any other computer.') }),
         h('div', { class: 'k', text: 'Data folder' }), h('div', { class: 'v', text: sys.data_dir }),
         h('div', { class: 'k', text: 'Version' }), h('div', { class: 'v', text: 'InSys ' + sys.app_version + ' (Python ' + sys.python + ' on ' + sys.platform + ')' }))),
       card('Backups', null,
@@ -2808,6 +2806,7 @@
       setup: 'InSys set up', login_ok: 'Signed in', login_failed: 'Failed sign-in', password_changed: 'Password changed',
       password_reset: 'Password reset', user_created: 'Login created', user_updated: 'Login changed',
       record_deleted: 'Record deleted', backup_downloaded: 'Backup downloaded', settings_changed: 'Settings changed',
+      blocked: 'Refused: not local',
       upgraded: 'InSys upgraded', subcon_deleted: 'Subcontractor deleted',
       record_restored: 'Record restored', database_loaded: 'Database loaded',
     };
@@ -2816,7 +2815,7 @@
       h('thead', null, h('tr', null, ['When', 'Event', 'Who', 'Details', 'From'].map((x) => h('th', { scope: 'col', text: x })))),
       h('tbody', null, items.map((a) => h('tr', null,
         h('td', { class: 'nowrap', text: fmtDateTime(a.at) }),
-        h('td', null, a.event === 'login_failed' ? h('span', { class: 'chip overdue' }, h('span', { class: 'icon', text: '!', 'aria-hidden': 'true' }), names[a.event]) : (names[a.event] || a.event)),
+        h('td', null, (a.event === 'login_failed' || a.event === 'blocked') ? h('span', { class: 'chip overdue' }, h('span', { class: 'icon', text: '!', 'aria-hidden': 'true' }), names[a.event]) : (names[a.event] || a.event)),
         h('td', { text: a.username || '—' }),
         h('td', { class: 'cell-text', text: a.detail }),
         h('td', { class: 'nowrap muted', text: a.ip }))))));

@@ -21,6 +21,7 @@ import atexit
 import datetime
 import hashlib
 import hmac
+import ipaddress
 import json
 import math
 import os
@@ -30,6 +31,7 @@ import secrets
 import shutil
 import signal
 import socket
+import socketserver
 import sqlite3
 import subprocess
 import sys
@@ -42,7 +44,7 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-VERSION = "1.2.4"
+VERSION = "1.2.5"
 
 # The database layout this version reads and writes. Version 1 is InSys 1.0.0;
 # version 2 (InSys 1.1.x) adds the subcontractor directory; version 3 (InSys
@@ -77,7 +79,7 @@ SESSION_IDLE_SECONDS = 12 * 3600
 SESSION_MAX_SECONDS = 7 * 24 * 3600
 SESSION_TOUCH_SECONDS = 60
 
-PBKDF2_ITERATIONS = int(os.environ.get("INSYS_PBKDF2_ITERATIONS", "600000"))
+PBKDF2_ITERATIONS = 600000  # fixed in the program; not adjustable from outside
 MIN_PASSWORD_LENGTH = 10
 
 BACKUP_KEEP = 20
@@ -284,6 +286,10 @@ class Runtime:
         self.kept_awake = False
         self.upgraded_from = None
         self.upgrade_backup = None
+        # True only while the internet tunnel of choice 3 is running. Everything
+        # that lets the internet in, or goes out to it, is conditional on this.
+        self.tunnel_active = False
+        self.local_names = set()   # names this computer answers to on the local network
 
     @property
     def db_path(self):
@@ -2189,6 +2195,7 @@ def h_admin_system(ctx):
         "python": platform.python_version(),
         "platform": platform.system(),
         "packaged": PACKAGED,
+        "mode": "online" if RT.tunnel_active else ("lan" if RT.lan else "local"),
     }
 
 
@@ -2368,6 +2375,110 @@ def is_loopback(address):
     return address in ("127.0.0.1", "::1", "::ffff:127.0.0.1")
 
 
+# ---- Keeping choices 1 and 2 off the internet --------------------------------
+# Choice 1 listens on this computer only, which the operating system enforces.
+# Choice 2 has to listen on the network, so InSys itself checks every connection
+# and every request: a connection must come from a local address, and a request
+# must show no sign of having been relayed from, or addressed through, the
+# internet. Only choice 3 (the tunnel) switches these checks off.
+
+# Address ranges that are never routed on the public internet.
+LOCAL_NETWORKS = [ipaddress.ip_network(n) for n in (
+    "127.0.0.0/8",        # this computer
+    "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16",   # private networks
+    "169.254.0.0/16",     # link-local (no router involved)
+    "::1/128", "fc00::/7", "fe80::/10")]               # the IPv6 equivalents
+
+# Names that only exist on a local network.
+LOCAL_NAME_SUFFIXES = (".localhost", ".local", ".lan", ".home", ".internal", ".intranet",
+                       ".corp", ".localdomain", ".home.arpa")
+
+# Headers added by services that carry requests in from the internet
+# (Cloudflare, ngrok, cloud load balancers and the like). A browser on the
+# local network never sends these.
+RELAY_HEADER_PREFIXES = ("cf-", "cdn-loop", "true-client-ip", "fastly-", "fly-", "ngrok-", "x-ngrok",
+                         "x-vercel-", "x-amz-cf-", "x-amzn-", "x-azure-", "akamai-", "x-akamai")
+# Headers in which a proxy names the address a request originally came from.
+FORWARD_IP_HEADERS = ("x-forwarded-for", "x-real-ip", "x-client-ip", "x-cluster-client-ip", "forwarded")
+
+LOCAL_ONLY_PAGE = (
+    "InSys is running for local use only (choice 1 or 2) and does not answer requests\r\n"
+    "that come from, or by way of, the internet.\r\n\r\n"
+    "On the host computer use http://localhost and the port shown in the InSys window;\r\n"
+    "on the office network use the 'On your network' address shown there.\r\n").encode("ascii")
+
+
+def parse_ip(text):
+    """An IP address out of '1.2.3.4', '1.2.3.4:80', '[::1]:80' and similar; else None."""
+    text = (text or "").strip().strip('"')
+    if text.startswith("["):
+        text = text[1:].split("]")[0]
+    elif text.count(":") == 1:
+        text = text.split(":")[0]
+    try:
+        ip = ipaddress.ip_address(text.split("%")[0])
+    except ValueError:
+        return None
+    return getattr(ip, "ipv4_mapped", None) or ip
+
+
+def is_local_address(address):
+    """True only for an address that cannot be on the public internet."""
+    ip = parse_ip(address)
+    return ip is not None and any(ip.version == net.version and ip in net for net in LOCAL_NETWORKS)
+
+
+def is_local_host_name(value, arrived_on=None):
+    """Whether the address a browser asked for is a local one: a local IP address,
+    the very address the connection arrived on, 'localhost', a one-word name, this
+    computer's own name, or a name with a local-only ending. A public name such
+    as a tunnel's or a company's website address is not."""
+    host = (value or "").strip().lower()
+    if host.startswith("["):
+        host = host[1:].split("]")[0]
+    elif host.count(":") == 1:
+        host = host.rsplit(":", 1)[0]
+    host = host.rstrip(".")
+    if not host:
+        return False
+    ip = parse_ip(host)
+    if ip is not None:
+        return is_local_address(str(ip)) or (arrived_on is not None and str(ip) == arrived_on)
+    if not re.match(r"^[a-z0-9]([a-z0-9._-]*[a-z0-9])?$", host):
+        return False
+    return (host == "localhost" or "." not in host or host in RT.local_names
+            or host.endswith(LOCAL_NAME_SUFFIXES))
+
+
+_blocked_seen = {}
+_blocked_lock = threading.Lock()
+
+
+def note_blocked(address, detail):
+    """Record a refused connection or request in the security log, without
+    letting a flood of them fill it: once per address per ten minutes, and never
+    more than one entry every five seconds."""
+    now = time.time()
+    with _blocked_lock:
+        if now - _blocked_seen.get(address, 0) < 600 or now - _blocked_seen.get("", 0) < 5:
+            return
+        if len(_blocked_seen) > 2000:
+            _blocked_seen.clear()
+        _blocked_seen[address] = _blocked_seen[""] = now
+    log_error("Refused: %s" % detail)
+    try:
+        with write_db(bump=False) as conn:
+            audit(conn, "blocked", detail, ip=str(address)[:64])
+    except Exception:
+        pass
+
+
+def require_internet_mode(what):
+    """Interlock: code that reaches the internet runs only in choice 3."""
+    if not RT.online_requested:
+        raise RuntimeError("%s is only done when InSys is started Online (choice 3)." % what)
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "InSys"
     sys_version = ""
@@ -2398,10 +2509,36 @@ class Handler(BaseHTTPRequestHandler):
     # -- request helpers ----------------------------------------------------
 
     def forwarded(self, name):
-        """A proxy header, trusted only when the request came from this machine
-        (i.e. from the secure tunnel, which runs locally)."""
-        if is_loopback(self.client_address[0]):
+        """A proxy header, believed only while the internet tunnel is running and
+        only from the tunnel itself, which connects from this computer. In
+        choices 1 and 2 these headers are never believed (and a request that
+        carries them is refused: see internet_trace)."""
+        if RT.tunnel_active and is_loopback(self.client_address[0]):
             return self.headers.get(name)
+        return None
+
+    def internet_trace(self):
+        """Why this request looks as if it came from, or through, the internet;
+        None if it shows no such sign. Used to refuse it in choices 1 and 2."""
+        for name in self.headers.keys():
+            if name.lower().startswith(RELAY_HEADER_PREFIXES):
+                return "it was relayed by an internet service (it carried the header %s)" % name[:40]
+        for name in FORWARD_IP_HEADERS:
+            for value in self.headers.get_all(name) or []:
+                for token in re.split(r"[,;\s]+", value):
+                    ip = parse_ip(token.split("=", 1)[-1])
+                    if ip is not None and not is_local_address(str(ip)):
+                        return "it was passed on from the public address %s" % ip
+        try:
+            arrived_on = self.connection.getsockname()[0]
+        except OSError:
+            arrived_on = None
+        host = self.headers.get("Host")
+        if not host:
+            return "it did not say which address it was meant for"
+        for value in (host, self.headers.get("X-Forwarded-Host")):
+            if value and not is_local_host_name(value, arrived_on):
+                return "it was addressed to '%s', which is not a local address" % value[:80]
         return None
 
     def client_ip(self):
@@ -2540,6 +2677,13 @@ class Handler(BaseHTTPRequestHandler):
             self.close_connection = True
 
     def handle_request(self, method):
+        if not RT.tunnel_active:
+            reason = self.internet_trace()
+            if reason:
+                self.close_connection = True
+                note_blocked(self.client_address[0], "A request from %s was refused because %s."
+                             % (self.client_address[0], reason))
+                return self.send_bytes(403, LOCAL_ONLY_PAGE, "text/plain; charset=utf-8")
         parsed = urlparse(self.path)
         path = parsed.path
         if not path.startswith("/api/"):
@@ -2651,7 +2795,29 @@ class Server(ThreadingHTTPServer):
     def server_bind(self):
         if os.name == "nt" and hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
             self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
-        ThreadingHTTPServer.server_bind(self)
+        # Deliberately not http.server.HTTPServer.server_bind: that looks this
+        # computer's name up in DNS (socket.getfqdn) just to fill in a field
+        # InSys never uses, and a DNS lookup is a message onto the network.
+        socketserver.TCPServer.server_bind(self)
+        self.server_name, self.server_port = self.server_address[:2]
+
+    def verify_request(self, request, client_address):
+        """Decide, before anything is read from it, whether a connection may be
+        served at all. Always: this computer itself. In choice 2 as well: other
+        computers on a local network address. Never: anything else."""
+        peer = client_address[0]
+        if is_loopback(peer):
+            return True
+        if RT.lan and not RT.tunnel_active:
+            if is_local_address(peer):
+                return True
+            try:
+                if peer == request.getsockname()[0]:
+                    return True   # this computer, reaching itself by its own network address
+            except OSError:
+                pass
+        note_blocked(peer, "A connection from %s was refused: it is not a local network address." % peer)
+        return False
 
     def handle_error(self, request, client_address):
         exc = sys.exc_info()[1]
@@ -2693,6 +2859,7 @@ def find_cloudflared():
 def download_file(url, dest):
     """Download to dest atomically. Tries Python first, then curl (built into
     Windows 10 and later), which copes with unusual proxy / certificate set-ups."""
+    require_internet_mode("Downloading")
     tmp = dest + ".part"
     try:
         request = urllib.request.Request(url, headers={"User-Agent": "InSys"})
@@ -2715,6 +2882,7 @@ def download_file(url, dest):
 
 def ensure_cloudflared(interactive=True):
     """Path to cloudflared, downloading it into tools/ if necessary."""
+    require_internet_mode("Fetching the online access tool")
     path = find_cloudflared()
     if path:
         return path
@@ -2784,6 +2952,7 @@ class Tunnel(threading.Thread):
             delay = 5 if time.time() - started > 300 else min(delay * 2, 120)
 
     def run_once(self):
+        require_internet_mode("Opening the internet tunnel")
         RT.tunnel_status = "starting"
         command = [self.exe, "tunnel", "--no-autoupdate", "--url",
                    "http://127.0.0.1:%d" % self.port]
@@ -2796,6 +2965,7 @@ class Tunnel(threading.Thread):
             log_error("Could not start cloudflared: %s" % exc)
             say("  Could not start the online access tool: %s" % exc)
             return False
+        write_tunnel_pid(self.proc.pid)
         was_online = False
         try:
             with open(log_path, "w", encoding="utf-8", errors="replace") as log:
@@ -2815,6 +2985,7 @@ class Tunnel(threading.Thread):
         finally:
             try:
                 self.proc.wait(timeout=10)
+                clear_tunnel_pid()
             except Exception:
                 pass
         return was_online
@@ -2855,7 +3026,83 @@ class Tunnel(threading.Thread):
                 except Exception:
                     pass
         RT.public_url = None
+        RT.tunnel_active = False
+        clear_tunnel_pid()
         self.write_url_file()
+
+
+# A tunnel must never outlive the InSys session that opened it. Normally it is
+# closed with InSys; if InSys was ended abruptly it can be left running, still
+# offering the old public address. Its process number is kept on file so that
+# the next start, in any mode, can find it and close it.
+
+def tunnel_pid_path():
+    return os.path.join(RT.data_dir, "tunnel.pid")
+
+
+def write_tunnel_pid(pid):
+    try:
+        with open(tunnel_pid_path(), "w", encoding="ascii") as fh:
+            fh.write(str(pid))
+    except OSError:
+        pass
+
+
+def clear_tunnel_pid():
+    try:
+        os.remove(tunnel_pid_path())
+    except OSError:
+        pass
+
+
+def is_tunnel_process(pid):
+    """Whether process `pid` is running and is the tunnel tool (so that an
+    unrelated program that happens to have been given the same number is never touched)."""
+    try:
+        if os.name == "nt":
+            out = subprocess.run(["tasklist", "/FI", "PID eq %d" % pid, "/FO", "CSV", "/NH"],
+                                 capture_output=True, text=True, timeout=20).stdout
+            return "cloudflared" in out.lower()
+        try:
+            with open("/proc/%d/cmdline" % pid, "rb") as fh:
+                return b"cloudflared" in fh.read()
+        except OSError:
+            out = subprocess.run(["ps", "-p", str(pid), "-o", "command="],
+                                 capture_output=True, text=True, timeout=20).stdout
+            return "cloudflared" in out
+    except Exception:
+        return False
+
+
+def stop_leftover_tunnel():
+    """Close a tunnel left running by an earlier session. Returns True if one was closed."""
+    try:
+        with open(tunnel_pid_path(), "r", encoding="ascii") as fh:
+            pid = int(fh.read().strip())
+    except (OSError, ValueError):
+        return False
+    closed = False
+    if pid > 0 and is_tunnel_process(pid):
+        try:
+            if os.name == "nt":
+                subprocess.run(["taskkill", "/PID", str(pid), "/T", "/F"], capture_output=True, timeout=20)
+            else:
+                os.kill(pid, signal.SIGTERM)
+                for _ in range(20):
+                    time.sleep(0.1)
+                    if not is_tunnel_process(pid):
+                        break
+                else:
+                    os.kill(pid, signal.SIGKILL)
+            closed = True
+        except Exception as exc:
+            log_error("Could not close a leftover tunnel (process %d): %s" % (pid, exc))
+    clear_tunnel_pid()
+    try:
+        os.remove(os.path.join(RT.data_dir, "public-url.txt"))
+    except OSError:
+        pass
+    return closed
 
 
 # ---------------------------------------------------------------------------
@@ -2957,9 +3204,15 @@ def start_menu(ask=read_key):
     say("")
     say("    4  Reset the administrator password")
     say("")
-    say("  Press 1, 2, 3 or 4.  Enter, or waiting %d seconds, chooses [%s]."
-        % (MENU_SECONDS, default))
-    key = ask("1234", default, MENU_SECONDS)
+    if default == "3":
+        # Going online is never done on a timer: it has to be chosen each time.
+        say("  Press 1, 2, 3 or 4.  Enter chooses [3] (Online), as last time.")
+        say("  InSys will not go online by itself; it waits here until you choose.")
+        key = ask("1234", default, 366 * 24 * 3600)
+    else:
+        say("  Press 1, 2, 3 or 4.  Enter, or waiting %d seconds, chooses [%s]."
+            % (MENU_SECONDS, default))
+        key = ask("1234", default, MENU_SECONDS)
     if key not in ("1", "2", "3", "4"):
         key = default
     say("  -> %s" % key)
@@ -3049,6 +3302,9 @@ def bind_server(host, preferred_port, strict):
 def lan_addresses():
     found = []
     try:
+        # Asks the operating system which of this computer's addresses faces the
+        # local network. No packet is sent: "connecting" a datagram socket only
+        # selects a route, and the address used is a private one in any case.
         probe = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
             probe.connect(("10.255.255.255", 1))
@@ -3109,6 +3365,13 @@ def banner(first_password):
         say("      Over the internet:  off  (restart InSys and choose 3 to switch on)")
     else:
         say("      Over the internet:  off  (use Start-InSys-Online.bat to switch on)")
+    if not RT.online_requested:
+        say("")
+        if RT.lan:
+            say("  InSys is answering this computer and local network addresses only.")
+        else:
+            say("  InSys is answering this computer only.")
+        say("  It makes no connection to the internet, and refuses any that arrives from it.")
     if RT.lan and not lan_addresses():
         say("")
         say("  No network connection was found, so only this computer can reach")
@@ -3161,6 +3424,9 @@ def parse_args(argv):
                         help="folder for the database and backups (default: ./data)")
     parser.add_argument("--no-browser", action="store_true",
                         help="do not open the web browser automatically")
+    parser.add_argument("--allow-host", action="append", default=[], metavar="NAME",
+                        help="an extra name by which this computer is reached on your own network "
+                             "(for example an internal DNS name); may be given more than once")
     parser.add_argument("--menu", action="store_true",
                         help="ask how to run at start-up (the default for InSys.exe)")
     parser.add_argument("--no-menu", action="store_true",
@@ -3249,6 +3515,10 @@ def run(argv=None):
                 pass
         return 0
 
+    if stop_leftover_tunnel():
+        say("")
+        say("  An internet connection left open by an earlier InSys session was closed.")
+
     if not os.path.isfile(os.path.join(WEB_DIR, "index.html")):
         say("The 'web' folder is missing next to insys.py. Please extract the complete")
         say("InSys folder again and start it from there.")
@@ -3283,6 +3553,14 @@ def run(argv=None):
 
     RT.lan = args.lan
     RT.online_requested = args.online
+    RT.tunnel_active = False
+    RT.local_names = set(name.strip().lower().rstrip(".") for name in args.allow_host if name.strip())
+    try:
+        own = socket.gethostname().strip().lower().rstrip(".")   # read from this computer; no lookup is made
+        if own:
+            RT.local_names.add(own)
+    except OSError:
+        pass
     host = "0.0.0.0" if args.lan else "127.0.0.1"
     try:
         server = bind_server(host, args.port or DEFAULT_PORT, strict=args.port is not None)
@@ -3310,6 +3588,7 @@ def run(argv=None):
         if exe:
             say("")
             say("  Setting up online access...")
+            RT.tunnel_active = True
             tunnel = Tunnel(exe, RT.port)
             tunnel.start()
             atexit.register(tunnel.stop)

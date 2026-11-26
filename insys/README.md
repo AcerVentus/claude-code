@@ -309,6 +309,7 @@ If you use the office-network choice, Windows may ask again whether to allow
 
 | Version | What changed |
 |---|---|
+| 1.2.5 | Security hardening after a full code audit: choices 1 and 2 are closed to the internet in both directions (see *Choices 1 and 2 and the internet*). No change to stored data. |
 | 1.2.4 | Your own numbers for projects, enquiries and expressions of interest; column sorting made consistent. |
 | 1.2.3 | The Activity log and the bell show the actual date and time of each update. No change to stored data. |
 | 1.2.2 | Client names beside each item on the Subcontractors summary; a theme chooser with a Dark theme. No change to stored data. |
@@ -359,6 +360,53 @@ Everything is stored in the `data` folder next to `insys.py`:
   InSys listens only on `localhost`.
 - Sign-ins, failed sign-ins, password resets, deletions and backup downloads are
   recorded under **Admin → Security log**.
+
+### Choices 1 and 2 and the internet
+
+Started as **1 (this computer only)** or **2 (this computer and the office
+network)**, InSys neither sends anything to the internet nor answers anything
+that comes from it:
+
+- **Nothing goes out.** In these modes InSys opens no connection to any other
+  computer and looks nothing up in DNS. The only code able to reach the
+  internet — fetching and running the tunnel tool — is locked to choice 3 and
+  refuses to run otherwise. The pages in your browser load everything from
+  InSys itself and are barred by the browser from contacting anywhere else.
+- **Choice 1** listens on this computer only; the operating system does not
+  deliver connections from other machines to it at all.
+- **Choice 2** listens on the network, so InSys checks every connection and
+  serves only local addresses: this computer, private network ranges
+  (10.x, 172.16–31.x, 192.168.x) and link-local addresses. A connection from
+  any public address is dropped before a single byte is read — so even on a
+  computer that has a public address, or behind a router with the port
+  forwarded, outsiders are refused.
+- **Nothing relayed is accepted.** In both choices InSys refuses any request
+  that shows signs of having travelled through the internet: one carrying the
+  headers a tunnel, proxy or cloud service adds, one passed on from a public
+  address, or one addressed to a public name instead of a local address.
+- **A tunnel never outlives its session.** If an Online session was ended
+  abruptly and left its tunnel running, the next start in any mode closes it.
+- **Going online is never automatic.** The start-up countdown applies only to
+  choices 1 and 2. If the last choice was Online, InSys waits for you to
+  choose again. (For an unattended online host, start it with
+  `InSys.exe --online`.)
+- Refused connections and requests are listed in **Admin → Security log**, and
+  **Admin → System & online access** states who can currently reach InSys.
+
+If your office reaches the host by an internal DNS name that looks like a
+public one (for example `tracker.yourcompany.com`), start InSys with
+`--allow-host tracker.yourcompany.com`; names like `insys-pc`, `server.local`
+and IP addresses need nothing.
+
+What InSys cannot control: other software. If someone deliberately sets up
+their own forwarding to the InSys computer in a way that disguises where
+requests come from, those requests look local; they still meet the sign-in
+page and need a valid login. Your web browser and Windows make their own
+connections (updates, safe-browsing checks) regardless of InSys. Links you
+click inside InSys — a subcontractor's website, an external reference, an
+email address — open that site or your mail program, as you would expect; InSys
+adds nothing to them and the site is not told where you came from. And in
+choice 2 the traffic inside your office network is not encrypted.
 
 This is appropriate for a pilot with ordinary business information. Before
 putting highly sensitive data in it or scaling beyond a pilot, have the
