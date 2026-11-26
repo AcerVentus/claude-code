@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Isobar</title>
+<meta name="description" content="Multi-source metric weather: forecast consensus with confidence, air quality, sea state, tides, sun, moon and a global model map.">
+<meta name="theme-color" content="#0a1017">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to forecast</a>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#local" aria-label="Isobar home">
+      <svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true"><path d="M3 21c5-9 10 3 15-5s7-6 11-9"/><path d="M3 27c5-9 10 3 15-5s7-6 11-9" opacity=".55"/><path d="M3 15c5-9 10 3 15-5s7-6 11-9" opacity=".55"/></svg>
+      <span>Isobar</span>
+    </a>
+    <button class="place-btn" id="btn-place" type="button" aria-haspopup="dialog">
+      <span class="place-btn-icon" id="place-icon"></span>
+      <span class="place-btn-text"><span id="place-name">Choose a place</span><small id="place-sub"></small></span>
+    </button>
+    <nav class="views" aria-label="View">
+      <a href="#local" class="view-tab" data-view="local" aria-current="page">Local</a>
+      <a href="#globe" class="view-tab" data-view="globe">Globe</a>
+    </nav>
+    <div class="tools">
+      <button class="icon-btn" id="btn-locate" type="button" title="Use my location" aria-label="Use my location"></button>
+      <button class="icon-btn" id="btn-refresh" type="button" title="Refresh" aria-label="Refresh"></button>
+      <button class="icon-btn" id="btn-settings" type="button" title="Settings" aria-label="Settings" aria-haspopup="dialog"></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div id="view-local" class="view">
+    <section class="hero" id="hero" aria-label="Current conditions">
+      <canvas id="sky" aria-hidden="true"></canvas>
+      <div class="hero-scrim" aria-hidden="true"></div>
+      <div class="hero-in" id="hero-content"></div>
+    </section>
+
+    <div class="wrap">
+      <div id="p-alerts" class="alerts" aria-live="polite"></div>
+      <div class="grid">
+        <section class="panel span-12" id="p-hourly" aria-labelledby="h-hourly"></section>
+        <section class="panel span-7" id="p-daily" aria-labelledby="h-daily"></section>
+        <section class="panel span-5" id="p-cross" aria-labelledby="h-cross"></section>
+        <section class="panel span-6" id="p-nowcast" aria-labelledby="h-nowcast"></section>
+        <section class="panel span-3 tile" id="p-wind" aria-labelledby="h-wind"></section>
+        <section class="panel span-3 tile" id="p-pressure" aria-labelledby="h-pressure"></section>
+        <section class="panel span-3 tile" id="p-uv" aria-labelledby="h-uv"></section>
+        <section class="panel span-3 tile" id="p-humidity" aria-labelledby="h-humidity"></section>
+        <section class="panel span-3 tile" id="p-visibility" aria-labelledby="h-visibility"></section>
+        <section class="panel span-3 tile" id="p-cloud" aria-labelledby="h-cloud"></section>
+        <section class="panel span-6" id="p-air" aria-labelledby="h-air"></section>
+        <section class="panel span-6" id="p-sun" aria-labelledby="h-sun"></section>
+        <section class="panel span-5" id="p-moon" aria-labelledby="h-moon"></section>
+        <section class="panel span-7" id="p-tides" aria-labelledby="h-tides"></section>
+        <section class="panel span-7" id="p-sea" aria-labelledby="h-sea"></section>
+        <section class="panel span-5" id="p-radar" aria-labelledby="h-radar"></section>
+        <section class="panel span-6" id="p-climate" aria-labelledby="h-climate"></section>
+        <section class="panel span-6" id="p-space" aria-labelledby="h-space"></section>
+        <section class="panel span-12" id="p-sources" aria-labelledby="h-sources"></section>
+      </div>
+      <footer class="foot" id="foot"></footer>
+    </div>
+  </div>
+
+  <div id="view-globe" class="view" hidden>
+    <div class="globe">
+      <div id="globe-map" class="globe-map" role="application" aria-label="World map of model and satellite layers"></div>
+      <aside class="globe-side" id="globe-side" aria-label="Layers"></aside>
+      <div class="globe-bar" id="globe-bar"></div>
+    </div>
+  </div>
+</main>
+
+<dialog id="dlg-place" class="dlg" aria-labelledby="dlg-place-title">
+  <form method="dialog" class="dlg-head"><h2 id="dlg-place-title">Places</h2><button class="icon-btn" value="close" aria-label="Close" data-close></button></form>
+  <div class="dlg-body">
+    <label class="field" for="place-q"><span class="sr">Search for a city or place</span>
+      <input id="place-q" type="search" placeholder="Search city, town or airport" autocomplete="off" spellcheck="false" enterkeyhint="search">
+    </label>
+    <button class="btn wide" id="dlg-locate" type="button"></button>
+    <div id="place-results" class="place-list" aria-live="polite"></div>
+    <h3 class="label">Saved places</h3>
+    <div id="place-saved" class="place-list"></div>
+  </div>
+</dialog>
+
+<dialog id="dlg-settings" class="dlg" aria-labelledby="dlg-settings-title">
+  <form method="dialog" class="dlg-head"><h2 id="dlg-settings-title">Settings</h2><button class="icon-btn" value="close" aria-label="Close" data-close></button></form>
+  <div class="dlg-body" id="settings-body"></div>
+</dialog>
+
+<dialog id="dlg-detail" class="dlg dlg-wide" aria-labelledby="dlg-detail-title">
+  <form method="dialog" class="dlg-head"><h2 id="dlg-detail-title">Sources</h2><button class="icon-btn" value="close" aria-label="Close" data-close></button></form>
+  <div class="dlg-body" id="detail-body"></div>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<noscript><p style="padding:24px">Isobar needs JavaScript to fetch and compare weather sources.</p></noscript>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
