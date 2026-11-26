@@ -1,62 +1,80 @@
 {
- "date": "2026-11-25",
- "digest": "digests/2026-11-25.md",
- "new_opportunities": [],
+ "date": "2026-11-26",
+ "digest": "digests/2026-11-26.md",
+ "new_opportunities": [
+  {
+   "filed": true,
+   "id": "p-upper-zakum-expansion",
+   "name": "Upper Zakum expansion",
+   "stage": "execution"
+  },
+  {
+   "filed": false,
+   "id": "s-1cab06aa9edc",
+   "name": "ADNOC and ADNOC Gas Sign About 30 Agreements Around ADIPEC 2026",
+   "stage": "awarded"
+  },
+  {
+   "filed": true,
+   "id": "p-lower-zakum-long-term-development",
+   "name": "Lower Zakum long-term development",
+   "stage": ""
+  }
+ ],
  "newly_named_firms": [
   {
    "added": [
+    "CPECC",
+    "JGC",
     "Larsen & Toubro",
-    "McDermott",
+    "Maire Tecnimont",
+    "Petrofac",
+    "Sinopec Engineering",
     "Technip Energies"
    ],
-   "id": "p-umm-shaif-field-development"
+   "id": "p-bab-gas-cap-development"
   }
  ],
- "opportunities_active": 21,
- "signals_new": 13,
- "signals_total": 101,
+ "opportunities_active": 24,
+ "signals_new": 17,
+ "signals_total": 118,
  "source_health": {
   "bing-news": {
    "errors": [],
-   "items": 74,
-   "kept": 0,
+   "items": 65,
+   "kept": 1,
    "ok": 8,
    "requests": 8
   },
   "google-news": {
-   "errors": [
-    "\"ADNOC Onshore\" (contract OR tender OR bids OR project): 429 Too Many Requests: https://news.google.com/rss/search?q=%22ADNOC+Onshore%22+%28contract+OR+tender+OR+bids+OR+project%29+when%3A3d&hl=en&gl="
-   ],
-   "items": 168,
-   "kept": 0,
-   "ok": 17,
+   "errors": [],
+   "items": 204,
+   "kept": 1,
+   "ok": 18,
    "requests": 18
   },
   "inbox": {
    "errors": [],
-   "items": 3,
-   "kept": 3,
+   "items": 4,
+   "kept": 4,
    "ok": 1,
    "requests": 1
   },
   "linkedin-jobs": {
-   "adverts_listed": 86,
-   "adverts_read": 25,
-   "errors": [
-    "5 adverts left for the next run: the daily limit on adverts or minutes was reached"
-   ],
-   "items": 10,
-   "kept": 10,
-   "left_for_next_run": 5,
-   "ok": 37,
-   "requests": 37
+   "adverts_listed": 90,
+   "adverts_read": 22,
+   "errors": [],
+   "items": 12,
+   "kept": 11,
+   "ok": 34,
+   "requests": 34
   }
  },
  "stage_changes": [
   {
-   "from": "",
-   "id": "p-umm-shaif-field-development",
-   "to": "execution"
+   "from": "tender",
+   "id": "p-bab-gas-cap-well-tie-ins",
+   "to": "bid_evaluation"
   }
  ]
 }

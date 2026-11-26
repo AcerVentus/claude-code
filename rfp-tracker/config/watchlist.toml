@@ -159,7 +159,7 @@ aliases = ["Upper Zakum", "cs:UZ750", "re:UZ\\s?1(\\.2|\\.5)?\\s?MM"]
 [[project]]
 name = "Lower Zakum long-term development"
 client = "ADNOC Offshore"
-aliases = ["Lower Zakum", "cs:LZ LTDP", "cs:LTDP-1"]
+aliases = ["Lower Zakum", "cs:LZ LTDP", "cs:LTDP-1", "Omairah"]
 
 [[project]]
 name = "Umm Shaif field development"

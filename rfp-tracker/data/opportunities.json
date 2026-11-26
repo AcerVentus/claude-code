@@ -2,10 +2,191 @@
  {
   "also": [],
   "approach": {
-   "notes": [
-    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Gas work: Wison Engineering."
-   ],
-   "targets": []
+   "notes": [],
+   "targets": [
+    {
+     "kind": "bidder",
+     "links": [
+      {
+       "role": "Proposals Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Larsen%20%26%20Toubro%22%20Proposals%20Manager%20UAE"
+      },
+      {
+       "role": "Tendering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Larsen%20%26%20Toubro%22%20Tendering%20Manager%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Larsen%20%26%20Toubro%22%20Engineering%20Manager%20UAE"
+      }
+     ],
+     "offer": "Get your detailed-engineering offer in before award so you are the named engineering partner.",
+     "org": "Larsen & Toubro",
+     "roles": [
+      "Proposals Manager",
+      "Tendering Manager",
+      "Engineering Manager"
+     ],
+     "urgency": 2,
+     "why": "Bid submitted for Bab Gas Cap development; award pending."
+    },
+    {
+     "kind": "bidder",
+     "links": [
+      {
+       "role": "Proposals Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Petrofac%22%20Proposals%20Manager%20UAE"
+      },
+      {
+       "role": "Tendering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Petrofac%22%20Tendering%20Manager%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Petrofac%22%20Engineering%20Manager%20UAE"
+      }
+     ],
+     "offer": "Get your detailed-engineering offer in before award so you are the named engineering partner.",
+     "org": "Petrofac",
+     "roles": [
+      "Proposals Manager",
+      "Tendering Manager",
+      "Engineering Manager"
+     ],
+     "urgency": 2,
+     "why": "Bid submitted for Bab Gas Cap development; award pending."
+    },
+    {
+     "kind": "bidder",
+     "links": [
+      {
+       "role": "Proposals Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Technip%20Energies%22%20Proposals%20Manager%20UAE"
+      },
+      {
+       "role": "Tendering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Technip%20Energies%22%20Tendering%20Manager%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Technip%20Energies%22%20Engineering%20Manager%20UAE"
+      }
+     ],
+     "offer": "Get your detailed-engineering offer in before award so you are the named engineering partner.",
+     "org": "Technip Energies",
+     "roles": [
+      "Proposals Manager",
+      "Tendering Manager",
+      "Engineering Manager"
+     ],
+     "urgency": 2,
+     "why": "Bid submitted for Bab Gas Cap development; award pending."
+    },
+    {
+     "kind": "bidder",
+     "links": [
+      {
+       "role": "Proposals Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22JGC%22%20Proposals%20Manager%20UAE"
+      },
+      {
+       "role": "Tendering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22JGC%22%20Tendering%20Manager%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22JGC%22%20Engineering%20Manager%20UAE"
+      }
+     ],
+     "offer": "Get your detailed-engineering offer in before award so you are the named engineering partner.",
+     "org": "JGC",
+     "roles": [
+      "Proposals Manager",
+      "Tendering Manager",
+      "Engineering Manager"
+     ],
+     "urgency": 2,
+     "why": "Bid submitted for Bab Gas Cap development; award pending."
+    },
+    {
+     "kind": "bidder",
+     "links": [
+      {
+       "role": "Proposals Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Sinopec%20Engineering%22%20Proposals%20Manager%20UAE"
+      },
+      {
+       "role": "Tendering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Sinopec%20Engineering%22%20Tendering%20Manager%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Sinopec%20Engineering%22%20Engineering%20Manager%20UAE"
+      }
+     ],
+     "offer": "Get your detailed-engineering offer in before award so you are the named engineering partner.",
+     "org": "Sinopec Engineering",
+     "roles": [
+      "Proposals Manager",
+      "Tendering Manager",
+      "Engineering Manager"
+     ],
+     "urgency": 2,
+     "why": "Bid submitted for Bab Gas Cap development; award pending."
+    },
+    {
+     "kind": "bidder",
+     "links": [
+      {
+       "role": "Proposals Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Maire%20Tecnimont%22%20Proposals%20Manager%20UAE"
+      },
+      {
+       "role": "Tendering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Maire%20Tecnimont%22%20Tendering%20Manager%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Maire%20Tecnimont%22%20Engineering%20Manager%20UAE"
+      }
+     ],
+     "offer": "Get your detailed-engineering offer in before award so you are the named engineering partner.",
+     "org": "Maire Tecnimont",
+     "roles": [
+      "Proposals Manager",
+      "Tendering Manager",
+      "Engineering Manager"
+     ],
+     "urgency": 2,
+     "why": "Bid submitted for Bab Gas Cap development; award pending."
+    },
+    {
+     "kind": "bidder",
+     "links": [
+      {
+       "role": "Proposals Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22CPECC%22%20Proposals%20Manager%20UAE"
+      },
+      {
+       "role": "Tendering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22CPECC%22%20Tendering%20Manager%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22CPECC%22%20Engineering%20Manager%20UAE"
+      }
+     ],
+     "offer": "Get your detailed-engineering offer in before award so you are the named engineering partner.",
+     "org": "CPECC",
+     "roles": [
+      "Proposals Manager",
+      "Tendering Manager",
+      "Engineering Manager"
+     ],
+     "urgency": 2,
+     "why": "Bid submitted for Bab Gas Cap development; award pending."
+    }
+   ]
   },
   "client": "ADNOC Gas",
   "contract_type": "EPC",
@@ -13,19 +194,84 @@
   "filed": true,
   "first_found": "2026-11-23",
   "first_published": "2026-11-17",
-  "headline": "Bab Gas Cap main plant (EPC package 1): technical bids in on 16 November, four consortiums reported",
+  "headline": "Bab Gas Cap main plant: three bidding teams named",
   "id": "p-bab-gas-cap-development",
-  "last_found": "2026-11-24",
-  "last_published": "2026-11-24",
+  "last_found": "2026-11-26",
+  "last_published": "2026-11-26",
   "name": "Bab Gas Cap development",
   "notes": [
    "Research 23 Nov: the bid deadline was extended four months to 16 Nov 2026. Package 1 is the largest of four EPC packages. Construction Review reports four consortiums bidding but the names are not in free sources; MEED reported a Tecnimont and CPECC team forming earlier (unconfirmed for this package). The named list is in MEED's paid article.",
-   "Research 24 Nov: per MEED, Worley was awarded the FEED for the Bab gas cap plant in the December before the EPC expressions of interest went out (10 Feb 2026). Worley is the FEED contractor, not a bidder. Bidder names still not in free sources."
+   "Research 24 Nov: per MEED, Worley was awarded the FEED for the Bab gas cap plant in the December before the EPC expressions of interest went out (10 Feb 2026). Worley is the FEED contractor, not a bidder. Bidder names still not in free sources.",
+   "Research 26 Nov: Construction Review lists three EPC bidding teams for package 1: (1) L&T Energy Hydrocarbon with Petrofac Emirates; (2) Technip Energies, JGC and Sinopec; (3) Tecnimont with CPECC. MEED also reported the Tecnimont and CPECC team in April. The same article speaks of four consortiums; the fourth is not named. This is secondary reporting: it is unconfirmed which teams submitted technical bids on 16 Nov."
   ],
   "outlook": false,
-  "parties": {},
+  "parties": {
+   "CPECC": {
+    "evidence": [
+     "m-96c48d96e4df"
+    ],
+    "first_seen": "2026-11-26",
+    "last_seen": "2026-11-26",
+    "role": "bidder",
+    "type": "epc"
+   },
+   "JGC": {
+    "evidence": [
+     "m-96c48d96e4df"
+    ],
+    "first_seen": "2026-11-26",
+    "last_seen": "2026-11-26",
+    "role": "bidder",
+    "type": "epc"
+   },
+   "Larsen & Toubro": {
+    "evidence": [
+     "m-96c48d96e4df"
+    ],
+    "first_seen": "2026-11-26",
+    "last_seen": "2026-11-26",
+    "role": "bidder",
+    "type": "epc"
+   },
+   "Maire Tecnimont": {
+    "evidence": [
+     "m-96c48d96e4df"
+    ],
+    "first_seen": "2026-11-26",
+    "last_seen": "2026-11-26",
+    "role": "bidder",
+    "type": "epc"
+   },
+   "Petrofac": {
+    "evidence": [
+     "m-96c48d96e4df"
+    ],
+    "first_seen": "2026-11-26",
+    "last_seen": "2026-11-26",
+    "role": "bidder",
+    "type": "epc"
+   },
+   "Sinopec Engineering": {
+    "evidence": [
+     "m-96c48d96e4df"
+    ],
+    "first_seen": "2026-11-26",
+    "last_seen": "2026-11-26",
+    "role": "bidder",
+    "type": "epc"
+   },
+   "Technip Energies": {
+    "evidence": [
+     "m-96c48d96e4df"
+    ],
+    "first_seen": "2026-11-26",
+    "last_seen": "2026-11-26",
+    "role": "bidder",
+    "type": "epc"
+   }
+  },
   "priority": "High",
-  "score": 168,
+  "score": 173,
   "sectors": [
    "gas",
    "onshore"
@@ -36,7 +282,8 @@
    "n-eb848404879b",
    "n-fb9b0ba1e90b",
    "n-ac847052907a",
-   "m-e749966f4f2c"
+   "m-e749966f4f2c",
+   "m-96c48d96e4df"
   ],
   "stage": "bid_evaluation",
   "status": "active",
@@ -168,6 +415,55 @@
   "value_usd": null
  },
  {
+  "also": [
+   {
+    "date": "2026-11-18",
+    "headline": "Adnoc Onshore grants extra time for Bab gas cap well tie-in bids",
+    "stage": "tender",
+    "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNLUY2YUxjWUlqN3R4a2NFalQyYjhGNFRwM20tZ0pFZWloVkUwUVNSV1ZoVFh3S1ZKM2JNMkJyTFl4aDM2cXRxS2lBOHdieVVXWDB4cEltUml5alU5aWIteEQ5YjVXMWZHbHRYV1ZuTy0xem1OTk5UWktGUXF5M0JHUTNjdWNVMzNJVVZvQjNB?oc=5"
+   }
+  ],
+  "approach": {
+   "notes": [
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Onshore work: Mannesmann Energy, Jereh.",
+    "Another package is live (tender, 2026-11-18): Adnoc Onshore grants extra time for Bab gas cap well tie-in bids"
+   ],
+   "targets": []
+  },
+  "client": "ADNOC Onshore",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-10-27",
+  "headline": "Bab gas cap well tie-ins: 18 EPC packages, bids extended again",
+  "id": "p-bab-gas-cap-well-tie-ins",
+  "last_found": "2026-11-26",
+  "last_published": "2026-11-24",
+  "name": "Bab Gas Cap well tie-ins",
+  "notes": [
+   "Research 24 Nov: the tie-in scope is split into 18 EPC packages; MEED has put the budget at $800m-plus and, in an earlier report, $1.2bn. MEED reported on 27 Oct that contractors were selected for a 'Bab and North East Bab One' tie-in project, without naming them; it is unconfirmed whether that is the same tender. No bidders named in free sources."
+  ],
+  "outlook": false,
+  "parties": {},
+  "priority": "High",
+  "score": 158,
+  "sectors": [
+   "gas",
+   "onshore"
+  ],
+  "signal_ids": [
+   "n-b1a2bf48a400",
+   "n-428c07727824",
+   "m-8db62a3b1f85",
+   "n-9868af88366e",
+   "n-ed75bd105663"
+  ],
+  "stage": "bid_evaluation",
+  "status": "active",
+  "value_usd": 800000000.0
+ },
+ {
   "also": [],
   "approach": {
    "notes": [],
@@ -270,42 +566,75 @@
  {
   "also": [],
   "approach": {
-   "notes": [
-    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Onshore work: Mannesmann Energy, Jereh."
-   ],
-   "targets": []
+   "notes": [],
+   "targets": [
+    {
+     "kind": "winner",
+     "links": [
+      {
+       "role": "Project Director",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Project%20Director%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Subcontracts Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Subcontracts%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
+     "org": "Jereh",
+     "roles": [
+      "Project Director",
+      "Engineering Manager",
+      "Subcontracts Manager"
+     ],
+     "urgency": 2,
+     "why": "Won Bu Hasa field development."
+    }
+   ]
   },
   "client": "ADNOC Onshore",
   "contract_type": "EPC",
   "deadline": "",
   "filed": true,
   "first_found": "2026-11-23",
-  "first_published": "2026-10-27",
-  "headline": "Bab gas cap well tie-ins: 18 EPC packages, bids extended again",
-  "id": "p-bab-gas-cap-well-tie-ins",
-  "last_found": "2026-11-24",
-  "last_published": "2026-11-18",
-  "name": "Bab Gas Cap well tie-ins",
+  "first_published": "2026-11-13",
+  "headline": "Jereh's $392m Bu Hasa wellhead facilities EPC is one of its three ADNOC Onshore awards",
+  "id": "p-bu-hasa-field-development",
+  "last_found": "2026-11-26",
+  "last_published": "2026-11-13",
+  "name": "Bu Hasa field development",
   "notes": [
-   "Research 24 Nov: the tie-in scope is split into 18 EPC packages; MEED has put the budget at $800m-plus and, in an earlier report, $1.2bn. MEED reported on 27 Oct that contractors were selected for a 'Bab and North East Bab One' tie-in project, without naming them; it is unconfirmed whether that is the same tender. No bidders named in free sources."
+   "Research 26 Nov: AED1.44bn ($392.1m) EPC for wellhead surface facilities. With Ruwais Diyab ($1.7bn) and Bab / North East Bab ($599m) it makes up Jereh's $2.7bn total."
   ],
   "outlook": false,
-  "parties": {},
+  "parties": {
+   "Jereh": {
+    "evidence": [
+     "m-a1eed0e18aac",
+     "n-3ab5c8ede837"
+    ],
+    "first_seen": "2026-11-13",
+    "last_seen": "2026-11-13",
+    "role": "winner",
+    "type": "epc"
+   }
+  },
   "priority": "High",
-  "score": 156,
+  "score": 155,
   "sectors": [
-   "gas",
    "onshore"
   ],
   "signal_ids": [
-   "n-b1a2bf48a400",
-   "n-428c07727824",
-   "m-8db62a3b1f85",
-   "n-9868af88366e"
+   "m-a1eed0e18aac",
+   "n-3ab5c8ede837"
   ],
-  "stage": "tender",
+  "stage": "awarded",
   "status": "active",
-  "value_usd": null
+  "value_usd": 392000000.0
  },
  {
   "also": [
@@ -401,13 +730,14 @@
   "filed": true,
   "first_found": "2026-11-23",
   "first_published": "2026-11-02",
-  "headline": "Jereh's three ADNOC Onshore awards are letters of award; formal contracts not yet signed",
+  "headline": "Jereh's three ADNOC Onshore contracts: values, scope and signing",
   "id": "p-ruwais-diyab-unconventional-gas-development",
-  "last_found": "2026-11-24",
+  "last_found": "2026-11-26",
   "last_published": "2026-11-15",
   "name": "Ruwais Diyab unconventional gas development",
   "notes": [
-   "Research 24 Nov: Jereh's Shenzhen filing of 4 Nov describes letters of award for three ADNOC Onshore projects worth about $2.7bn (AED9.9bn); formal contracts were not yet signed. The three include Ruwais Diyab (a design, build and operate contract, per MEED sources; ADNOC took FID on 2-3 Nov) and Bab / North East Bab onshore facilities. MEED separately reports a $392m (AED1.44bn) EPC award to Jereh for wellhead surface facilities; whether it is one of the three is unconfirmed."
+   "Research 24 Nov: Jereh's Shenzhen filing of 4 Nov describes letters of award for three ADNOC Onshore projects worth about $2.7bn (AED9.9bn); formal contracts were not yet signed. The three include Ruwais Diyab (a design, build and operate contract, per MEED sources; ADNOC took FID on 2-3 Nov) and Bab / North East Bab onshore facilities. MEED separately reports a $392m (AED1.44bn) EPC award to Jereh for wellhead surface facilities; whether it is one of the three is unconfirmed.",
+   "Research 26 Nov: the three are Ruwais Diyab ($1.7bn: design, build, commission, then operate and maintain for five years), Bab / North East Bab ($599m, 60 months) and Bu Hasa wellhead surface facilities ($392m EPC). A 12 Nov release says the three contracts were signed by Jereh's executive president and ADNOC Onshore's CEO (single source; the 4 Nov filing said unsigned). MEED expected a kick-off meeting later in November, with formal agreements due within 90 days of the start date."
   ],
   "outlook": false,
   "parties": {
@@ -418,6 +748,7 @@
      "m-8c24a1f88377",
      "n-6365bdd6e95f",
      "n-5be7706a872b",
+     "m-c1095ef13383",
      "n-97cb2b83d912"
     ],
     "first_seen": "2026-11-04",
@@ -448,6 +779,7 @@
    "m-8c24a1f88377",
    "n-6365bdd6e95f",
    "n-5be7706a872b",
+   "m-c1095ef13383",
    "n-97cb2b83d912"
   ],
   "stage": "awarded",
@@ -633,8 +965,80 @@
  {
   "also": [],
   "approach": {
+   "notes": [],
+   "targets": [
+    {
+     "kind": "winner",
+     "links": [
+      {
+       "role": "Project Director",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Tecnicas%20Reunidas%22%20Project%20Director%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Tecnicas%20Reunidas%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Subcontracts Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Tecnicas%20Reunidas%22%20Subcontracts%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
+     "org": "Tecnicas Reunidas",
+     "roles": [
+      "Project Director",
+      "Engineering Manager",
+      "Subcontracts Manager"
+     ],
+     "urgency": 4,
+     "why": "Won Upper Zakum expansion."
+    }
+   ]
+  },
+  "client": "ADNOC Offshore",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-26",
+  "first_published": "2026-11-26",
+  "headline": "Upper Zakum 1.5 million b/d expansion: Tecnicas Reunidas holds two EPC packages; PMC consultants appointed",
+  "id": "p-upper-zakum-expansion",
+  "last_found": "2026-11-26",
+  "last_published": "2026-11-26",
+  "name": "Upper Zakum expansion",
+  "notes": [
+   "Research 26 Nov: ADNOC Offshore split the UZ 1.5MMBD EPC scope into three packages. MEED reported on 18 June 2026 that Tecnicas Reunidas was selected for two of them. An unverified LinkedIn post says NMDC Energy has the third (unconfirmed). MEED reported on 8 July 2026 that PMC deals were awarded; the consultants are named only in its paid article."
+  ],
+  "outlook": false,
+  "parties": {
+   "Tecnicas Reunidas": {
+    "evidence": [
+     "m-6678869208b9"
+    ],
+    "first_seen": "2026-11-26",
+    "last_seen": "2026-11-26",
+    "role": "winner",
+    "type": "epc"
+   }
+  },
+  "priority": "High",
+  "score": 133,
+  "sectors": [
+   "brownfield",
+   "offshore"
+  ],
+  "signal_ids": [
+   "m-6678869208b9"
+  ],
+  "stage": "execution",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [],
+  "approach": {
    "notes": [
-    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Offshore work: McDermott, Technip Energies, Larsen & Toubro."
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Offshore work: McDermott, Technip Energies, Larsen & Toubro, Tecnicas Reunidas."
    ],
    "targets": []
   },
@@ -747,7 +1151,7 @@
   "also": [],
   "approach": {
    "notes": [
-    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Gas work: Wison Engineering."
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Gas work: Wison Engineering, Larsen & Toubro, Petrofac, Technip Energies."
    ],
    "targets": []
   },
@@ -777,75 +1181,6 @@
   "stage": "tender",
   "status": "active",
   "value_usd": 8000000000.0
- },
- {
-  "also": [],
-  "approach": {
-   "notes": [],
-   "targets": [
-    {
-     "kind": "winner",
-     "links": [
-      {
-       "role": "Project Director",
-       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Project%20Director%20UAE"
-      },
-      {
-       "role": "Engineering Manager",
-       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Engineering%20Manager%20UAE"
-      },
-      {
-       "role": "Subcontracts Manager",
-       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Subcontracts%20Manager%20UAE"
-      }
-     ],
-     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
-     "org": "Jereh",
-     "roles": [
-      "Project Director",
-      "Engineering Manager",
-      "Subcontracts Manager"
-     ],
-     "urgency": 2,
-     "why": "Won Bu Hasa field development."
-    }
-   ]
-  },
-  "client": "ADNOC Onshore",
-  "contract_type": "",
-  "deadline": "",
-  "filed": true,
-  "first_found": "2026-11-23",
-  "first_published": "2026-11-13",
-  "headline": "Jereh wins $392m Bu Hasa oil field facilities project",
-  "id": "p-bu-hasa-field-development",
-  "last_found": "2026-11-23",
-  "last_published": "2026-11-13",
-  "name": "Bu Hasa field development",
-  "notes": [],
-  "outlook": false,
-  "parties": {
-   "Jereh": {
-    "evidence": [
-     "n-3ab5c8ede837"
-    ],
-    "first_seen": "2026-11-13",
-    "last_seen": "2026-11-13",
-    "role": "winner",
-    "type": "epc"
-   }
-  },
-  "priority": "High",
-  "score": 88,
-  "sectors": [
-   "onshore"
-  ],
-  "signal_ids": [
-   "n-3ab5c8ede837"
-  ],
-  "stage": "awarded",
-  "status": "active",
-  "value_usd": 392000000.0
  },
  {
   "also": [],
@@ -981,6 +1316,103 @@
    "n-6f470d3e27e3"
   ],
   "stage": "tender",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": []
+  },
+  "client": "ADNOC Gas",
+  "contract_type": "",
+  "deadline": "",
+  "filed": false,
+  "first_found": "2026-11-26",
+  "first_published": "2026-11-25",
+  "headline": "ADNOC and ADNOC Gas Sign About 30 Agreements Around ADIPEC 2026",
+  "id": "s-1cab06aa9edc",
+  "last_found": "2026-11-26",
+  "last_published": "2026-11-25",
+  "name": "ADNOC and ADNOC Gas Sign About 30 Agreements Around ADIPEC 2026",
+  "notes": [],
+  "outlook": false,
+  "parties": {},
+  "priority": "Medium",
+  "score": 72,
+  "sectors": [
+   "gas"
+  ],
+  "signal_ids": [
+   "n-bff19e8edd4e"
+  ],
+  "stage": "awarded",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": [
+    {
+     "kind": "hiring",
+     "links": [
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22SML%20Engineering%20%26%20Contracting%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Resourcing Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22SML%20Engineering%20%26%20Contracting%22%20Resourcing%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer engineers or a work package they can hand over instead of hiring.",
+     "org": "SML Engineering & Contracting",
+     "roles": [
+      "Engineering Manager",
+      "Resourcing Manager"
+     ],
+     "urgency": 3,
+     "why": "Advertising roles for Lower Zakum long-term development."
+    }
+   ]
+  },
+  "client": "ADNOC Offshore",
+  "contract_type": "",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-26",
+  "first_published": "2026-11-25",
+  "headline": "Project Manager (ADNOC Offshore Project)",
+  "id": "p-lower-zakum-long-term-development",
+  "last_found": "2026-11-26",
+  "last_published": "2026-11-25",
+  "name": "Lower Zakum long-term development",
+  "notes": [],
+  "outlook": false,
+  "parties": {
+   "SML Engineering & Contracting": {
+    "evidence": [
+     "li-4494651218"
+    ],
+    "first_seen": "2026-11-25",
+    "last_seen": "2026-11-25",
+    "role": "hiring",
+    "type": "unlisted"
+   }
+  },
+  "priority": "Medium",
+  "score": 70,
+  "sectors": [
+   "gas",
+   "offshore"
+  ],
+  "signal_ids": [
+   "li-4494651218"
+  ],
+  "stage": "",
   "status": "active",
   "value_usd": null
  },

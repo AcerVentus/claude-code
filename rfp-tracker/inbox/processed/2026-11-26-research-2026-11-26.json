@@ -1,0 +1,64 @@
+[
+ {
+  "kind": "research",
+  "title": "Bab Gas Cap main plant: three bidding teams named",
+  "project": "Bab Gas Cap development",
+  "client": "ADNOC Gas",
+  "stage": "bid_evaluation",
+  "contract_type": "EPC",
+  "value_usd": 8000000000,
+  "bidders": [
+   "Larsen & Toubro",
+   "Petrofac",
+   "Technip Energies",
+   "JGC",
+   "Sinopec Engineering",
+   "Maire Tecnimont",
+   "CPECC"
+  ],
+  "publisher": "Construction Review / MEED (read from search summaries)",
+  "url": "https://constructionreviewonline.com/8bn-bab-gas-cap-project-uae-gas-plant-bid-race-widens-attracting-four-major-consortiums/",
+  "published": "2026-11-26",
+  "note": "Research 26 Nov: Construction Review lists three EPC bidding teams for package 1: (1) L&T Energy Hydrocarbon with Petrofac Emirates; (2) Technip Energies, JGC and Sinopec; (3) Tecnimont with CPECC. MEED also reported the Tecnimont and CPECC team in April. The same article speaks of four consortiums; the fourth is not named. This is secondary reporting: it is unconfirmed which teams submitted technical bids on 16 Nov."
+ },
+ {
+  "kind": "research",
+  "title": "Jereh's three ADNOC Onshore contracts: values, scope and signing",
+  "project": "Ruwais Diyab unconventional gas development",
+  "client": "ADNOC Onshore",
+  "stage": "awarded",
+  "winner": "Jereh",
+  "value_usd": 2700000000,
+  "publisher": "Blackridge Research / MEED (read from search summaries)",
+  "url": "https://www.blackridgeresearch.com/news-releases/jereh-signs-three-contracts-with-adnoc-onshore-anchored-by-ruwais-diyab-gas-development-in-uae",
+  "published": "2026-11-12",
+  "note": "Research 26 Nov: the three are Ruwais Diyab ($1.7bn: design, build, commission, then operate and maintain for five years), Bab / North East Bab ($599m, 60 months) and Bu Hasa wellhead surface facilities ($392m EPC). A 12 Nov release says the three contracts were signed by Jereh's executive president and ADNOC Onshore's CEO (single source; the 4 Nov filing said unsigned). MEED expected a kick-off meeting later in November, with formal agreements due within 90 days of the start date."
+ },
+ {
+  "kind": "research",
+  "title": "Jereh's $392m Bu Hasa wellhead facilities EPC is one of its three ADNOC Onshore awards",
+  "project": "Bu Hasa field development",
+  "client": "ADNOC Onshore",
+  "stage": "awarded",
+  "contract_type": "EPC",
+  "winner": "Jereh",
+  "value_usd": 392100000,
+  "publisher": "MEED (read from search summaries)",
+  "url": "https://guest.meed.com/?p=18562",
+  "published": "2026-11-13",
+  "note": "Research 26 Nov: AED1.44bn ($392.1m) EPC for wellhead surface facilities. With Ruwais Diyab ($1.7bn) and Bab / North East Bab ($599m) it makes up Jereh's $2.7bn total."
+ },
+ {
+  "kind": "research",
+  "title": "Upper Zakum 1.5 million b/d expansion: Tecnicas Reunidas holds two EPC packages; PMC consultants appointed",
+  "project": "Upper Zakum expansion",
+  "client": "ADNOC Offshore",
+  "stage": "execution",
+  "contract_type": "EPC",
+  "winner": "Tecnicas Reunidas",
+  "publisher": "MEED (read from search summaries)",
+  "url": "https://www.meed.com/adnoc-awards-upper-zakum-field-expansion-contract",
+  "published": "2026-11-26",
+  "note": "Research 26 Nov: ADNOC Offshore split the UZ 1.5MMBD EPC scope into three packages. MEED reported on 18 June 2026 that Tecnicas Reunidas was selected for two of them. An unverified LinkedIn post says NMDC Energy has the third (unconfirmed). MEED reported on 8 July 2026 that PMC deals were awarded; the consultants are named only in its paid article."
+ }
+]

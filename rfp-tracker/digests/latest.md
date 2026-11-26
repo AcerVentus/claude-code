@@ -1,40 +1,65 @@
-# ADNOC enquiry watch — Wed 25 Nov 2026
+# ADNOC enquiry watch — Thu 26 Nov 2026
 
-**Today:** 0 new opportunities · 1 stage change · 3 new news/lead signals · 10 new hiring signals. **Register:** 21 active opportunities.
+**Today:** 3 new opportunities · 1 stage change · 6 new news/lead signals · 11 new hiring signals. **Register:** 24 active opportunities.
 
 ## 1. Who to approach
 
 | When | Who | Opportunity | Why | What to offer | Find the people |
 |---|---|---|---|---|---|
-| Next 2 weeks | **Mannesmann Energy** | 🆕 North East Bab (NEB) facilities upgrade | Won North East Bab (NEB) facilities upgrade. | Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise. | [Project Director](https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Project%20Director%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Engineering%20Manager%20UAE) · [Subcontracts Manager](https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Subcontracts%20Manager%20UAE) |
-| Next 2 weeks | **Jereh** | Ruwais Diyab unconventional gas development | Won Ruwais Diyab unconventional gas development. | Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise. | [Project Director](https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Project%20Director%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Engineering%20Manager%20UAE) · [Subcontracts Manager](https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Subcontracts%20Manager%20UAE) |
+| Next 2 weeks | **Larsen & Toubro** | 🆕 Bab Gas Cap development | Bid submitted for Bab Gas Cap development; award pending. | Get your detailed-engineering offer in before award so you are the named engineering partner. | [Proposals Manager](https://www.linkedin.com/search/results/people/?keywords=%22Larsen%20%26%20Toubro%22%20Proposals%20Manager%20UAE) · [Tendering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Larsen%20%26%20Toubro%22%20Tendering%20Manager%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Larsen%20%26%20Toubro%22%20Engineering%20Manager%20UAE) |
+| Next 2 weeks | **Petrofac** | 🆕 Bab Gas Cap development | Bid submitted for Bab Gas Cap development; award pending. | Get your detailed-engineering offer in before award so you are the named engineering partner. | [Proposals Manager](https://www.linkedin.com/search/results/people/?keywords=%22Petrofac%22%20Proposals%20Manager%20UAE) · [Tendering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Petrofac%22%20Tendering%20Manager%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Petrofac%22%20Engineering%20Manager%20UAE) |
+| Next 2 weeks | **Technip Energies** | 🆕 Bab Gas Cap development | Bid submitted for Bab Gas Cap development; award pending. | Get your detailed-engineering offer in before award so you are the named engineering partner. | [Proposals Manager](https://www.linkedin.com/search/results/people/?keywords=%22Technip%20Energies%22%20Proposals%20Manager%20UAE) · [Tendering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Technip%20Energies%22%20Tendering%20Manager%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Technip%20Energies%22%20Engineering%20Manager%20UAE) |
+| Next 2 weeks | **JGC** | 🆕 Bab Gas Cap development | Bid submitted for Bab Gas Cap development; award pending. | Get your detailed-engineering offer in before award so you are the named engineering partner. | [Proposals Manager](https://www.linkedin.com/search/results/people/?keywords=%22JGC%22%20Proposals%20Manager%20UAE) · [Tendering Manager](https://www.linkedin.com/search/results/people/?keywords=%22JGC%22%20Tendering%20Manager%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22JGC%22%20Engineering%20Manager%20UAE) |
+| Next 2 weeks | **Sinopec Engineering** | 🆕 Bab Gas Cap development | Bid submitted for Bab Gas Cap development; award pending. | Get your detailed-engineering offer in before award so you are the named engineering partner. | [Proposals Manager](https://www.linkedin.com/search/results/people/?keywords=%22Sinopec%20Engineering%22%20Proposals%20Manager%20UAE) · [Tendering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Sinopec%20Engineering%22%20Tendering%20Manager%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Sinopec%20Engineering%22%20Engineering%20Manager%20UAE) |
+| Next 2 weeks | **Maire Tecnimont** | 🆕 Bab Gas Cap development | Bid submitted for Bab Gas Cap development; award pending. | Get your detailed-engineering offer in before award so you are the named engineering partner. | [Proposals Manager](https://www.linkedin.com/search/results/people/?keywords=%22Maire%20Tecnimont%22%20Proposals%20Manager%20UAE) · [Tendering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Maire%20Tecnimont%22%20Tendering%20Manager%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Maire%20Tecnimont%22%20Engineering%20Manager%20UAE) |
+| Next 2 weeks | **CPECC** | 🆕 Bab Gas Cap development | Bid submitted for Bab Gas Cap development; award pending. | Get your detailed-engineering offer in before award so you are the named engineering partner. | [Proposals Manager](https://www.linkedin.com/search/results/people/?keywords=%22CPECC%22%20Proposals%20Manager%20UAE) · [Tendering Manager](https://www.linkedin.com/search/results/people/?keywords=%22CPECC%22%20Tendering%20Manager%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22CPECC%22%20Engineering%20Manager%20UAE) |
+| Next 2 weeks | **Jereh** | 🆕 Bu Hasa field development | Won Bu Hasa field development. | Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise. | [Project Director](https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Project%20Director%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Engineering%20Manager%20UAE) · [Subcontracts Manager](https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Subcontracts%20Manager%20UAE) |
+| Next 2 weeks | **Jereh** | 🆕 Ruwais Diyab unconventional gas development | Won Ruwais Diyab unconventional gas development. | Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise. | [Project Director](https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Project%20Director%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Engineering%20Manager%20UAE) · [Subcontracts Manager](https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Subcontracts%20Manager%20UAE) |
+| Next 2 weeks | **Mannesmann Energy** | North East Bab (NEB) facilities upgrade | Won North East Bab (NEB) facilities upgrade. | Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise. | [Project Director](https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Project%20Director%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Engineering%20Manager%20UAE) · [Subcontracts Manager](https://www.linkedin.com/search/results/people/?keywords=%22Mannesmann%20Energy%22%20Subcontracts%20Manager%20UAE) |
 | Next 2 weeks | **Confidential-Oil & Gas** | Hiring for Borouge work | Advertising 1 role naming Borouge: Mechanical Proposal Engineer. | Proposal roles mean a live bid: offer bid-phase engineering and a detailed-engineering price they can carry. | [Proposals Manager](https://www.linkedin.com/search/results/people/?keywords=%22Confidential-Oil%20%26%20Gas%22%20Proposals%20Manager%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Confidential-Oil%20%26%20Gas%22%20Engineering%20Manager%20UAE) |
-| Next 2 weeks | **Jereh** | Bu Hasa field development | Won Bu Hasa field development. | Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise. | [Project Director](https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Project%20Director%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Engineering%20Manager%20UAE) · [Subcontracts Manager](https://www.linkedin.com/search/results/people/?keywords=%22Jereh%22%20Subcontracts%20Manager%20UAE) |
 | Next 2 weeks | **IMCO Engineering & Construction Co . W.L.L.** | Hiring for ADNOC (Group) work | Advertising 1 role naming ADNOC (Group): Estimation Engineer. | Proposal roles mean a live bid: offer bid-phase engineering and a detailed-engineering price they can carry. | [Proposals Manager](https://www.linkedin.com/search/results/people/?keywords=%22IMCO%20Engineering%20%26%20Construction%20Co%20.%20W.L.L.%22%20Proposals%20Manager%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22IMCO%20Engineering%20%26%20Construction%20Co%20.%20W.L.L.%22%20Engineering%20Manager%20UAE) |
-| This month | **Wood** | 🆕 Hiring for ADNOC (Group), ADNOC Offshore work | Advertising 6 roles naming ADNOC (Group), ADNOC Offshore: PMC Lead Piping Engineer (Early MP); PMC Lead Weight Control Engineer (SPB); PMC Engineering Manager Offshore (Gas Cap) (+3 more). | They are short of engineers for ADNOC work: offer seconded engineers or a work package instead of hires. | [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Wood%22%20Engineering%20Manager%20UAE) · [Resourcing Manager](https://www.linkedin.com/search/results/people/?keywords=%22Wood%22%20Resourcing%20Manager%20UAE) |
-| This month | **Worley** | 🆕 Hiring for ADNOC (Group), ADNOC Offshore work | Advertising 8 roles naming ADNOC (Group), ADNOC Offshore: Specialist Static Equipment Engineer; Specialist, Process Engineer; Senior Engineer, Static (+5 more). | They are short of engineers for ADNOC work: offer seconded engineers or a work package instead of hires. | [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Worley%22%20Engineering%20Manager%20UAE) · [Resourcing Manager](https://www.linkedin.com/search/results/people/?keywords=%22Worley%22%20Resourcing%20Manager%20UAE) |
-| This month | **KBR** | 🆕 Hiring for ADNOC Offshore work | Advertising 1 role naming ADNOC Offshore: Lead Project Engineer. | They are short of engineers for ADNOC work: offer seconded engineers or a work package instead of hires. | [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22KBR%22%20Engineering%20Manager%20UAE) · [Resourcing Manager](https://www.linkedin.com/search/results/people/?keywords=%22KBR%22%20Resourcing%20Manager%20UAE) |
-| This month | **TALENTMATE** | 🆕 Hiring for ADNOC (Group) work | Advertising 1 role naming ADNOC (Group): Mechanical Engineer Level II. | They are short of engineers for ADNOC work: offer seconded engineers or a work package instead of hires. | [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22TALENTMATE%22%20Engineering%20Manager%20UAE) · [Resourcing Manager](https://www.linkedin.com/search/results/people/?keywords=%22TALENTMATE%22%20Resourcing%20Manager%20UAE) |
-| This month | **Penspen** | 🆕 Hiring for ADNOC (Group) work | Advertising 2 roles naming ADNOC (Group): Senior Engineer, Project; Engineer, Project-MOC(Management of Change). | They are short of engineers for ADNOC work: offer seconded engineers or a work package instead of hires. | [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Penspen%22%20Engineering%20Manager%20UAE) · [Resourcing Manager](https://www.linkedin.com/search/results/people/?keywords=%22Penspen%22%20Resourcing%20Manager%20UAE) |
-| This month | **Duncan & Ross Consulting** | 🆕 Hiring for ADNOC (Group) work | Advertising 1 role naming ADNOC (Group): MECHANICAL COMMSSIONING MANAGER. | They are short of engineers for ADNOC work: offer seconded engineers or a work package instead of hires. | [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Duncan%20%26%20Ross%20Consulting%22%20Engineering%20Manager%20UAE) · [Resourcing Manager](https://www.linkedin.com/search/results/people/?keywords=%22Duncan%20%26%20Ross%20Consulting%22%20Resourcing%20Manager%20UAE) |
-| This month | **CC7 Global Engineering Solutions / CC7 Emirates Engineering Solutions** | Hiring for ADNOC (Group) work | Advertising 1 role naming ADNOC (Group): Senior Project Engineer - HVAC. | They are short of engineers for ADNOC work: offer seconded engineers or a work package instead of hires. | [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22CC7%20Global%20Engineering%20Solutions%20%7C%20CC7%20Emirates%20Engineering%20Solutions%22%20Engineering%20Manager%20UAE) · [Resourcing Manager](https://www.linkedin.com/search/results/people/?keywords=%22CC7%20Global%20Engineering%20Solutions%20%7C%20CC7%20Emirates%20Engineering%20Solutions%22%20Resourcing%20Manager%20UAE) |
-| This month | **ADNOC Onshore** | Adnoc Onshore to upgrade existing oil fields | ADNOC Onshore is at the planning stage. The pre-FEED / FEED enquiry comes first, and that is yours to bid. | Introduce your concept and FEED credentials to the project team before the enquiry is written. | [Project Manager](https://www.linkedin.com/search/results/people/?keywords=%22ADNOC%20Onshore%22%20Project%20Manager%20UAE) · [Vice President Projects](https://www.linkedin.com/search/results/people/?keywords=%22ADNOC%20Onshore%22%20Vice%20President%20Projects%20UAE) · [Senior Engineer Projects](https://www.linkedin.com/search/results/people/?keywords=%22ADNOC%20Onshore%22%20Senior%20Engineer%20Projects%20UAE) |
-| Keep warm | **McDermott** | 🆕 Umm Shaif field development | Won Umm Shaif field development. | Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise. | [Project Director](https://www.linkedin.com/search/results/people/?keywords=%22McDermott%22%20Project%20Director%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22McDermott%22%20Engineering%20Manager%20UAE) · [Subcontracts Manager](https://www.linkedin.com/search/results/people/?keywords=%22McDermott%22%20Subcontracts%20Manager%20UAE) |
-| Keep warm | **Larsen & Toubro** | 🆕 Umm Shaif field development | Won Umm Shaif field development. | Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise. | [Project Director](https://www.linkedin.com/search/results/people/?keywords=%22Larsen%20%26%20Toubro%22%20Project%20Director%20UAE) · [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Larsen%20%26%20Toubro%22%20Engineering%20Manager%20UAE) · [Subcontracts Manager](https://www.linkedin.com/search/results/people/?keywords=%22Larsen%20%26%20Toubro%22%20Subcontracts%20Manager%20UAE) |
+| This month | **Wood** | 🆕 Hiring for ADNOC (Group), ADNOC Offshore work | Advertising 7 roles naming ADNOC (Group), ADNOC Offshore: PMC Lead Piping Engineer (Early MP); PMC Lead Weight Control Engineer (SPB); PMC Engineering Manager Offshore (Gas Cap) (+4 more). | They are short of engineers for ADNOC work: offer seconded engineers or a work package instead of hires. | [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Wood%22%20Engineering%20Manager%20UAE) · [Resourcing Manager](https://www.linkedin.com/search/results/people/?keywords=%22Wood%22%20Resourcing%20Manager%20UAE) |
+| This month | **Worley** | 🆕 Hiring for ADNOC (Group), ADNOC Offshore work | Advertising 10 roles naming ADNOC (Group), ADNOC Offshore: Specialist Static Equipment Engineer; Senior Engineer, Piping; Specialist, Process Engineer (+7 more). | They are short of engineers for ADNOC work: offer seconded engineers or a work package instead of hires. | [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22Worley%22%20Engineering%20Manager%20UAE) · [Resourcing Manager](https://www.linkedin.com/search/results/people/?keywords=%22Worley%22%20Resourcing%20Manager%20UAE) |
+| This month | **TALENTMATE** | 🆕 Hiring for ADNOC (Group), ADNOC Offshore work | Advertising 5 roles naming ADNOC (Group), ADNOC Offshore: Mechanical Engineer Level II; Engineer Process; Engineer Instrument Control (+2 more). | They are short of engineers for ADNOC work: offer seconded engineers or a work package instead of hires. | [Engineering Manager](https://www.linkedin.com/search/results/people/?keywords=%22TALENTMATE%22%20Engineering%20Manager%20UAE) · [Resourcing Manager](https://www.linkedin.com/search/results/people/?keywords=%22TALENTMATE%22%20Resourcing%20Manager%20UAE) |
 
 🆕 = new or changed today. The people links open a LinkedIn search in your own browser; the tracker never reads profiles.
 
 ## 2. New today
 
-No new opportunities today.
+### Upper Zakum expansion
+
+ADNOC Offshore · In execution · EPC · High priority (score 133)
+
+- **Firms named:** Tecnicas Reunidas (winner)
+- **Approach Tecnicas Reunidas** (keep warm): Won Upper Zakum expansion. Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.
+- Research 26 Nov: ADNOC Offshore split the UZ 1.5MMBD EPC scope into three packages. MEED reported on 18 June 2026 that Tecnicas Reunidas was selected for two of them. An unverified LinkedIn post says NMDC Energy has the third (unconfirmed). MEED reported on 8 July 2026 that PMC deals were awarded; the consultants are named only in its paid article.
+- **Evidence:**
+  - [Upper Zakum 1.5 million b/d expansion: Tecnicas Reunidas holds two EPC packages; PMC consultants appointed](https://www.meed.com/adnoc-awards-upper-zakum-field-expansion-contract) — MEED (read from search summaries), 2026-11-26
+
+### ADNOC and ADNOC Gas Sign About 30 Agreements Around ADIPEC 2026
+
+ADNOC Gas · Awarded · Medium priority (score 72)
+
+- **Evidence:**
+  - [ADNOC and ADNOC Gas Sign About 30 Agreements Around ADIPEC 2026](https://news.google.com/rss/articles/CBMiugFBVV95cUxObWRPUEQ3ZXYxODl4Ml94MGJlT1J4ZXo4Tjl1T1Y0NlRaNUZJaERFZ0xFUHhGb1pOMFFGcUVoRmNZZGlnZ0x6RnVmcTF0bmZkUVRnOGNaTWxwQWpvczNZaUJ1NmVEQURGYjY0X25PaGdWTTF3Vl9HdHRWYnJJU0x6Y0VGOC1hLXZxRnNFdFkwTEdPc1NHVC1ORHBTMGtSUkRPT3NVMFliWWN2MzVxZl8tQWVuVU1tYTRvOUE?oc=5) — SaudiGulf Projects, 2026-11-25
+
+### Lower Zakum long-term development
+
+ADNOC Offshore · Unclear · Medium priority (score 70)
+
+- **Firms named:** SML Engineering & Contracting (hiring)
+- **Approach SML Engineering & Contracting** (this month): Advertising roles for Lower Zakum long-term development. Offer engineers or a work package they can hand over instead of hiring.
+- **Evidence:**
+  - [SML Engineering & Contracting is hiring: Project Manager (ADNOC Offshore Project)](https://www.linkedin.com/jobs/view/4494651218), 2026-11-25
 
 ## 3. Movement on tracked opportunities
 
-- **Umm Shaif field development** moved from *Unclear* to *In execution*.
-- **Umm Shaif field development**: newly named — Larsen & Toubro (winner), McDermott (winner), Technip Energies (contractor).
-- **North East Bab (NEB) facilities upgrade**: [North East Bab Phase II scope: Mannesmann Energy to upgrade existing facilities at Al Nouf and Rumaitha/Shanayel](https://gulfnews.com/business/adnoc-onshore-taps-mannesmann-energy-to-boost-capacity-at-north-east-bab-oil-facilities-1.500752068) (2026-11-25)
-- **Umm Shaif field development**: [Umm Shaif Gas Cap and Surface Pressure Boosting: McDermott holds EPCI package 4](https://worldoil.com/news/2026/8/24/adnoc-awards-mcdermott-1-billion-plus-epci-contract-for-umm-shaif-field/) (2026-11-25)
-- **Umm Shaif field development**: [Umm Shaif Gas Cap package 1: Larsen & Toubro is main contractor, with detailed engineering subcontracted to Technip Energies](https://guest.meed.com/technip-energies-secures-role-in-umm-shaif-gas-cap-project/) (2026-11-25)
+- **Bab Gas Cap well tie-ins** moved from *Out to tender* to *Bids in / evaluation*.
+- **Bab Gas Cap development**: newly named — CPECC (bidder), JGC (bidder), Larsen & Toubro (bidder), Maire Tecnimont (bidder), Petrofac (bidder), Sinopec Engineering (bidder), Technip Energies (bidder).
+- **Bab Gas Cap development**: [Bab Gas Cap main plant: three bidding teams named](https://constructionreviewonline.com/8bn-bab-gas-cap-project-uae-gas-plant-bid-race-widens-attracting-four-major-consortiums/) (2026-11-26)
+- **Bab Gas Cap well tie-ins**: [Contractors submit bids for Bab gas cap well tie-ins project](https://www.meed.com/contractors-submit-bids-for-bab-gas-cap-well-tie-ins-project) (2026-11-24)
+- **Bu Hasa field development**: [Jereh's $392m Bu Hasa wellhead facilities EPC is one of its three ADNOC Onshore awards](https://guest.meed.com/?p=18562) (2026-11-13)
+- **Ruwais Diyab unconventional gas development**: [Jereh's three ADNOC Onshore contracts: values, scope and signing](https://www.blackridgeresearch.com/news-releases/jereh-signs-three-contracts-with-adnoc-onshore-anchored-by-ruwais-diyab-gas-development-in-uae) (2026-11-12)
 
 ## 4. Hiring signals
 
@@ -42,16 +67,17 @@ Firms advertising roles that name ADNOC work. *Bidding* roles point to a live te
 
 | Employer | Role | Signal | ADNOC company / project named | Posted |
 |---|---|---|---|---|
-| **KBR, Inc.** | [Lead Project Engineer](https://www.linkedin.com/jobs/view/4493041537) | engineering | ADNOC Offshore | 2026-11-24 |
-| **Worley** | [Specialist Static Equipment Engineer](https://www.linkedin.com/jobs/view/4448895996) | engineering | ADNOC (Group) | 2026-11-19 |
-| **Wood** | [PMC Lead Piping Engineer (Early MP)](https://www.linkedin.com/jobs/view/4484207117) | engineering | ADNOC (Group) | 2026-11-18 |
-| **TALENTMATE** | [Mechanical Engineer Level II](https://www.linkedin.com/jobs/view/4492436795) | engineering | ADNOC (Group) | 2026-11-19 |
-| **Worley** | [Senior Engineer, Static](https://www.linkedin.com/jobs/view/4492476699) | engineering | ADNOC (Group) | 2026-11-19 |
-| **Penspen** | [Engineer, Project-MOC(Management of Change)](https://www.linkedin.com/jobs/view/4402877637) | engineering | ADNOC (Group) | 2026-11-24 |
-| **Duncan & Ross Consulting** | [MECHANICAL COMMSSIONING MANAGER](https://www.linkedin.com/jobs/view/4492408108) | engineering | ADNOC (Group) | 2026-11-19 |
-| **TALENTMATE** | [Project Manager Oil And Gas EPC](https://www.linkedin.com/jobs/view/4494135925) | other | ADNOC (Group) | 2026-11-24 |
-| **TALENTMATE** | [Senior Project Manager Oil And Gas EPC](https://www.linkedin.com/jobs/view/4494145545) | other | ADNOC (Group) | 2026-11-24 |
-| **TALENTMATE** | [Senior Project Manager Oil And Gas EPC](https://www.linkedin.com/jobs/view/4494148480) | other | ADNOC (Group) | 2026-11-24 |
+| **TALENTMATE** | [Lead Project Engineer](https://www.linkedin.com/jobs/view/4494651189) | engineering | ADNOC Offshore | 2026-11-25 |
+| **Worley** | [Lead Rotating Equip. Engineer](https://www.linkedin.com/jobs/view/4441439965) | engineering | ADNOC (Group) | 2026-11-25 |
+| **Worley** | [Senior Engineer, Piping](https://www.linkedin.com/jobs/view/4492471730) | engineering | ADNOC (Group) | 2026-11-19 |
+| **KBR, Inc.** | [Lead Pipeline Designer](https://www.linkedin.com/jobs/view/4493413779) | engineering | ADNOC (Group) | 2026-11-25 |
+| **TALENTMATE** | [Engineer Process](https://www.linkedin.com/jobs/view/4494635834) | engineering | ADNOC (Group) | 2026-11-25 |
+| **McDermott International, Ltd** | [Senior Manager Project Engineering](https://www.linkedin.com/jobs/view/4484999079) | engineering | ADNOC (Group) | 2026-11-19 |
+| **TALENTMATE** | [Engineer Instrument Control](https://www.linkedin.com/jobs/view/4494644417) | engineering | ADNOC (Group) | 2026-11-25 |
+| **Wood** | [Management of Change (MOC) Engineer](https://www.linkedin.com/jobs/view/4494671615) | engineering | ADNOC (Group) | 2026-11-25 |
+| **TALENTMATE** | [Engineer Project](https://www.linkedin.com/jobs/view/4494645372) | engineering | ADNOC (Group) | 2026-11-25 |
+| **SML Engineering & Contracting** | [Project Manager (ADNOC Offshore Project)](https://www.linkedin.com/jobs/view/4494651218) | other | ADNOC Offshore / Lower Zakum long-term development | 2026-11-25 |
+| **Euro Mechanical** | [Multiple Positions - Onshore & Offshore Oil and Gas Projects / Abu Dhabi](https://www.linkedin.com/jobs/view/4493430197) | other | ADNOC (Group) | 2026-11-25 |
 
 ## 5. Forward look
 
@@ -74,14 +100,14 @@ Advance notice: plans, approvals and tender programmes that come before an enqui
 |---|---|---|---|---|---|---|
 | Rumaitha & Shanayel (RUMS) field facilities | ADNOC Onshore | EPC | $1.2bn |  | 2026-11-18 | High |
 | Borouge ethane cracker expansion (EU2 / EU3) | Borouge | EPC |  | Linde Engineering (winner) | 2026-11-15 | High |
-| Bab Gas Cap well tie-ins | ADNOC Onshore | EPC |  |  | 2026-11-18 | High |
 | SARB & Umm Lulu | ADNOC Offshore | EPC |  |  | 2026-11-16 | High |
 
 **Bids in / evaluation**
 
 | Opportunity | Client | Type | Value | Firms named | Last news | Priority |
 |---|---|---|---|---|---|---|
-| Bab Gas Cap development | ADNOC Gas | EPC | $8bn |  | 2026-11-24 | High |
+| Bab Gas Cap development | ADNOC Gas | EPC | $8bn | CPECC (bidder), JGC (bidder), Larsen & Toubro (bidder), Maire Tecnimont (bidder), Petrofac (bidder), Sinopec Engineering (bidder), Technip E | 2026-11-26 | High |
+| Bab Gas Cap well tie-ins | ADNOC Onshore | EPC | $800m |  | 2026-11-24 | High |
 | Bu Hasa enhanced oil recovery (EOR) | ADNOC Onshore | EPC | $2bn |  | 2026-11-11 | High |
 
 **Awarded**
@@ -89,15 +115,22 @@ Advance notice: plans, approvals and tender programmes that come before an enqui
 | Opportunity | Client | Type | Value | Firms named | Last news | Priority |
 |---|---|---|---|---|---|---|
 | North East Bab (NEB) facilities upgrade | ADNOC Onshore | EPC |  | Mannesmann Energy (winner) | 2026-11-25 | High |
+| Bu Hasa field development | ADNOC Onshore | EPC | $392m | Jereh (winner) | 2026-11-13 | High |
 | Ruwais Diyab unconventional gas development | ADNOC Onshore |  | $2.7bn | Jereh (winner) | 2026-11-15 | High |
-| Bu Hasa field development | ADNOC Onshore |  | $392m | Jereh (winner) | 2026-11-13 | High |
 
 **In execution**
 
 | Opportunity | Client | Type | Value | Firms named | Last news | Priority |
 |---|---|---|---|---|---|---|
 | Umm Shaif field development | ADNOC Offshore | EPC | $1bn | Larsen & Toubro (winner), McDermott (winner), Technip Energies (contractor) | 2026-11-25 | High |
+| Upper Zakum expansion | ADNOC Offshore | EPC |  | Tecnicas Reunidas (winner) | 2026-11-26 | High |
 | Habshan gas complex (incl. carbon capture) | ADNOC Gas | EPC | $3.9bn | Wison Engineering (contractor) | 2026-11-18 | High |
+
+**Unclear**
+
+| Opportunity | Client | Type | Value | Firms named | Last news | Priority |
+|---|---|---|---|---|---|---|
+| Lower Zakum long-term development | ADNOC Offshore |  |  | SML Engineering & Contracting (hiring) | 2026-11-25 | Medium |
 
 ## 7. Other leads (not yet filed under a named project)
 
@@ -105,6 +138,7 @@ Stories the tracker could not tie to a project in `config/watchlist.toml`. Add a
 
 | Lead | Client | Stage | Type | Value | Firms named | Date |
 |---|---|---|---|---|---|---|
+| [ADNOC and ADNOC Gas Sign About 30 Agreements Around ADIPEC 2026](https://news.google.com/rss/articles/CBMiugFBVV95cUxObWRPUEQ3ZXYxODl4Ml94MGJlT1J4ZXo4Tjl1T1Y0NlRaNUZJaERFZ0xFUHhGb1pOMFFGcUVoRmNZZGlnZ0x6RnVmcTF0bmZkUVRnOGNaTWxwQWpvczNZaUJ1NmVEQURGYjY0X25PaGdWTTF3Vl9HdHRWYnJJU0x6Y0VGOC1hLXZxRnNFdFkwTEdPc1NHVC1ORHBTMGtSUkRPT3NVMFliWWN2MzVxZl8tQWVuVU1tYTRvOUE?oc=5) | ADNOC Gas | Awarded |  |  |  | 2026-11-25 |
 | [$8 billion-plus Adnoc Gas project reaches key bid milestone](https://news.google.com/rss/articles/CBMiwgFBVV95cUxNM2FlbmpJTEVCY0lCTURTS0w3NlRJS2c5d29QbmJxRThmT2dnQ2N5RVN3V3RFZTY0Uk52QVpCbHlKOE1IRWdLSkVtbE1sbmg1V3lUR29ENjRjVElib0EzS01EWVhXWGg2MVEyYzdHVkk1enpTbjhQbm1lOGlJS1Nfb3NmMUJzTG5nMG5oLUJ5eGpOUEt1T0JDSEk1QkFzVm5HVG1KbVh0UHVsNmd0R2lyYUViLXdTYTl3QXNxUWdZZU51Zw?oc=5) | ADNOC Gas | Out to tender |  | $8bn |  | 2026-11-18 |
 | [Adnoc Onshore to upgrade existing oil fields](https://news.google.com/rss/articles/CBMijwFBVV95cUxNMm5YbUNDd3kwRUdNS1BtX1lBNzJPZzE4TVJFeHlDX1RjWHRwcUtSdkFEUUYzNEl3SURaa3JPcFJjYUFibnhLdy1BSU1hYXZ0eE5hZHFrb2RWQTJFcXVPYkFWUTN4ZG1SUll4V2cwMzNqLW5ZTkpuUmVOU2hQUG90MmU2YUVKLVBSdzdPcUE4NA?oc=5) | ADNOC Onshore | Planned / early |  |  |  | 2026-11-18 |
 | [Mannesmann Energy plans ADNOC facility upgrade project, two UAE representation agreements](https://news.google.com/rss/articles/CBMixwFBVV95cUxNajV1TnQzX1FMZXdNeDhJN19EdmxFMkNBQmMxODFkT2xzUTkyY2QxbjFwUThseG82MXZPQktaY1BpUFZHSFE0Y1MxMGdCLWFqaUpxbXlDZ2wtckpISVZKVmVYMzQ3WWtPYUgyZVIyV2RsNzFPWjQtVmpuQmRpOWlwZmZVRWdvR194Qjl2VlF3Z0QwS1JuM1Z2TThVY3F4cW5yMkJfSTJ5dnpKRFZYMWRZNEJXMzlkelJaTXJrLW52Mi15M3MwMlZr?oc=5) | ADNOC (Group) | Planned / early |  |  | Mannesmann Energy (named) | 2026-11-04 |
@@ -120,9 +154,9 @@ Stories the tracker could not tie to a project in `config/watchlist.toml`. Add a
 
 | Source | Requests | Succeeded | Signals kept | Problems |
 |---|---|---|---|---|
-| bing-news | 8 | 8 | 0 | none |
-| google-news | 18 | 17 | 0 | "ADNOC Onshore" (contract OR tender OR bids OR project): 429 Too Many Requests: https://news.google.com/rss/search?q=%22ADNOC+Onshore%22+%28contract+OR+tender+O |
-| inbox | 1 | 1 | 3 | none |
-| linkedin-jobs | 37 | 37 | 10 (25 adverts read of 86 listed) | 5 adverts left for the next run: the daily limit on adverts or minutes was reached |
+| bing-news | 8 | 8 | 1 | none |
+| google-news | 18 | 18 | 1 | none |
+| inbox | 1 | 1 | 4 | none |
+| linkedin-jobs | 34 | 34 | 11 (22 adverts read of 90 listed) | none |
 
 *Built for Our consultancy from public sources. Headlines and adverts are leads, not confirmation: check the source before you act. ADNOC's own tender portal is not public, so invitations issued only there will not appear here.*
