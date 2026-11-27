@@ -459,7 +459,7 @@ function renderChrome() {
   document.getElementById("edition-line").textContent = `Vol. I · No. ${m.edition_no || 1} · ${m.price || "Free to all readers"}`;
   document.getElementById("date-line").textContent = fmtDate(m.date);
   document.getElementById("updated-line").textContent = m.updated_at ? `Updated ${fmtTime(m.updated_at)}` : "";
-  document.getElementById("live-line").textContent = `Live edition · refreshed hourly`;
+  document.getElementById("live-line").textContent = m.updated_at ? `Latest edition · ${fmtTime(m.updated_at)}` : `Latest edition`;
   const snap = (ED.markets && ED.markets.snapshot) || [];
   const t = snap.map(s => `<span class="tk"><b>${esc(s.name)}</b> ${esc(s.value)} <span class="${changeClass(s.change)}">${esc(s.change || "")}</span></span>`).join("");
   document.getElementById("ticker").innerHTML = t ? t + `<span aria-hidden="true" style="display:contents">${t}</span>` : `<span class="tk">Markets data is on its way to the press.</span>`;
@@ -845,5 +845,5 @@ fetch("art/vignettes.json").then(r => r.ok ? r.json() : {}).then(v => {
   if (ED) show();
 }).catch(() => {});
 load(true);
-setInterval(() => load(false), 10 * 60 * 1000);  // pick up hourly editions without a reload
+setInterval(() => load(false), 10 * 60 * 1000);  // pick up a new edition without a reload
 </script>

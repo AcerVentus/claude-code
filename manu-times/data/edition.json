@@ -17,17 +17,17 @@
     ]
    },
    {
-    "headline": "Two Italians killed in drone attack in Kuwait as Gulf tensions rise",
-    "summary": "Kuwait blamed Iran for a drone strike on an air defence site that killed two Italian technicians working for Rheinmetall Italia; Tehran denied involvement and proposed a joint investigation. The incident came as Iran's Revolutionary Guards reported tankers striking mines near the Strait of Hormuz, pushing Brent crude higher.",
+    "headline": "Iran denies Kuwait drone attack that killed two Italians as new tanker strike reported",
+    "summary": "Kuwait blamed Iran for a drone strike that killed two Italian technicians; Foreign Minister Abbas Araghchi called the attack 'suspicious', denied involvement and offered a joint investigation. Iran's Revolutionary Guards said another tanker hit a mine in the Strait of Hormuz, and President Trump told troops the war would end 'whenever I want it to be'.",
     "section": "world",
     "sources": [
      {
       "name": "Al Jazeera",
-      "url": "https://www.aljazeera.com/news/2026/11/26/two-italians-killed-after-iranian-drones-strike-facility-says-kuwait"
+      "url": "https://www.aljazeera.com/news/liveblog/2026/11/27/iran-war-live-irans-araghchi-calls-deadly-kuwait-attack-suspicious"
      },
      {
-      "name": "CBS News",
-      "url": "https://www.cbsnews.com/live-updates/iran-war-us-military-ai-weapons-oil/"
+      "name": "CNBC",
+      "url": "https://cnbc.com/2026/11/27/us-iran-war-trump-hormuz-italian-killed-trump.html"
      }
     ]
    },
@@ -47,32 +47,32 @@
     ]
    },
    {
-    "headline": "Thanksgiving storm cuts power to hundreds of thousands on US East Coast",
-    "summary": "Wind gusts of up to 70 mph left more than 900,000 customers without power on Thursday night and disrupted flights at major Washington and New York airports. The storm forced the first weather-related postponement of the Macy's Thanksgiving Day Parade, now set for Saturday.",
+    "headline": "East Coast storm recovery under way; hundreds of thousands still without power",
+    "summary": "More than 500,000 customers remained without electricity on Friday morning after a Thanksgiving storm knocked out power to nearly a million at its peak, with Pennsylvania and New Jersey hardest hit. The Macy's parade, postponed for the first time over weather, is set for Saturday.",
     "section": "us",
     "sources": [
      {
-      "name": "CBC News",
-      "url": "https://www.cbc.ca/news/world/u-s-thanksgiving-storm-power-flight-delays-9.7438358"
+      "name": "News4JAX (AP)",
+      "url": "https://www.news4jax.com/news/national/2026/11/27/heavy-rain-winds-down-as-power-remains-out-for-hundreds-of-thousands-on-the-east-coast/"
      },
      {
-      "name": "CNN",
-      "url": "https://www.cnn.com/2026/11/25/us/macys-thanksgiving-day-parade-postponed"
+      "name": "CBS News",
+      "url": "https://www.cbsnews.com/news/thanksgiving-day-storm-northeast-midwest-flooding-power-outages/"
      }
     ]
    },
    {
-    "headline": "Trump and NATO's Rutte urge Russia not to widen Ukraine war",
-    "summary": "After talks at Mar-a-Lago, President Trump and NATO Secretary General Mark Rutte issued a joint statement warning against actions that would expand the conflict and calling for a swift peaceful settlement. Hours later Russia launched ballistic missiles and more than 100 drones at Ukraine, including Kyiv.",
+    "headline": "Zelenskyy warns of imminent Russian mass strike; Trump says he pressed Putin",
+    "summary": "Ukraine's president said Russia is preparing a large missile and drone attack on the power grid within days, after strikes killed six people and cut power in six regions. President Trump said he urged Vladimir Putin to pull back, while envoy Jared Kushner described a deadlock over territory.",
     "section": "world",
     "sources": [
      {
-      "name": "CNBC",
-      "url": "https://www.cnbc.com/2026/11/26/trump-nato-rutte-russia-ukraine-war.html"
+      "name": "PBS NewsHour (AP)",
+      "url": "https://www.pbs.org/newshour/world/zelenskyy-warns-of-imminent-major-russian-attack-on-ukraines-power-grid"
      },
      {
-      "name": "Kyiv Independent",
-      "url": "https://kyivindependent.com/russian-attacks-kill-10-injure-58-across-ukraine-over-past-day-strike-kyiv-with-ballistic-missiles/"
+      "name": "Al Jazeera",
+      "url": "https://www.aljazeera.com/news/2026/11/27/zelenskyy-warns-of-major-russian-attack-as-trump-urges-putin-to-pull-back"
      }
     ]
    },
@@ -121,40 +121,59 @@
  },
  "world": {
   "lead": {
-   "headline": "Russian missiles and drones hit Kyiv and other Ukrainian cities",
-   "dek": "",
+   "headline": "Zelenskyy warns of imminent Russian mass strike as Trump says he pressed Putin to pull back",
+   "dek": "Ukraine's president says Moscow is preparing a large attack on the power grid in the coming days, after strikes left six regions with outages.",
    "dateline": "KYIV",
    "body": [
-    "Russia launched ballistic missiles and 113 drones at Ukraine overnight into Thursday, injuring seven people in Kyiv, according to Ukrainian officials. The Kyiv Independent reported that Russian attacks killed 10 people and injured 58 across the country over the previous day, including two killed in Kharkiv."
+    "Ukrainian President Volodymyr Zelenskyy said Kyiv has intelligence that Russia is preparing a new mass missile and drone strike in the coming days, likely aimed at the country's energy system, and urged Ukrainians to take air-raid alerts seriously. It was his second such warning this week.",
+    "Russian attacks killed six people and injured 25 across Ukraine over the past day, regional authorities said on Friday. First Deputy Energy Minister Artem Nekrasov said strikes on substations and distribution networks cut power to consumers in six oblasts, with Dnipropetrovsk and Kherson worst affected. Earlier, ballistic missiles hit Kyiv overnight into Thursday, injuring seven people and damaging a shopping centre, according to Mayor Vitali Klitschko.",
+    "Zelenskyy said a previous large-scale attack on 20 November involved more than 400 drones and 110 missiles and killed eight people.",
+    "In Washington, President Donald Trump wrote on Truth Social that he had spent considerable time with Vladimir Putin during his visit to China pressing him to pull back military action, and said he hoped it would lead to a quick settlement. US envoy Jared Kushner, who is mediating alongside Steve Witkoff, said he believes Putin wants peace but acknowledged 'a little bit of a deadlock' over the future of Ukrainian territory.",
+    "The warning follows a joint statement by Trump and NATO Secretary General Mark Rutte at Mar-a-Lago cautioning against any widening of the war; the Kremlin said it read the statement as aimed at Kyiv."
    ],
    "sources": [
     {
-     "name": "Kyiv Independent",
-     "url": "https://kyivindependent.com/russian-attacks-kill-10-injure-58-across-ukraine-over-past-day-strike-kyiv-with-ballistic-missiles/"
+     "name": "PBS NewsHour (AP)",
+     "url": "https://www.pbs.org/newshour/world/zelenskyy-warns-of-imminent-major-russian-attack-on-ukraines-power-grid"
     },
     {
-     "name": "Meduza",
-     "url": "https://meduza.io/en/news/2026/11/26/russian-strikes-on-ukraine-kill-two-in-kharkiv-and-injure-seven-in-kyiv"
+     "name": "Al Jazeera",
+     "url": "https://www.aljazeera.com/news/2026/11/27/zelenskyy-warns-of-major-russian-attack-as-trump-urges-putin-to-pull-back"
+    },
+    {
+     "name": "Kyiv Independent",
+     "url": "https://kyivindependent.com/russian-attacks-kill-6-injure-25-across-ukraine-over-past-day-power-outages-across-6-oblasts/"
     }
    ]
   },
   "stories": [
    {
-    "headline": "Gulf conflict widens as drone strike in Kuwait kills two Italians and tankers hit near Hormuz",
-    "summary": "Kuwait and Italy point to Iran over a deadly drone attack, Tehran denies involvement, and shipping incidents near the Strait of Hormuz lift oil prices.",
+    "headline": "Iran calls deadly Kuwait drone attack 'suspicious' as IRGC reports new tanker mine strike",
+    "summary": "Foreign Minister Abbas Araghchi denied any Iranian role in the drone attack that killed two Italian technicians in Kuwait, calling it suspicious and offering a joint investigation with Kuwait and Italy; Kuwait says the drones were Iranian and Italy plans a formal protest. Separately, Iran's Revolutionary Guards said a tanker hit a mine and exploded in the Strait of Hormuz, and Iranian police said a 'hostile drone' was downed in the country's southeast.",
     "dateline": "KUWAIT CITY",
     "sources": [
      {
       "name": "Al Jazeera",
-      "url": "https://www.aljazeera.com/news/2026/11/26/two-italians-killed-after-iranian-drones-strike-facility-says-kuwait"
+      "url": "https://www.aljazeera.com/news/liveblog/2026/11/27/iran-war-live-irans-araghchi-calls-deadly-kuwait-attack-suspicious"
      },
      {
-      "name": "Middle East Monitor",
-      "url": "https://www.middleeastmonitor.com/20261127-oil-prices-rise-after-tankers-hit-mines-in-strait-of-hormuz/"
+      "name": "CNBC",
+      "url": "https://cnbc.com/2026/11/27/us-iran-war-trump-hormuz-italian-killed-trump.html"
      },
      {
       "name": "Al Jazeera",
-      "url": "https://www.aljazeera.com/news/2026/11/24/hormuz-oil-traffic-is-down-40-percent-are-irans-tanker-attacks-working"
+      "url": "https://www.aljazeera.com/news/2026/11/27/italians-killed-in-kuwait-why-is-iran-denying-responsibility"
+     }
+    ]
+   },
+   {
+    "headline": "UN agencies warn famine risk will rise on conflict and El Nino",
+    "summary": "The Food and Agriculture Organization and the World Food Programme warned that hunger hotspots are set to worsen, driven by conflict and El Nino weather effects. They named Sudan, South Sudan, Somalia, northern Nigeria and Yemen as facing the gravest famine threats.",
+    "dateline": "ROME",
+    "sources": [
+     {
+      "name": "Al Jazeera",
+      "url": "https://www.aljazeera.com/news/2026/11/27/famine-expect-to-rise-due-to-global-conflict-el-nino-warns-un"
      }
     ]
    },
@@ -170,6 +189,21 @@
      {
       "name": "Al Jazeera",
       "url": "https://aljazeera.com/news/2026/11/26/israeli-attacks-on-gaza-kill-senior-education-official-seven-other-people"
+     }
+    ]
+   },
+   {
+    "headline": "Libya's eastern government seeks UN probe after Ukraine sinks Russian warship",
+    "summary": "President Volodymyr Zelensky confirmed Ukrainian naval drones sank the Russian corvette Merkury at Benghazi and struck a cargo ship that Kyiv says carried weapons, Ukraine's first acknowledged operation in Libya. Eastern Libyan Prime Minister Osama Hamad asked the UN to investigate whether the drones were launched from western Libya.",
+    "dateline": "BENGHAZI",
+    "sources": [
+     {
+      "name": "ABC News",
+      "url": "https://abcnews.com/International/ukrainian-naval-drones-sank-russias-merkury-warship-libya/story?id=138369738"
+     },
+     {
+      "name": "The Hill",
+      "url": "https://thehill.com/policy/defense/6237786-ukraine-drones-sink-russian-ship-zelensky/"
      }
     ]
    },
@@ -202,66 +236,58 @@
       "url": "https://www.aljazeera.com/economy/2026/11/26/south-koreas-central-bank-hikes-interest-rates-raises-gdp-growth-forecast"
      }
     ]
-   },
-   {
-    "headline": "Ethiopia offers to host Sudan peace talks; Khartoum rejects proposal",
-    "summary": "Ethiopian Prime Minister Abiy Ahmed proposed hosting talks among Sudan's warring parties, but Sudan's government rejected the offer, questioning Addis Ababa's neutrality. The African Union said it had taken note of the initiative, as Egypt and Sudan separately agreed to prioritise post-war reconstruction.",
-    "dateline": "ADDIS ABABA",
-    "sources": [
-     {
-      "name": "Sudan Tribune",
-      "url": "https://sudantribune.com/article/321679"
-     },
-     {
-      "name": "Sudan Tribune",
-      "url": "https://sudantribune.com/article/321681"
-     }
-    ]
-   },
-   {
-    "headline": "Libya's eastern government seeks UN probe after Ukraine sinks Russian warship",
-    "summary": "President Volodymyr Zelensky confirmed Ukrainian naval drones sank the Russian corvette Merkury at Benghazi and struck a cargo ship that Kyiv says carried weapons, Ukraine's first acknowledged operation in Libya. Eastern Libyan Prime Minister Osama Hamad asked the UN to investigate whether the drones were launched from western Libya.",
-    "dateline": "BENGHAZI",
-    "sources": [
-     {
-      "name": "ABC News",
-      "url": "https://abcnews.com/International/ukrainian-naval-drones-sank-russias-merkury-warship-libya/story?id=138369738"
-     },
-     {
-      "name": "The Hill",
-      "url": "https://thehill.com/policy/defense/6237786-ukraine-drones-sink-russian-ship-zelensky/"
-     }
-    ]
    }
   ],
   "briefs": [
-   "Iranian lorry drivers entered a sixth day of strike action, with protests reported in about 20 cities, according to The National.",
+   "Australia imposed sanctions on two men it accuses of directing 2024 anti-Semitic arson attacks on behalf of Iran's Revolutionary Guards, Al Jazeera reported.",
+   "Costa Rica barred UN special rapporteur Francesca Albanese from entering the country, citing national security concerns, according to Al Jazeera.",
+   "An IISS report found Russian hybrid attacks on Europe have increased but have not weakened European support for Ukraine.",
    "Houthi-run media said a Saudi strike on a power station in Yemen's Taiz killed 11 civilians; there was no immediate Saudi comment in the reports.",
-   "Iran's navy said it had recovered two oil tankers previously seized by the US military, according to Al Jazeera's live coverage.",
-   "China and Japan remain in a diplomatic freeze after Xi Jinping declined a formal meeting with Prime Minister Sanae Takaichi at APEC, with Beijing demanding Tokyo change its stance on Taiwan.",
-   "The Rapid Support Forces killed at least 19 people in drone attacks in Sudan's Blue Nile state, Al Jazeera reported."
+   "Ethiopia's offer to host Sudan peace talks was rejected by Khartoum, which questioned Addis Ababa's neutrality."
   ]
  },
  "politics": {
   "lead": {
-   "headline": "Trading partners push back on proposed US Section 301 tariffs",
-   "dek": "",
+   "headline": "Trump says Iran war will end 'whenever I want' as Pentagon tallies $48.3bn cost",
+   "dek": "The president's holiday-week remarks come as Congress weighs curbs on war funding ahead of an 11 December shutdown deadline.",
    "dateline": "WASHINGTON",
    "body": [
-    "Washington's proposed tariffs on 14 economies, including 15% on the EU, Japan, South Korea, Taiwan and Switzerland, are described as replacing broader duties struck down by the Supreme Court in February. Japan protested, Singapore called the move very disappointing and China rejected the overcapacity rationale, while supporters argue the duties protect US manufacturing."
+    "President Donald Trump said the US war with Iran would end 'sort of whenever I want it to be', in remarks reported on Friday as the conflict moves through its ninth month. The Hill reported that the comment came amid rising costs and growing domestic pushback, with the Pentagon putting the cost of the war at $48.3 billion, a figure that excludes damage to bases.",
+    "Trump also said victory over Iran was 'at hand' and that Washington was still giving Tehran every chance to reach a deal. Speaking with US troops over the Thanksgiving holiday, he played down the significance of Russian and Chinese support for Iran and asserted that Iran has missiles capable of reaching Europe, according to Al Jazeera.",
+    "The remarks came a day after Kuwait blamed Iran for a drone attack that killed two Italian technicians, which Tehran denies. Iranian Foreign Minister Abbas Araghchi has said a proposal to reopen the Strait of Hormuz within 48 hours and begin talks with Washington remains on the table; earlier reporting said the plan is conditioned on steps including lifting the US naval blockade and sanctions relief.",
+    "At home, the war is shaping a funding fight in Congress, where government funding expires on 11 December. Some Democrats want any spending package to restrict money for the war, and Senate Republican leaders have signalled openness to funding the Pentagon while limiting war spending."
    ],
    "sources": [
     {
-     "name": "CNBC",
-     "url": "https://www.cnbc.com/2026/11/25/us-tariffs-trump-section-301.html"
+     "name": "The Hill",
+     "url": "https://thehill.com/homenews/administration/6245034-trump-says-iran-war-ends-whenever/"
     },
     {
-     "name": "The Next Web",
-     "url": "https://thenextweb.com/news/new-tariffs-14-trading-partners-china-eu-section-301-excess-capacity"
+     "name": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/27/us-iran-war-trump-hormuz-italian-killed-trump.html"
+    },
+    {
+     "name": "Al Jazeera",
+     "url": "https://www.aljazeera.com/news/2026/11/27/trump-downplays-russia-china-support-for-iran-during-talks-with-us-troops"
     }
    ]
   },
   "stories": [
+   {
+    "headline": "Trading partners push back on proposed US Section 301 tariffs",
+    "summary": "The proposed Section 301 tariffs on 14 economies, including 15% on the EU, Japan, South Korea, Taiwan and Switzerland and 20% on China, would replace broader duties struck down by the Supreme Court in February. Japan protested, Singapore called the move very disappointing and Beijing rejected the overcapacity rationale, while the administration says the duties protect US manufacturing.",
+    "dateline": "WASHINGTON",
+    "sources": [
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/25/us-tariffs-trump-section-301.html"
+     },
+     {
+      "name": "The Next Web",
+      "url": "https://thenextweb.com/news/new-tariffs-14-trading-partners-china-eu-section-301-excess-capacity"
+     }
+    ]
+   },
    {
     "headline": "EU budget talks stall as leaders defer EUR 45bn Ukraine loan to December",
     "summary": "A special European Council summit ended with no agreement on the bloc's 2028-2034 budget and no final decision on new loans for Kyiv.",
@@ -312,17 +338,6 @@
     ]
    },
    {
-    "headline": "Yashar and UTJ reportedly agree principles of Haredi draft law",
-    "summary": "Yashar and the ultra-Orthodox United Torah Judaism party reportedly reached agreement on key principles of legislation governing military service for Haredi men, a long-running dispute in Israeli politics. The reported deal could widen Eisenkot's options as he seeks to form a government.",
-    "dateline": "JERUSALEM",
-    "sources": [
-     {
-      "name": "Times of Israel",
-      "url": "https://www.timesofisrael.com/liveblog-november-26-2026/"
-     }
-    ]
-   },
-   {
     "headline": "Congress weighs Iran war funding as December shutdown deadline nears",
     "summary": "Lawmakers have until 11 December to fund the government, and some Democrats want any package to cut off money for the Iran war. Senate Republican leaders have signalled openness to funding the Pentagon while restricting war spending, while many House Democrats are wary of forcing a shutdown.",
     "dateline": "WASHINGTON",
@@ -354,40 +369,59 @@
    }
   ],
   "briefs": [
+   "Trump called for an investigation into the upward revision of third-quarter GDP growth to 4.3%, describing it as a purposeful error, Time reported.",
+   "Gadi Eisenkot's Yashar party and United Torah Judaism reportedly agreed key principles of a Haredi military draft law, the Times of Israel reported.",
    "Bahrain asked the UN Security Council to hold Iran accountable for the drone attack in Kuwait that killed two Italians.",
    "Romanian President Nicusor Dan said winter could make a Ukraine ceasefire less likely in the short term.",
-   "Croatian Prime Minister Andrej Plenkovic rejected arbitration over Croatia's border dispute with Slovenia on the sidelines of the EU summit.",
-   "House Democrats were set to formally nominate Hakeem Jeffries as their candidate for speaker ahead of their January majority, Punchbowl News reported.",
-   "Chilean President Jose Antonio Kast's approval rating has fallen to new lows eight months into his term, The Intercept reported."
+   "House Democrats were set to formally nominate Hakeem Jeffries as their candidate for speaker ahead of their January majority, Punchbowl News reported."
   ]
  },
  "us": {
   "lead": {
-   "headline": "Thanksgiving storm knocks out power and snarls travel; Macy's parade moved to Saturday",
-   "dek": "Hurricane-force gusts and heavy rain swept the Mid-Atlantic and Northeast on the holiday, forcing the first weather postponement in the parade's history.",
+   "headline": "East Coast begins storm recovery as hundreds of thousands still lack power on Black Friday",
+   "dek": "Rain eased on Friday after a Thanksgiving storm cut electricity to nearly a million customers; the Macy's parade is set for Saturday.",
    "dateline": "NEW YORK",
    "body": [
-    "A powerful storm battered the US East Coast on Thanksgiving Day, bringing down trees and power lines and disrupting one of the busiest travel periods of the year. More than 908,000 utility customers were without electricity late Thursday, according to PowerOutage.us, with Virginia, Maryland, Pennsylvania and New Jersey among the hardest hit.",
-    "Wind gusts reached up to 70 mph. FlightAware recorded hundreds of US flight cancellations and thousands of delays on Thursday, with airports in the Washington and New York areas most affected. Officials from North Carolina to New York had warned of torrential rain, coastal flooding and outages before the system arrived.",
-    "Organisers postponed the 100th Macy's Thanksgiving Day Parade to 8:30 a.m. ET on Saturday, 28 November, the first time the event has been rescheduled because of weather. Executive producer Will Coss said the balloons would be deflated, taken to New Jersey and reinflated on Friday afternoon. New York Mayor Zohran Mamdani will miss the rescheduled parade because of planned foot surgery.",
-    "The National Weather Service said conditions would improve on Friday as the system weakened, and utilities had begun restoring power. Storms also affected parts of the West Coast."
+    "Utilities across the Mid-Atlantic and Northeast worked on Friday to restore electricity after a powerful Thanksgiving Day storm left close to a million customers without power at its peak. More than 500,000 customers remained without service on Friday morning, according to PowerOutage.us data cited in reports, with Pennsylvania and New Jersey hardest hit.",
+    "Heavy rain was winding down over flooded coastal communities, though the National Weather Service still flagged lingering showers, gusty winds and coastal flooding. Officials urged residents to stay away from downed wires and to heed road closures.",
+    "Wind gusts reached up to 70 mph on Thursday, and FlightAware recorded hundreds of US flight cancellations and thousands of delays during one of the busiest travel periods of the year, with Washington and New York-area airports most affected. Disruption eased on Friday.",
+    "Organisers moved the 100th Macy's Thanksgiving Day Parade to 8:30 a.m. ET on Saturday, the first weather-related postponement in its history, with balloons to be reinflated on Friday afternoon. New York Mayor Zohran Mamdani will miss the rescheduled event because of planned foot surgery."
    ],
    "sources": [
     {
-     "name": "CBC News",
-     "url": "https://www.cbc.ca/news/world/u-s-thanksgiving-storm-power-flight-delays-9.7438358"
+     "name": "News4JAX (AP)",
+     "url": "https://www.news4jax.com/news/national/2026/11/27/heavy-rain-winds-down-as-power-remains-out-for-hundreds-of-thousands-on-the-east-coast/"
+    },
+    {
+     "name": "CBS News",
+     "url": "https://www.cbsnews.com/news/thanksgiving-day-storm-northeast-midwest-flooding-power-outages/"
     },
     {
      "name": "Washington Post",
      "url": "https://www.washingtonpost.com/nation/2026/11/25/macys-thanksgiving-day-parade-postponed-by-storm-rescheduled-saturday/"
-    },
-    {
-     "name": "NPR",
-     "url": "https://www.npr.org/2026/11/26/nx-s1-6054079/storms-expected-on-both-coasts-as-millions-travel-for-thanksgiving"
     }
    ]
   },
   "stories": [
+   {
+    "headline": "Trump tells troops Iran war will end 'whenever I want it to be'",
+    "summary": "In Thanksgiving calls with service members from Mar-a-Lago, President Trump said victory over Iran was at hand, that the US was giving Tehran every chance to make a deal, and played down Russian and Chinese support for Iran. Critics, quoted by HuffPost, called the remark about the war's timing callous to deployed troops; the conflict is in its ninth month.",
+    "dateline": "PALM BEACH",
+    "sources": [
+     {
+      "name": "Al Jazeera",
+      "url": "https://www.aljazeera.com/news/2026/11/27/trump-downplays-russia-china-support-for-iran-during-talks-with-us-troops"
+     },
+     {
+      "name": "Israel National News",
+      "url": "https://www.israelnationalnews.com/news/437242"
+     },
+     {
+      "name": "HuffPost",
+      "url": "https://www.huffpost.com/entry/donald-trump-iran-comment-reaction_n_6b092979e4b01f494a036ec4"
+     }
+    ]
+   },
    {
     "headline": "GDP revised up to 4.3% as Trump alleges data errors",
     "summary": "The Commerce Department's second estimate put third-quarter growth at a 4.3% annual rate, up from 3.4% and the fastest since 2023, driven by stronger investment and consumer spending. President Trump called the revision 'A RECORD SETTING ERROR' and accused the government of falsifying data without evidence; the Bureau of Economic Analysis did not immediately comment.",
@@ -462,25 +496,6 @@
       "url": "https://www.washingtonpost.com/business/2026/11/23/senate-gop-leaders-signal-openness-cutting-off-iran-war-funding/"
      }
     ]
-   },
-   {
-    "headline": "Trump's Thanksgiving message targets critics and federal statisticians",
-    "summary": "President Trump issued a formal proclamation marking Thanksgiving in the nation's 250th anniversary year, then posted a Truth Social message aimed at political opponents, immigrants and economists. He was expected to call US service members from Mar-a-Lago on Thursday.",
-    "dateline": "PALM BEACH",
-    "sources": [
-     {
-      "name": "U.S. News (Reuters)",
-      "url": "https://www.usnews.com/news/world/articles/2026-11-26/trump-uses-thanksgiving-message-to-lash-out-at-political-foes-immigrants-federal-government"
-     },
-     {
-      "name": "White House",
-      "url": "https://www.whitehouse.gov/presidential-actions/2026/11/thanksgiving-day-2026/"
-     },
-     {
-      "name": "HuffPost",
-      "url": "https://www.huffpost.com/entry/trumps-happy-thanksgiving-message-is-bursting-with-grievance_n_6b086400e4b01d8bd1dbbe24"
-     }
-    ]
    }
   ],
   "briefs": [
@@ -519,6 +534,44 @@
    ]
   },
   "stories": [
+   {
+    "headline": "Bundestag passes Germany's 2027 budget with heavy borrowing",
+    "summary": "German lawmakers approved the 2027 federal budget on Friday by 317 votes to 260, with Chancellor Friedrich Merz's CDU/CSU-SPD coalition carrying the vote, according to Reuters. Core spending is about €556 billion, of which roughly €123 billion is financed by borrowing; including special funds, new debt for the year is reported to exceed €210 billion. Defence is the largest beneficiary, with about €140 billion including €12 billion for Ukraine, and a cut in electricity tax is funded for 2027 only. The budget now goes to the Bundesrat before taking effect on 1 January.",
+    "dateline": "BERLIN",
+    "sources": [
+     {
+      "name": "onvista (Reuters)",
+      "url": "https://onvista.de/news/2026/11-27-bundestag-beschliesst-bundeshaushalt-fuer-2027-0-20-26581491"
+     },
+     {
+      "name": "QNC News",
+      "url": "https://qncnews.com/2026/11/27/bundestag-approves-2027-budget-with-core-spending-of-555-9-billion-euros/"
+     },
+     {
+      "name": "Breaking The News",
+      "url": "https://breakingthenews.net/Article/Germany's-Bundestag-passes-2027-budget/67654275"
+     }
+    ]
+   },
+   {
+    "headline": "Ukraine says Russia struck two foreign grain ships near Odesa",
+    "summary": "Ukrainian Prime Minister Sergiy Koretskyi said Russian strikes overnight into 26 November hit two foreign-flagged vessels near Odesa carrying more than 100,000 tonnes of grain; the claim has not been independently confirmed. Russia says it does not target civilian objects, and the Kremlin accused Kyiv of trying to extend the war into the Mediterranean and Baltic seas. Attacks on shipping have risen sharply since July, and Italian Prime Minister Giorgia Meloni said the conflict should not spread to the Mediterranean. US President Donald Trump and NATO Secretary-General Mark Rutte have warned Russia against widening the war.",
+    "dateline": "ODESA",
+    "sources": [
+     {
+      "name": "Yahoo News (Reuters)",
+      "url": "https://www.yahoo.com/news/articles/ukraine-says-russia-hits-two-105033322.html"
+     },
+     {
+      "name": "The National",
+      "url": "https://www.thenationalnews.com/news/2026/11/27/russia-ukraine-war-increasingly-expanding-out-to-sea/"
+     },
+     {
+      "name": "IBTimes",
+      "url": "https://www.ibtimes.com/trump-nato-warn-russia-widening-ukraine-war-3810230"
+     }
+    ]
+   },
    {
     "headline": "Russian strikes kill at least 10 across Ukraine as ballistic missiles hit Kyiv",
     "summary": "Russian attacks killed at least 10 people and injured dozens across Ukraine over 25-26 November, according to Ukrainian officials, with ballistic missiles striking Kyiv, where Mayor Vitali Klitschko said a shopping centre was hit. Ukraine's air force said Russia launched ballistic missiles and 113 drones overnight, of which 87 drones were downed or neutralised by morning. Deaths were also reported in Donetsk and Kharkiv regions.",
@@ -565,36 +618,6 @@
     ]
    },
    {
-    "headline": "Hungary's Magyar and Zelenskyy hail 'new chapter' at Uzhhorod meeting",
-    "summary": "Hungarian Prime Minister Péter Magyar made his first official visit to Ukraine on 24 November, meeting Zelenskyy in the western city of Uzhhorod. Magyar announced humanitarian aid worth about 1 billion hryvnias, including medicine and generators, and pressed Kyiv to speed up agreements on the rights of the Hungarian minority. Both leaders called the talks substantive, while Magyar stressed that Hungary does not supply weapons to Ukraine.",
-    "dateline": "UZHHOROD",
-    "sources": [
-     {
-      "name": "Euronews",
-      "url": "https://www.euronews.com/2026/11/25/peter-magyar-and-volodymyr-zelenskyy-open-new-chapter-in-ukraine-hungary-relations"
-     },
-     {
-      "name": "UNITED24 Media",
-      "url": "https://united24media.com/world/the-hungarian-people-stand-with-you-magyar-meets-zelenskyy-in-first-official-talks-24684"
-     }
-    ]
-   },
-   {
-    "headline": "German parliament votes on record-borrowing 2027 budget",
-    "summary": "The Bundestag was scheduled to hold its final vote on Friday on Germany's 2027 federal budget, which foresees spending of roughly €556-561 billion and about €210 billion in new borrowing across the core budget and special funds. Chancellor Merz's coalition added a cut in electricity taxes late in the process. Lawmakers from the CDU/CSU and SPD were expected to provide enough votes for passage.",
-    "dateline": "BERLIN",
-    "sources": [
-     {
-      "name": "Yahoo News (DW)",
-      "url": "https://www.yahoo.com/news/world/articles/german-lawmakers-vote-556-billion-040333694.html"
-     },
-     {
-      "name": "FINCHANNEL",
-      "url": "https://finchannel.com/germanys-2027-budget-advances-with-near-record-borrowing-after-coalition-deal/141569/world-2/2026/11/"
-     }
-    ]
-   },
-   {
     "headline": "Estonia prepares to shut road crossings with Russia from 1 December",
     "summary": "Estonia's government has approved a preliminary six-month closure of all its road border crossings with Russia, starting on 1 December, after blaming Russian military intelligence for a foiled arson plot against a drone manufacturer. Rail freight is exempt. Moscow, which denies the accusations, has accused Tallinn of building a 'new Iron Curtain' and promised a response.",
     "dateline": "TALLINN",
@@ -611,11 +634,11 @@
    }
   ],
   "briefs": [
+   "Hungarian Prime Minister Péter Magyar, on his first official visit to Ukraine, met Zelenskyy in Uzhhorod on 24 November and announced humanitarian aid worth about 1 billion hryvnias.",
    "UK Prime Minister Andy Burnham told parliament on 25 November that any future UK-EU agreement on university tuition fees would be handled separately from the deals announced at last week's EU-UK summit.",
    "The UK government has announced an independent panel on nuclear weapons testing, followed by a prime ministerial statement to parliament on nuclear test veterans.",
    "In France, a joint committee of deputies and senators failed to agree on the social security budget, sending the bill back to the National Assembly.",
-   "French Prime Minister Sébastien Lecornu said he will meet the leaders of each parliamentary group next week to continue talks on the 2027 budget.",
-   "Ukraine said its drones also struck oil storage facilities in Bashkortostan and a military airfield in Russia's Volgograd region."
+   "French Prime Minister Sébastien Lecornu said he will meet the leaders of each parliamentary group next week to continue talks on the 2027 budget."
   ]
  },
  "africa": {
@@ -646,6 +669,32 @@
    ]
   },
   "stories": [
+   {
+    "headline": "DR Congo summons Ugandan envoy over army chief's posts on Walikale",
+    "summary": "Congo's foreign ministry summoned Uganda's top diplomat in Kinshasa on 26 November over social media posts by Ugandan military chief Gen. Muhoozi Kainerugaba that appeared to back an advance on Walikale territory in North Kivu by rebels linked to former president Joseph Kabila. Kinshasa called the remarks particularly serious and asked Kampala to clarify its official position; some reports said Muhoozi also suggested Uganda could take the town itself. Muhoozi has said Uganda's aims are limited to security and that it has no interest in Walikale's minerals; Kampala had not publicly responded to the summons. The two countries have conducted joint operations against the ADF militia since 2021.",
+    "dateline": "KINSHASA",
+    "sources": [
+     {
+      "name": "Yahoo News",
+      "url": "https://www.yahoo.com/news/world/articles/dr-congo-summons-ugandan-envoy-103628146.html"
+     },
+     {
+      "name": "The EastAfrican",
+      "url": "https://www.theeastafrican.co.ke/tea/news/east-africa/muhoozi-remarks-spark-outrage-in-dr-congo-5684850"
+     }
+    ]
+   },
+   {
+    "headline": "UN agencies warn famine risks rising, with Sudan among gravest hotspots",
+    "summary": "The UN's Food and Agriculture Organization and World Food Programme warned on 27 November that the number of hunger hotspots is increasing, naming Sudan, South Sudan, Somalia, northern Nigeria and Yemen as facing the most severe threats. In Sudan, the agencies said famine is a risk in 13 areas of North Darfur and South Kordofan through January 2027.",
+    "dateline": "ROME",
+    "sources": [
+     {
+      "name": "U.S. News & World Report (Reuters)",
+      "url": "https://www.usnews.com/news/world/articles/2026-11-27/un-warns-famine-risks-rising-as-hunger-hotspots-increase"
+     }
+    ]
+   },
    {
     "headline": "South African court sets aside Phala Phala impeachment panel report",
     "summary": "The Western Cape High Court on 25 November set aside in full the Section 89 panel report on the Phala Phala matter, which had been the basis for impeachment proceedings against President Cyril Ramaphosa, finding that the panel applied the wrong legal test. The ruling did not examine the president's conduct itself. The African Transformation Movement, which brought the original motion, says it is consulting lawyers on an appeal, while parliament is seeking legal advice.",
@@ -681,21 +730,6 @@
     ]
    },
    {
-    "headline": "Guinea-Bissau junta postpones elections to 2028",
-    "summary": "Guinea-Bissau's military government has delayed presidential and legislative elections planned for 6 December by two years, to 26 November 2028, citing insufficient technical, material and financial conditions. The decree came on the first anniversary of the November 2025 coup that halted the release of disputed election results. The regional bloc ECOWAS has called for a return to civilian rule.",
-    "dateline": "BISSAU",
-    "sources": [
-     {
-      "name": "RTÉ",
-      "url": "https://www.rte.ie/news/2026/1127/1600846-guinea-bissau/"
-     },
-     {
-      "name": "Yahoo News",
-      "url": "https://www.yahoo.com/news/world/articles/guinea-bissau-presidential-election-delayed-180718006.html"
-     }
-    ]
-   },
-   {
     "headline": "Sudan fighting continues as RSF commander defects to army",
     "summary": "A senior Rapid Support Forces commander has defected to Sudan's army along with eight other commanders, according to a report by The New Arab, and made allegations about mass graves near El Fasher that have not been independently verified. The Council on Foreign Relations' conflict tracker lists RSF drone attacks that killed 19 people in Blue Nile state on 25 November. Analysts estimate the army holds about 60% of the country's territory and the RSF about 40%, mostly in Darfur.",
     "dateline": "KHARTOUM",
@@ -724,25 +758,14 @@
       "url": "https://nation.africa/kenya"
      }
     ]
-   },
-   {
-    "headline": "Nigeria joins UN High Seas Treaty",
-    "summary": "Nigeria has deposited its instrument of ratification of the UN agreement on marine biodiversity in areas beyond national jurisdiction at UN headquarters in New York, Premium Times reported. The move makes Nigeria a party to the treaty ahead of its first Conference of the Parties in January 2027.",
-    "dateline": "ABUJA",
-    "sources": [
-     {
-      "name": "Premium Times",
-      "url": "https://www.premiumtimesng.com/business/business-news/928016-exclusive-nigeria-submits-bbnj-treaty-ratification-instrument-to-un.html"
-     }
-    ]
    }
   ],
   "briefs": [
+   "Guinea-Bissau's military government has pushed elections planned for 6 December back by two years to 26 November 2028, citing inadequate technical and financial conditions.",
+   "Nigeria has ratified the UN High Seas Treaty on marine biodiversity, becoming a party ahead of the first Conference of the Parties in January 2027.",
    "UNICEF says 72% of children under five with confirmed Ebola infection in the DR Congo outbreak have died.",
    "Five EU countries' plan for a migrant return hub in Rwanda has drawn concern from UN human rights chief Volker Türk, whose office says it has not seen the text of the arrangement.",
-   "Human Rights Watch says Burkina Faso's military government is pursuing critics abroad through arrest warrants and extradition requests.",
-   "South Sudan has pushed its first elections back to February, with results expected on 15 February.",
-   "Egyptian officials said early local reports that a fallen high-voltage cable contributed to the Cairo tanker crash had not been confirmed."
+   "Human Rights Watch says Burkina Faso's military government is pursuing critics abroad through arrest warrants and extradition requests."
   ]
  },
  "americas": {
@@ -1166,78 +1189,78 @@
  },
  "markets": {
   "lead": {
-   "headline": "AI shares lead a holiday rebound as Wall Street returns for a half-day Black Friday",
-   "dek": "Futures pointed sharply higher before Friday's 1pm close as investors bought beaten-down chip stocks, though a near-certain December Fed hike and a fear gauge near 28 kept the mood fragile.",
+   "headline": "Wall Street opens higher in Black Friday half-day as chipmakers rebound, but Nvidia lags",
+   "dek": "Stocks extended a volatile Thanksgiving week's gains in thin holiday trading, led by memory and semiconductor shares, while a report on halted Nvidia shipments to Southeast Asia weighed on the AI bellwether.",
    "dateline": "NEW YORK",
    "body": [
-    "US stock futures climbed ahead of Friday's shortened session, the last trading day of Thanksgiving week, as buyers returned to artificial-intelligence stocks that have been battered through November. Early Friday, S&P 500 futures were up about 1.7% and Dow futures about 1%, while Nasdaq 100 futures gained close to 3%. Nvidia rose roughly 4% in premarket trading and memory maker Micron about 6%. The NYSE and Nasdaq close at 1pm ET and the bond market at 2pm ET.",
-    "The bounce follows a turbulent week. On Wednesday, the last full session before the holiday, the S&P 500 fell as much as 3.2% and the Nasdaq as much as 4.6% intraday before clawing back most of the losses. The S&P closed down 0.3% at 7,182.78, the Nasdaq down 0.6% at 23,585.80, and the Dow rose 0.3% to 50,182.95 after erasing a drop of more than 1,100 points. Small caps did better still. Even so, the indexes were on track for strong weekly gains, with the S&P up about 3.9% for the week through Wednesday, according to AP figures.",
-    "The swings have centred on AI. Nvidia shares jumped 31% on Monday after its board reinstated Jensen Huang as chief executive, then gave back ground as doubts resurfaced over whether heavy borrowing to build data centres will pay off. Hotter-than-expected core inflation data also cut short the early-week rally. The VIX volatility index closed Wednesday at 28.03, a level that signals continued nervousness, and analysts were divided on whether the selling has run its course.",
-    "Monetary policy is the other weight on markets. Traders see a quarter-point Federal Reserve rate increase at the 8-9 December meeting as all but certain after October PCE inflation reached 3.8%, and some Fed officials have floated larger or additional moves. Treasury yields have nonetheless eased from their mid-November highs above 5%, with the 10-year near 4.86% at Wednesday's close.",
-    "Thin holiday trading can magnify price moves, and Black Friday volumes are typically well below average. Investors will also be watching early holiday-shopping data for signs of how consumers are holding up under higher rates and new tariffs."
+    "US stocks rose in the first hour of Friday's shortened session. As of 9:51am Eastern time, the S&P 500 was up 0.7%, the Dow Jones Industrial Average was up 334 points, or 0.6%, and the Nasdaq Composite was up 0.9%, according to the Associated Press. A later AP update showed the gains widening, with the S&P 500 up 1.2% and the Nasdaq up 1.5%. Stock markets close at 1pm ET (18:00 UTC) and bond markets an hour later.",
+    "Gains were smaller than futures had signalled before the bell, when Nasdaq 100 futures were up more than 2%. Chipmakers led, with memory maker Sandisk among the S&P 500's biggest gainers and Broadcom up about 2% early. Nvidia moved against the trend, trading down 1.7% in the AP's early snapshot after the Financial Times reported that the company had told partners to stop shipping AI servers to Malaysia, Singapore, Thailand and Indonesia under tighter US export rules.",
+    "Every major US index is on track for a weekly gain after Monday's rally, which followed Nvidia's reinstatement of Jensen Huang as chief executive, and despite sharp swings on Tuesday and Wednesday. The 10-year Treasury yield was little changed at about 4.89% on Friday morning, compared with 4.85% at Wednesday's close and a mid-November high of about 5.15%. Markets continue to price a quarter-point Federal Reserve rate increase at the 8-9 December meeting.",
+    "In Europe, the Stoxx 600 rose 0.9% to 642.65 in early trade, with technology shares up 2.3% led by ASML, ASM International and Infineon, and miners also higher. The index was on course for a weekly gain after one of its worst weeks since March 2025, though it remains down for November. Germany's DAX and Britain's FTSE 100 gained about 0.7% to 0.8% in the morning.",
+    "Oil held near $96 to $97 a barrel ahead of Sunday's online OPEC+ meeting, where producers are reported to have agreed in principle to keep first-quarter output targets unchanged. Light holiday volumes can exaggerate price moves, and analysts cautioned that big swings on thin trading may not last."
    ],
    "sources": [
     {
-     "name": "Forbes",
-     "url": "https://www.forbes.com/sites/siladityaray/2026/11/27/stock-futures-surge-as-battered-ai-shares-rebound-ahead-of-shorterned-friday-trading/"
+     "name": "AP via Local10",
+     "url": "https://www.local10.com/business/2026/11/27/stocks-rise-and-keep-wall-street-on-track-to-close-out-an-erratic-week-with-big-gains/"
     },
     {
-     "name": "AP via WTOP",
-     "url": "https://wtop.com/national/2026/11/how-major-us-stock-indexes-fared-wednesday-11-25-2026"
+     "name": "AP via CP24",
+     "url": "https://www.cp24.com/news/money/2026/11/27/stocks-rise-and-keep-wall-street-on-track-to-close-out-an-erratic-week-with-big-gains/"
     },
     {
      "name": "Yahoo Finance",
-     "url": "https://finance.yahoo.com/markets/live/stock-market-today-firday-november-27-dow-sp-500-nasdaq-black-friday-holiday-091152065.html"
+     "url": "https://finance.yahoo.com/markets/article/chip-stocks-lead-a-black-friday-rally-but-nvidia-misses-out-alphacheck-145727185.html"
     }
    ]
   },
   "stories": [
    {
-    "headline": "Markets price in a December Fed hike as yields slip from 5%",
-    "summary": "CME FedWatch showed a quarter-point rate rise at the December meeting fully priced as of 24 November, after New York Fed President John Williams said there was still work to do to bring inflation back to 2%. The 10-year Treasury yield, which topped 5% earlier in the month, edged down to about 4.90% on Tuesday as investors weighed the economy's resilience against the hawkish outlook.",
+    "headline": "Stoxx 600 heads for weekly gain as chip stocks lead European rebound",
+    "summary": "Europe's benchmark climbed about 0.9% to 642.65 by 08:12 GMT and held a gain of around 1% at midday, with technology the strongest sector as semiconductor names including ASML and Infineon rose. Miners also advanced. The rebound put the index on track for a weekly rise despite a weak November, as investors weighed new US tariffs and expectations of an ECB rate rise in December.",
+    "dateline": "LONDON",
+    "sources": [
+     {
+      "name": "Reuters via Investing.com",
+      "url": "https://www.investing.com/news/stock-market-news/european-stocks-extend-recovery-as-tech-miners-advance-5053129"
+     },
+     {
+      "name": "ADVFN",
+      "url": "https://uk.advfn.com/market-news/article/27003/european-stocks-extend-recovery-as-stoxx-600-heads-for-weekly-gain-despite-november-losses"
+     }
+    ]
+   },
+   {
+    "headline": "Treasury yields edge up in holiday trading, still well below November peak",
+    "summary": "The 10-year Treasury yield was around 4.89% to 4.90% on Friday, a few basis points above Wednesday's close of about 4.85% but well below the 5.15% reached on 13 November. Investors expect a quarter-point Fed rate increase in December after hotter inflation data; the bond market closes early at 2pm ET.",
     "dateline": "NEW YORK",
     "sources": [
      {
-      "name": "CNBC",
-      "url": "https://www.cnbc.com/amp/2026/11/24/treasury-yields-bonds-inflation.html"
+      "name": "Trading Economics",
+      "url": "https://tradingeconomics.com/united-states/government-bond-yield"
      },
      {
-      "name": "CNBC",
-      "url": "https://www.cnbc.com/2026/11/12/us-treasurys-bonds-yields.html"
+      "name": "24/7 Wall St.",
+      "url": "https://247wallst.com/investing/2026/11/27/stock-market-today-markets-off-to-a-strong-black-friday-start/"
+     },
+     {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/markets/live/stock-market-today-firday-november-27-dow-sp-500-nasdaq-black-friday-holiday-091152065.html"
      }
     ]
    },
    {
-    "headline": "Brent heads for first weekly gain in four weeks on Middle East supply fears",
-    "summary": "Brent crude traded near $96.60 a barrel early Friday, on course for a weekly rise of about 4% after a Houthi attack on a Saudi refinery and attacks on tankers near the Strait of Hormuz revived supply concerns. Prices are still down sharply for November amid expectations of a supply glut, and OPEC+ meets online on Sunday to consider its output policy for 2027.",
+    "headline": "Oil holds near $97 before OPEC+ meets on 2027 output",
+    "summary": "Brent crude traded in a range of roughly $96 to $97 a barrel on Friday and was on course for its first weekly gain in four weeks, after attacks on tankers near the Strait of Hormuz and on Saudi energy facilities revived supply concerns. OPEC+ meets online on Sunday; citing Reuters sources, reports said producers have agreed in principle to leave first-quarter 2027 targets unchanged. The January Brent contract expires on Monday.",
     "dateline": "LONDON",
     "sources": [
      {
-      "name": "CNBC",
-      "url": "https://cnbc.com/2026/11/25/oil-wti-brent-hormuz-middle-east.html"
+      "name": "FinanceFeeds",
+      "url": "https://financefeeds.com/brent-crude-oil-price-96-30-friday-opec-plus-set-to-hold-q1-output-sunday-bull-100-bear-92-57/"
      },
      {
-      "name": "Zee Business",
-      "url": "https://www.zeebiz.com/markets/commodities/news-brent-crude-rises-4-in-a-week-set-for-first-weekly-gain-in-four-weeks-whats-driving-oil-prices-406068"
-     },
-     {
-      "name": "Admiral Markets",
-      "url": "https://admiralmarkets.com/analytics/traders-blog/opec-meeting-november-29-2026-preview"
-     }
-    ]
-   },
-   {
-    "headline": "European shares rally as tech leads a Thanksgiving rebound",
-    "summary": "With Wall Street shut on Thursday, the Stoxx 600 rose 1.83% to 637.50, Germany's DAX gained 2.14% and London's FTSE 100 climbed 1.75% to 10,609.30, led by technology stocks after Wednesday's sell-off. Gains carried into Friday morning, with all major regional indices trading higher in early deals.",
-    "dateline": "LONDON",
-    "sources": [
-     {
-      "name": "investingLive",
-      "url": "https://investinglive.com/stocks/european-stocks-surge-s-p-500-futures-finish-higher-in-thanksgiving-trading/"
-     },
-     {
-      "name": "Edge Consultancy",
-      "url": "https://edgeconsultancykw.com/europe-market-wrap-27-november-2026/"
+      "name": "Invezz",
+      "url": "https://invezz.com/news/2026/11/27/brent-crude-oil-price-forecast-100-opec-meeting/"
      }
     ]
    },
@@ -1288,42 +1311,42 @@
    }
   ],
   "briefs": [
+   "Nasdaq 100 futures were up 2.4% at 8:06am ET before the open, larger than the cash index's early gain (MLQ.ai).",
+   "The S&P 500 remains below its one-year high of 7,844.52 (24/7 Wall St.).",
+   "France's Lumibird jumped about 18% after a deal with Thales, among Europe's biggest gainers on Friday (MLQ.ai).",
    "Gold rebounded more than 2% to above $3,650 an ounce on Friday after touching a 15-month low near $3,427 on Wednesday (FXStreet).",
-   "US October PCE inflation reached 3.8%, with core inflation at 3.3%, reinforcing expectations for Fed tightening (INDmoney).",
-   "Pablo Hernandez de Cos has been endorsed to succeed Christine Lagarde as ECB president; analysts expect little change in policy direction (FXStreet).",
-   "Polymarket put the odds of a quarter-point Fed hike in December at 93.5% as of 25 November (Rio Times).",
-   "ANZ analysts said Brent could still top $100 a barrel without a new Middle East escalation, but only with evidence of tighter supply (Zee Business)."
+   "US October PCE inflation reached 3.8%, with core inflation at 3.3%, reinforcing expectations for Fed tightening (INDmoney)."
   ],
   "snapshot": [
    {
     "name": "S&P 500",
-    "value": "7,182.78",
-    "change": "-0.25%",
-    "asof": "Nov 25 close"
+    "value": "~7,233",
+    "change": "+0.7%",
+    "asof": "Nov 27, 9:51am ET (14:51 UTC)"
    },
    {
     "name": "Dow Jones",
-    "value": "50,182.95",
-    "change": "+0.33%",
-    "asof": "Nov 25 close"
+    "value": "~50,517",
+    "change": "+334 pts (+0.6%)",
+    "asof": "Nov 27, 9:51am ET (14:51 UTC)"
    },
    {
     "name": "Nasdaq Composite",
-    "value": "23,585.80",
-    "change": "-0.62%",
-    "asof": "Nov 25 close"
+    "value": "~23,798",
+    "change": "+0.9%",
+    "asof": "Nov 27, 9:51am ET (14:51 UTC)"
    },
    {
     "name": "FTSE 100",
-    "value": "10,609.30",
-    "change": "+1.75%",
-    "asof": "Nov 26 close"
+    "value": "10,687.81",
+    "change": "+0.7%",
+    "asof": "Nov 27, 11:10 GMT"
    },
    {
     "name": "Stoxx 600",
-    "value": "637.50",
-    "change": "+1.83%",
-    "asof": "Nov 26 close"
+    "value": "643.25",
+    "change": "+0.98%",
+    "asof": "Nov 27, ~11:19 GMT (12:19 CET)"
    },
    {
     "name": "Nikkei 225",
@@ -1339,75 +1362,146 @@
    },
    {
     "name": "US 10Y yield",
-    "value": "4.86%",
-    "change": "-7 bp",
-    "asof": "Nov 25 close"
+    "value": "4.89%",
+    "change": "+4 bp",
+    "asof": "Nov 27, US morning"
    },
    {
     "name": "Brent",
-    "value": "$96.61",
-    "change": "+$0.04",
-    "asof": "Nov 27, 04:50 GMT"
+    "value": "$96.30",
+    "change": "-$0.27",
+    "asof": "Nov 27, 13:00 GMT"
    },
    {
     "name": "WTI",
-    "value": "$85.78",
-    "change": "n/a",
-    "asof": "Nov 27, early Asia"
+    "value": "$85.18",
+    "change": "+0.37%",
+    "asof": "Nov 27, 12:18 GMT (7:18am ET)"
    },
    {
     "name": "Gold",
-    "value": "above $3,650",
+    "value": "~$3,650",
     "change": "+2% (approx.)",
     "asof": "Nov 27, European morning"
    },
    {
     "name": "EUR/USD",
-    "value": "1.0970",
-    "change": "flat",
-    "asof": "Nov 27, European morning"
+    "value": "~1.0950",
+    "change": "-0.2% (approx.)",
+    "asof": "Nov 27, ~09:40 GMT"
    },
    {
     "name": "USD/JPY",
-    "value": "159.0+",
+    "value": "~159.0",
     "change": "flat",
     "asof": "Nov 27, European morning"
    },
    {
     "name": "Bitcoin",
-    "value": "$61,775",
-    "change": "+1.4% (24h)",
-    "asof": "Nov 27, 05:55 UTC"
+    "value": "$61,538",
+    "change": "+1.7% (24h)",
+    "asof": "Nov 27, 12:59 UTC (7:59am ET)"
    }
   ]
  },
  "stocks": {
   "lead": {
-   "headline": "Nvidia's whiplash week: a CEO restored, a 31% surge and a fresh test for the AI trade",
-   "dek": "Shares in the world's most-watched chipmaker swung wildly after Jensen Huang's reinstatement, setting the tone for a volatile holiday week across tech.",
-   "dateline": "SANTA CLARA",
+   "headline": "Chipmakers lead Black Friday bounce as Nvidia slips on Southeast Asia shipment halt",
+   "dek": "Memory and semiconductor stocks rallied in early holiday trading, but the AI bellwether turned lower after a report that it had paused server shipments to four countries under new US export curbs.",
+   "dateline": "NEW YORK",
    "body": [
-    "Nvidia's board reinstated Jensen Huang as president and chief executive on Monday 23 November, about 11 days after he resigned. Interim chief Colette Kress returned to her role as chief financial officer, and Huang rejoined the board. The company said a committee of independent directors had investigated the circumstances, and also said Huang had been the target of a foreign intelligence effort.",
-    "Investors cheered. Nvidia's shares closed up 31% on the day of the announcement, pulling the wider market sharply higher. But the rally proved hard to hold: the stock fell back on Tuesday and slid 3.9% on Wednesday as worries returned about whether AI customers borrowing heavily to build data centres can earn back their spending. By Monday the company had lost more than $2 trillion in market value from its October peak, according to reports.",
-    "The reinstatement has drawn political attention. NBC reported that President Donald Trump welcomed Huang's return and said he had spoken with the board, while congressional Democrats criticised the move and pledged an investigation. CNBC noted that an internal review and California and federal scrutiny are continuing.",
-    "On Friday, Nvidia rose about 4% in premarket trading to around $155 as investors returned from the holiday to buy beaten-down AI names. Whether that bounce sticks may depend on the Fed's December decision and on fresh evidence about AI spending, with analysts split on whether the sell-off has stabilised."
+    "Semiconductor shares led US stocks higher at the start of Friday's half-day session. Sandisk rose about 11% before the opening bell, the biggest gain in the S&P 500 at that stage, and Marvell Technology climbed about 8.6% ahead of its earnings on 1 December. Broadcom was up about 2% in early trading, according to the Associated Press. Gains in some names faded after the open, and one early report put Sandisk's rise at about 6%.",
+    "Nvidia did not share in the rally. After rising more than 2% before the open, the stock was down 1.7% in the AP's 9:51am ET snapshot. The Financial Times reported on Thursday that Nvidia had told manufacturing partners to halt shipments of servers containing its AI chips to Malaysia, Singapore, Thailand and Indonesia, after the US began requiring licences for advanced AI chip exports to those countries and Brazil. It was unclear whether the pause is temporary.",
+    "The shipment report adds to a turbulent stretch for Nvidia. Its shares jumped 31% on Monday after its board reinstated Jensen Huang as chief executive, then fell back, closing Wednesday at $149.30, nearly 39% below their October high of $243.37. Investors are weighing whether heavy borrowing by AI customers to build data centres will pay off.",
+    "Outside tech, Vertex Pharmaceuticals fell more than 7% after the FDA extended its review of a biologics application by up to three months, and Altria slipped about 1.9% after confirming it is considering a bid for Imperial Brands. SpaceX shares rose after Elon Musk said he would give a SpaceX share to every child in America each year. Analysts noted that big moves on light holiday volume may not last."
    ],
    "sources": [
     {
-     "name": "Nvidia",
-     "url": "https://nvidianews.nvidia.com/news/nvidia-board-reinstates-jensen-huang-as-president-ceo-and-board-director"
+     "name": "Yahoo Finance",
+     "url": "https://finance.yahoo.com/markets/article/chip-stocks-lead-a-black-friday-rally-but-nvidia-misses-out-alphacheck-145727185.html"
+    },
+    {
+     "name": "Forbes",
+     "url": "https://www.forbes.com/sites/siladityaray/2026/11/26/nvidia-reportedly-halts-ai-chip-shipments-to-southeast-asia-as-us-tightens-china-curbs/"
     },
     {
      "name": "CNBC",
-     "url": "https://www.cnbc.com/2026/11/23/nvidia-jensen-huang-ceo.html"
-    },
-    {
-     "name": "NBC News",
-     "url": "https://www.nbcnews.com/tech/tech-news/nvidia-reinstates-jensen-huang-rcna610864"
+     "url": "https://www.cnbc.com/2026/11/27/stocks-moving-the-most-today-live-updates.html"
     }
    ]
   },
   "stories": [
+   {
+    "headline": "Nvidia pauses AI server shipments to four Southeast Asian countries",
+    "summary": "Nvidia told its manufacturing partners to stop shipping servers with its AI chips to Malaysia, Singapore, Thailand and Indonesia, according to a Financial Times report, after new US export rules required licences for those markets and Brazil, with exemptions for qualifying US-based firms. The move comes as Washington tries to limit Chinese AI developers' access to advanced chips; reports said Nvidia had not commented.",
+    "dateline": "SANTA CLARA",
+    "sources": [
+     {
+      "name": "Forbes",
+      "url": "https://www.forbes.com/sites/siladityaray/2026/11/26/nvidia-reportedly-halts-ai-chip-shipments-to-southeast-asia-as-us-tightens-china-curbs/"
+     },
+     {
+      "name": "Engadget",
+      "url": "https://www.engadget.com/2329200/nvidia-reportedly-halts-chip-shipments-to-southeast-asia/"
+     }
+    ]
+   },
+   {
+    "headline": "Memory stocks lead the early chip rally",
+    "summary": "Sandisk was the S&P 500's top gainer before Friday's open, up about 11%, and Marvell rose about 8.6% in premarket trading. Sandisk has lost roughly three-quarters of its value since its June peak, and the bounce came as investors returned to beaten-down semiconductor names after a weak November for tech.",
+    "dateline": "NEW YORK",
+    "sources": [
+     {
+      "name": "Blockonomi",
+      "url": "https://blockonomi.com/todays-market-movers-sandisk-marvell-nvidia-lead-black-friday-tech-rebound/"
+     },
+     {
+      "name": "MLQ.ai",
+      "url": "https://mlq.ai/news/nasdaq-futures-rise-24-before-black-friday-half-day-as-chips-rebound/"
+     }
+    ]
+   },
+   {
+    "headline": "Vertex falls after FDA extends review",
+    "summary": "Vertex Pharmaceuticals shares fell more than 7% after the US Food and Drug Administration extended its review of the company's biologics licence application by up to three months, setting a target date of no later than 28 February 2027.",
+    "dateline": "BOSTON",
+    "sources": [
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/27/stocks-moving-the-most-today-live-updates.html"
+     }
+    ]
+   },
+   {
+    "headline": "SpaceX rises after Musk pledges annual share gift to American children",
+    "summary": "SpaceX shares gained between about 3% and 6% in early trading, according to different reports, after Elon Musk said he would donate another SpaceX share to every child in the United States each year.",
+    "dateline": "HAWTHORNE, CALIFORNIA",
+    "sources": [
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/27/stocks-moving-the-most-today-live-updates.html"
+     },
+     {
+      "name": "TokenPost",
+      "url": "https://www.tokenpost.com/news/investing/63476"
+     }
+    ]
+   },
+   {
+    "headline": "Altria slips as it weighs Imperial Brands bid",
+    "summary": "Altria shares fell about 1.9% on Friday after the Marlboro maker confirmed it is considering an offer for British tobacco group Imperial Brands, potentially alongside Japan Tobacco. Imperial jumped 13.3% on Thursday and Japan Tobacco closed about 4.5% higher in Tokyo on Friday.",
+    "dateline": "RICHMOND, VIRGINIA",
+    "sources": [
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/27/stocks-moving-the-most-today-live-updates.html"
+     },
+     {
+      "name": "Reuters via Investing.com",
+      "url": "https://www.investing.com/news/stock-market-news/japan-tobacco-shares-surge-on-talk-it-may-acquire-part-of-imperial-5053257"
+     }
+    ]
+   },
    {
     "headline": "Anthropic slips below its $83 IPO price days after debut",
     "summary": "Anthropic shares closed at about $81.91 on 24 November, down 6.5% and below their $83 offer price in only the fourth trading session, and traded near $79 the next day. Coverage linked the slide to the end of underwriter price support, large committed spending disclosed in its filing and share sales by its co-founders, though many analysts kept positive ratings.",
@@ -1422,124 +1516,64 @@
       "url": "https://www.bloomberg.com/news/articles/2026-11-24/anthropic-breaks-below-83-ipo-price-in-premarket-trading"
      }
     ]
-   },
-   {
-    "headline": "Dell beats on AI servers after a 12% sell-off",
-    "summary": "Dell shares fell 12% to $295.28 on Tuesday amid a broad AI-hardware sell-off, then rose about 3% after hours when the company reported revenue of $54.9 billion and AI-server revenue of $22 billion. It raised its full-year revenue guidance to $202 billion and approved another $25 billion of buybacks.",
-    "dateline": "ROUND ROCK, TEXAS",
-    "sources": [
-     {
-      "name": "The Motley Fool",
-      "url": "https://www.fool.com/investing/2026/11/24/dell-just-reported-earnings-and-raised-its-forecast-by-usd10-billion-is-the-stock-a-buy-after-tuesday-s-selloff/"
-     },
-     {
-      "name": "The Next Web",
-      "url": "https://thenextweb.com/news/dell-q3-fy27-earnings-ai-server-backlog-202bn-forecast"
-     }
-    ]
-   },
-   {
-    "headline": "Memory makers lead Friday's premarket chip bounce",
-    "summary": "Micron rose about 6.4% to $640 before Friday's open as investors returned to semiconductor names, with memory chipmakers among the strongest gainers. Nasdaq 100 futures were up nearly 3%, though the VIX near 28 pointed to lingering caution.",
-    "dateline": "NEW YORK",
-    "sources": [
-     {
-      "name": "Forbes",
-      "url": "https://www.forbes.com/sites/siladityaray/2026/11/27/stock-futures-surge-as-battered-ai-shares-rebound-ahead-of-shorterned-friday-trading/"
-     },
-     {
-      "name": "The Globe and Mail",
-      "url": "https://www.theglobeandmail.com/investing/markets/inside-the-market/market-news/article-premarket-nasdaq-futures-surge-as-investors-pile-back-into-battered-ai/"
-     }
-    ]
-   },
-   {
-    "headline": "Chip and hardware earnings disappoint as ADI and Ambarella tumble",
-    "summary": "Analog Devices fell 17.4% on 24 November after its results, well beyond the move options traders had priced, while Ambarella dropped sharply after missing earnings forecasts and issuing weak guidance. Semtech and Dycom also fell around 17-18% on the day.",
-    "dateline": "NEW YORK",
-    "sources": [
-     {
-      "name": "Earnings Watcher",
-      "url": "https://earnings-watcher.com/wiki/earnings-reactions-2026-11-24"
-     },
-     {
-      "name": "GuruFocus",
-      "url": "https://www.gurufocus.com/news/9218592/ambarella-amba-shares-plunge-44-after-earnings-miss-and-weak-guidance"
-     }
-    ]
-   },
-   {
-    "headline": "Japan Tobacco climbs on talk of an Imperial carve-up",
-    "summary": "Japan Tobacco shares closed up about 4.5% in Tokyo on Friday, outpacing a 1.7% gain in the Topix, after reports that it is studying a deal for Imperial Brands, possibly alongside Altria. The stock had slumped earlier in November after JT lost control of its Russian subsidiaries.",
-    "dateline": "TOKYO",
-    "sources": [
-     {
-      "name": "Reuters via Investing.com",
-      "url": "https://www.investing.com/news/stock-market-news/japan-tobacco-shares-surge-on-talk-it-may-acquire-part-of-imperial-5053257"
-     }
-    ]
-   },
-   {
-    "headline": "Insmed and Sanofi both rise on $41 billion takeover",
-    "summary": "Insmed shares jumped about 14% in premarket trading to around $170 after Sanofi agreed to buy the company for $175 a share in cash, while Sanofi's own stock rose about 5% to a more than one-year high. Insmed had already rallied on earlier reports of the approach.",
-    "dateline": "PARIS",
-    "sources": [
-     {
-      "name": "Investing.com",
-      "url": "https://www.investing.com/news/stock-market-news/sanofi-to-acquire-insmed-in-41-billion-cash-deal-5047167"
-     }
-    ]
    }
   ],
   "briefs": [
-   "Kohl's shares rose 19.5% on 24 November, while Dollar Tree gained 11.2% (Earnings Watcher).",
-   "Amentum Holdings climbed 20.1% on 24 November (Earnings Watcher).",
-   "Li Auto rose 11% after its third-quarter revenue beat estimates (Zacks via MetaTrader).",
-   "Small caps outperformed on Wednesday, with the Russell 2000 up 0.7% to 2,704.06 (AP).",
-   "South Korea's Kospi jumped 4.34% to 4,915.68 on Friday as chip stocks rebounded (Bangkok Post)."
+   "Broadcom rose about 2% and Microsoft 0.5% in early Friday trading (AP).",
+   "Nvidia closed Wednesday at $149.30, down 3.91% on the day (Forbes).",
+   "Technology shares were the biggest gainers in Europe on Friday morning, up 2.3%, led by ASML, ASM International and Infineon (Reuters).",
+   "South Korea's Kospi jumped 4.34% to 4,915.68 on Friday as chip stocks rebounded (Bangkok Post).",
+   "Sanofi agreed on 24 November to buy Insmed for $175 a share in cash, about $41 billion (Investing.com)."
   ],
   "movers": [
    {
+    "ticker": "SNDK",
+    "name": "Sandisk",
+    "move": "+11%",
+    "why": "Led premarket chip rebound as the S&P 500's top gainer before the open; memory stocks have been heavily sold since June",
+    "asof": "Nov 27 premarket"
+   },
+   {
+    "ticker": "MRVL",
+    "name": "Marvell Technology",
+    "move": "+8.6%",
+    "why": "Chip rebound ahead of its earnings on 1 December",
+    "asof": "Nov 27 premarket"
+   },
+   {
     "ticker": "NVDA",
     "name": "Nvidia",
-    "move": "+4.2%",
-    "why": "Premarket rebound in battered AI stocks after a volatile week following Jensen Huang's reinstatement",
-    "asof": "Nov 27 premarket"
+    "move": "-1.7%",
+    "why": "Gave up premarket gains after FT reported it halted AI server shipments to four Southeast Asian countries",
+    "asof": "Nov 27, 9:51am ET"
    },
    {
-    "ticker": "MU",
-    "name": "Micron",
-    "move": "+6.4%",
-    "why": "Memory makers led Friday's early chip-stock bounce",
-    "asof": "Nov 27 premarket"
+    "ticker": "AVGO",
+    "name": "Broadcom",
+    "move": "+2%",
+    "why": "Joined the broad semiconductor rebound",
+    "asof": "Nov 27, 9:51am ET"
    },
    {
-    "ticker": "ANT",
-    "name": "Anthropic",
-    "move": "-6.5%",
-    "why": "Fell below its $83 IPO price in its fourth trading session",
-    "asof": "Nov 24 close"
+    "ticker": "VRTX",
+    "name": "Vertex Pharmaceuticals",
+    "move": "-7%",
+    "why": "FDA extended review of its biologics application by up to three months, to 28 February 2027",
+    "asof": "Nov 27, early trading"
    },
    {
-    "ticker": "DELL",
-    "name": "Dell Technologies",
-    "move": "-12%",
-    "why": "Caught in AI-hardware sell-off before results; rose about 3% after hours on strong AI-server sales",
-    "asof": "Nov 24 close"
+    "ticker": "MO",
+    "name": "Altria",
+    "move": "-1.9%",
+    "why": "Weighing a possible all-cash offer for Imperial Brands",
+    "asof": "Nov 27, early trading"
    },
    {
-    "ticker": "ADI",
-    "name": "Analog Devices",
-    "move": "-17.4%",
-    "why": "Shares slumped after quarterly results",
-    "asof": "Nov 24 close"
-   },
-   {
-    "ticker": "IMB.L",
-    "name": "Imperial Brands",
-    "move": "+13.3%",
-    "why": "Altria confirmed it is weighing an all-cash bid; Japan Tobacco also reported to be interested",
-    "asof": "Nov 26 close"
+    "ticker": "SPCX",
+    "name": "SpaceX",
+    "move": "+3% to +6%",
+    "why": "Elon Musk said he would give a SpaceX share to every child in America each year",
+    "asof": "Nov 27, early trading"
    },
    {
     "ticker": "2914.T",
@@ -1547,13 +1581,6 @@
     "move": "+4.5%",
     "why": "Reports it may acquire part of Imperial Brands",
     "asof": "Nov 27 close"
-   },
-   {
-    "ticker": "INSM",
-    "name": "Insmed",
-    "move": "+14%",
-    "why": "Agreed $175-a-share cash takeover by Sanofi",
-    "asof": "Nov 24 premarket"
    }
   ]
  },
@@ -1586,6 +1613,47 @@
   },
   "stories": [
    {
+    "headline": "Nvidia halts AI server shipments to Southeast Asia under new US export rules",
+    "summary": "Nvidia instructed partners to stop shipping AI servers to Malaysia, Singapore, Thailand and Indonesia, the Financial Times reported, after Washington began requiring licences for advanced chip exports to those countries and Brazil to curb Chinese access. The freeze also covers server makers that package Nvidia chips; US-owned operators appear to be exempt, and it is unclear how long the pause will last.",
+    "dateline": "SANTA CLARA",
+    "sources": [
+     {
+      "name": "Forbes",
+      "url": "https://www.forbes.com/sites/siladityaray/2026/11/26/nvidia-reportedly-halts-ai-chip-shipments-to-southeast-asia-as-us-tightens-china-curbs/"
+     },
+     {
+      "name": "Engadget",
+      "url": "https://www.engadget.com/2329200/nvidia-reportedly-halts-chip-shipments-to-southeast-asia/"
+     }
+    ]
+   },
+   {
+    "headline": "FDA extends review of Vertex biologics application",
+    "summary": "The FDA has extended its review of a Vertex Pharmaceuticals biologics licence application by up to three months, with a decision now due by 28 February 2027. Vertex shares fell more than 7% on Friday.",
+    "dateline": "BOSTON",
+    "sources": [
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/27/stocks-moving-the-most-today-live-updates.html"
+     }
+    ]
+   },
+   {
+    "headline": "Black Friday online sales forecast at $12.9 billion as shoppers hunt bargains",
+    "summary": "Adobe expects US online spending of about $12.9 billion on Black Friday, up 9.2% from last year, after tracking $82.5 billion in online sales from 1 to 22 November. The National Retail Federation says fewer people plan to shop over the holiday weekend as households watch budgets, even as it expects November-December sales to top $1 trillion.",
+    "dateline": "NEW YORK",
+    "sources": [
+     {
+      "name": "Digital Commerce 360",
+      "url": "https://www.digitalcommerce360.com/2026/11/25/adobe-online-holiday-spending-data/"
+     },
+     {
+      "name": "Forbes",
+      "url": "https://www.forbes.com/sites/gabrielalinzainescu/2026/11/16/black-friday-2026-becomes-stock-up-season-for-everyday-essentials/"
+     }
+    ]
+   },
+   {
     "headline": "Sanofi agrees $41 billion cash deal for Insmed",
     "summary": "Sanofi will pay $175 per share in cash for US drugmaker Insmed, valuing it at about $41 billion and marking 2026's largest pharmaceutical deal, to strengthen its respiratory and rare-disease pipeline. The deal, announced on 24 November and backed by both boards, is expected to close in the first half of 2027 and will be funded with cash and debt.",
     "dateline": "PARIS",
@@ -1616,21 +1684,6 @@
     ]
    },
    {
-    "headline": "Black Friday online sales forecast at $12.9 billion as shoppers hunt bargains",
-    "summary": "Adobe expects US online spending of about $12.9 billion on Black Friday, up 9.2% from last year, after tracking $82.5 billion in online sales from 1 to 22 November. The National Retail Federation says fewer people plan to shop over the holiday weekend as households watch budgets, even as it expects November-December sales to top $1 trillion.",
-    "dateline": "NEW YORK",
-    "sources": [
-     {
-      "name": "Digital Commerce 360",
-      "url": "https://www.digitalcommerce360.com/2026/11/25/adobe-online-holiday-spending-data/"
-     },
-     {
-      "name": "Forbes",
-      "url": "https://www.forbes.com/sites/gabrielalinzainescu/2026/11/16/black-friday-2026-becomes-stock-up-season-for-everyday-essentials/"
-     }
-    ]
-   },
-   {
     "headline": "Trading partners push back against new US tariffs of up to 20%",
     "summary": "China, Japan and other partners protested on Thursday against planned US tariff increases of up to 20% on China, the EU and 12 other countries, and rejected US claims of excess manufacturing capacity. Some countries, including Vietnam and Thailand, are negotiating, while the US and China have extended their trade truce by two months.",
     "dateline": "WASHINGTON",
@@ -1644,44 +1697,14 @@
       "url": "https://finance.yahoo.com/markets/article/us-announces-new-tariffs-of-up-to-20-on-china-the-eu-and-12-other-nations-131802359.html"
      }
     ]
-   },
-   {
-    "headline": "Dell's AI order book swells to $132 billion",
-    "summary": "Dell said it ended its fiscal third quarter with a record $132.3 billion backlog of AI-server orders after booking $60.2 billion in the period, and raised its AI-server revenue forecast for next year to $78 billion. The board added $25 billion to its share buyback programme after a record $4.9 billion returned to shareholders in the quarter.",
-    "dateline": "ROUND ROCK, TEXAS",
-    "sources": [
-     {
-      "name": "The Next Web",
-      "url": "https://thenextweb.com/news/dell-q3-fy27-earnings-ai-server-backlog-202bn-forecast"
-     },
-     {
-      "name": "Dell 8-K (SEC)",
-      "url": "https://www.sec.gov/Archives/edgar/data/0001571996/000157199626000050/exhibit991earnings8kq3fy27.htm"
-     }
-    ]
-   },
-   {
-    "headline": "Nvidia's governance questions linger after Huang's return",
-    "summary": "Although Nvidia restored Jensen Huang as chief executive, an internal investigation and state and federal scrutiny are continuing, and California's attorney general has said its probe will go on. Democrats in Congress have also promised to investigate the company and the Commerce Department over the circumstances of his reinstatement.",
-    "dateline": "SANTA CLARA",
-    "sources": [
-     {
-      "name": "CNBC",
-      "url": "https://www.cnbc.com/2026/11/24/nvidia-jensen-huang-ceo-return.html"
-     },
-     {
-      "name": "NBC News",
-      "url": "https://www.nbcnews.com/tech/tech-news/nvidia-reinstates-jensen-huang-rcna610864"
-     }
-    ]
    }
   ],
   "briefs": [
+   "OPEC+ producers have agreed in principle to keep first-quarter 2027 output targets unchanged ahead of Sunday's online meeting, according to reports citing Reuters (FinanceFeeds).",
+   "Adobe projects US online holiday spending of $275.1 billion across November and December, up 6.7% (Business News Today).",
+   "Elon Musk said he would give a SpaceX share to every child in America each year (CNBC).",
    "JPMorgan and BNP Paribas are splitting a $35 billion bridge loan to help finance Sanofi's Insmed purchase, according to Bloomberg (Investing.com).",
-   "Adobe forecasts Cyber Monday online sales of $15.1 billion, which would be the first day above $15 billion, and $47.5 billion across Cyber Week (Digital Commerce 360).",
-   "Americans are expected to finance $21.3 billion of online holiday purchases through buy-now-pay-later services, up 6.6% on last year, Adobe estimates (Digital Commerce 360).",
-   "OPEC+ ministers meet online on Sunday 29 November, with the group's current output agreement expiring at the end of 2026 (Admiral Markets).",
-   "Anthropic co-founders Dario and Daniela Amodei each sold roughly $280 million worth of shares, according to TheStreet."
+   "Adobe forecasts Cyber Monday online sales of $15.1 billion, which would be the first day above $15 billion, and $47.5 billion across Cyber Week (Digital Commerce 360)."
   ]
  },
  "tech": {
@@ -1690,11 +1713,11 @@
    "dek": "A new Commerce Department licensing regime for advanced chips is cutting into Southeast Asia's data-centre boom, and Nvidia's partners and resellers are now tightening supply to customers linked to China.",
    "dateline": "WASHINGTON",
    "body": [
-    "Nvidia has told server partners to stop shipping AI systems to Malaysia, Singapore, Thailand and Indonesia, the Financial Times reported this week. If confirmed, the move would be the clearest sign yet of how far new US export rules on advanced semiconductors reach beyond China. The report, which Forbes and others followed up on 26 November, rests on unnamed sources. Nvidia has not publicly confirmed the pause.",
+    "Nvidia has told server partners, including Dell and Super Micro, to stop shipping AI systems to Malaysia, Singapore, Thailand and Indonesia, the Financial Times reported this week. If confirmed, the move would be the clearest sign yet of how far new US export rules on advanced semiconductors reach beyond China. The report, which Forbes and others followed up on 26 November, rests on unnamed sources. Nvidia has not publicly confirmed the pause.",
     "The trigger is an interim final rule that the Commerce Department's Bureau of Industry and Security announced on 16 November, Bloomberg reported. It requires licences, reviewed case by case, to export advanced chips to Indonesia, Malaysia, Singapore, Thailand and Brazil. It also targets data centres anywhere in the world that provide large amounts of compute to companies headquartered in China and other restricted destinations. Washington says the rule closes a loophole: Chinese firms have been reaching cutting-edge GPUs remotely through facilities in third countries. The rule also formally rescinds the Biden-era AI Diffusion Rule.",
     "Downstream, resellers of Nvidia hardware have reportedly begun refusing to supply cloud operators that count any Chinese company among their clients, according to the Seoul Economic Daily. Singapore, meanwhile, is seeking talks with Washington over the rules as investigators examine Singapore-based operator Megaspeed, the South China Morning Post reported.",
     "Opinion in Washington is divided. Treasury Secretary Scott Bessent said on 21 November that no further restrictions are needed on sales of older Nvidia chips to China. Critics in Congress, however, have questioned how the Commerce Department has handled licences for China-bound chips. Regional coverage warns that the curbs threaten Southeast Asia's AI build-out, and lenders have reportedly paused billions of dollars of financing for related projects. US officials argue that diversion risks in those markets justify closer scrutiny.",
-    "The shipment reports add to a turbulent month for Nvidia. Co-founder Jensen Huang resigned as chief executive on 12 November, and the company named chief financial officer Colette Kress as interim CEO while the board searches for a permanent successor."
+    "The shipment reports cap a turbulent month for Nvidia's leadership. Co-founder Jensen Huang resigned as chief executive on 12 November, but the board voted unanimously on 23 November to reinstate him as president and CEO after saying it had consulted senior US government officials. Colette Kress, who served as interim CEO, remains chief financial officer."
    ],
    "sources": [
     {
@@ -1708,10 +1731,33 @@
     {
      "name": "South China Morning Post",
      "url": "https://scmp.com/week-asia/economics/article/3374665/singapore-seeks-us-talks-ai-chip-export-rules-amid-nvidia-fallout-megaspeed-probe"
+    },
+    {
+     "name": "TechCrunch",
+     "url": "https://techcrunch.com/2026/11/26/nvidia-hits-pause-on-chip-shipments-to-southeast-asia/"
     }
    ]
   },
   "stories": [
+   {
+    "headline": "Nvidia board reinstates Jensen Huang as chief executive",
+    "summary": "Nvidia's board voted unanimously on 23 November to bring back Jensen Huang as president and chief executive, less than two weeks after he resigned amid a scandal over personal relationships. The board said it had consulted senior US government officials and concluded that his return posed no national security risk; CBS News reported that the Trump administration offered the board legal assurances. Nvidia shares rose more than 30% that day. Critics say the board's statement did not address the misconduct allegations, and an independent probe into a reported foreign intelligence effort is continuing.",
+    "dateline": "SANTA CLARA",
+    "sources": [
+     {
+      "name": "TechCrunch",
+      "url": "https://techcrunch.com/2026/11/23/nvidia-reverses-course-and-brings-jensen-huang-back-as-ceo/"
+     },
+     {
+      "name": "CBS News",
+      "url": "https://www.cbsnews.com/news/trump-jensen-huang-nvidia-ceo-reinstated/"
+     },
+     {
+      "name": "PBS NewsHour",
+      "url": "https://www.pbs.org/newshour/nation/nvidia-ceos-comeback-fuels-debate-over-misogyny-and-impunity-for-the-rich-and-powerful"
+     }
+    ]
+   },
    {
     "headline": "OpenAI pilots 'Private Inference' for enterprise customers",
     "summary": "OpenAI chief executive Sam Altman said the company is piloting Private Inference with its first enterprise customers. The service is designed to let businesses run prompts through OpenAI models without OpenAI being able to read them. OpenAI's business pages describe it as an alpha API preview. The company has not named the participating customers or given a timeline for wider release.",
@@ -1784,17 +1830,6 @@
      {
       "name": "RansomNews",
       "url": "https://ransomnews.com/ransomware-attacks-today/"
-     }
-    ]
-   },
-   {
-    "headline": "Electric truck maker Harbinger adds more than $100 million in financing",
-    "summary": "Los Angeles-based Harbinger said on 24 November that it has secured more than $100 million in new financing. The package includes a convertible note and senior debt from Erebor Bank, the lender backed by Palmer Luckey. The financing comes less than three weeks after Harbinger closed a $240 million Series D round.",
-    "dateline": "LOS ANGELES",
-    "sources": [
-     {
-      "name": "TechCrunch",
-      "url": "https://techcrunch.com/2026/11/24/electric-truck-startup-harbinger-gets-financing-boost-from-palmer-luckeys-bank"
      }
     ]
    }
@@ -1928,27 +1963,28 @@
  },
  "energy": {
   "lead": {
-   "headline": "Oil heads for first weekly gain of November as Gulf attacks overshadow OPEC+ meeting",
-   "dek": "Strikes on tankers near the Strait of Hormuz and on Saudi energy facilities have lifted Brent off a three-month low ahead of Sunday's OPEC+ meeting on 2027 output.",
+   "headline": "Oil heads for weekly gain as OPEC+ capacity dispute clouds Sunday meeting",
+   "dek": "Gulf attacks have lifted Brent back toward $97 a barrel, while delegates weigh rolling over current quotas as Iraq contests the audit that will set 2027 baselines.",
    "dateline": "LONDON",
    "body": [
-    "Oil prices were on course on Friday for their first weekly rise of November. A wave of attacks on shipping and energy infrastructure in the Gulf revived worries about supply only days after concerns about a glut had pushed Brent crude to a three-month low. Market reports put Brent at about $89 a barrel on 24 November. It recovered to around $95-97 by Friday, its strongest level since early November.",
-    "The UK Maritime Trade Operations centre reported that an unidentified projectile struck an outbound tanker near the Strait of Hormuz. Iran's navy gave a different account, saying two oil tankers caught fire after hitting mines east of the strait. In Saudi Arabia, a projectile hit Saudi Aramco's Jazan refinery, and the energy ministry said some operations there were temporarily suspended. The Saudi-led coalition blamed Yemen's Houthis, who also claimed attacks on Ras Tanura. Container line Hapag-Lloyd estimates that rerouting ships around the strait costs it more than EUR 60 million a week.",
-    "Attention now turns to Vienna, where OPEC and its allies meet on Sunday, 29 November, to set production policy for 2027. Analysts quoted by ICIS and others expect the group to consider keeping current output targets through the first quarter of 2027. Members are reported to disagree: some producers favour defending prices, while Saudi Arabia appears under less pressure to support the market with deeper cuts.",
-    "The fundamental picture remains bearish. US crude inventories have been rising, and both the IEA and the US Energy Information Administration have estimated that global oil demand contracted in 2026. Analysts say steady flows and looser quotas would confirm the surplus and push prices back toward the high $80s. Further disruption in Hormuz, failed diplomacy with Iran or an OPEC+ cut could instead lift Brent back toward $100."
+    "Oil prices were heading on Friday for their first weekly rise of November, as attacks on tankers and Saudi energy facilities revived supply worries just days after concerns about a glut had pushed Brent crude to a three-month low. Brent traded around $96-97 a barrel, with estimates of the weekly gain ranging from about 4.5% to 7%. The benchmark is still down nearly 20% for the month.",
+    "Tankers have continued to be hit in and around the Strait of Hormuz, and Yemen's Houthis have claimed attacks on Saudi Aramco's Jazan refinery and the Ras Tanura hub. Saudi crude shipments are reported to be shifting toward the Red Sea port of Yanbu. Trade-press estimates put flows through Hormuz at roughly half of normal levels, leaving many Gulf producers pumping well below their quotas, even though tanker traffic picked up this month.",
+    "OPEC and its allies meet on Sunday, 29 November, to set output policy for 2027. Bloomberg, citing delegates, reported that the group is considering rolling over current production quotas into January; Reuters sources said talks were continuing and no decision had been reached. Current group-wide quotas expire at the end of the year.",
+    "The meeting is complicated by a dispute over the independent capacity audit that will be used to set quotas from 2027. Iraq has rejected preliminary findings by consultant DeGolyer and MacNaughton that put its capacity at about 4.9 million barrels a day; Iraqi Oil Minister Basim Khudair says the country can reach 5.2 million. Kazakhstan is also seeking a higher assessment. The audit, originally due by the end of September, slipped to mid-November after the regional war delayed expansion plans and some members were late submitting data.",
+    "The fundamental picture remains bearish. US crude inventories have been rising, and forecasts cited by analysts point to a 2027 surplus of 2 million to 3.8 million barrels a day. Analysts say looser quotas and steady flows would push prices back toward the high $80s, while further disruption in Hormuz or an OPEC+ cut could lift Brent back toward $100."
    ],
    "sources": [
     {
-     "name": "The National",
-     "url": "https://www.thenationalnews.com/business/energy/2026/11/27/oil-set-to-post-weekly-gain-as-middle-east-attacks-stoke-supply-concerns/"
+     "name": "Bloomberg",
+     "url": "https://bloomberg.com/news/articles/2026-11-26/latest-oil-market-news-and-analysis-for-nov-27"
     },
     {
-     "name": "ICIS",
-     "url": "https://www.icis.com/explore/resources/news/2026/11/25/11243387/oil-falls-on-supply-glut-concerns-eyes-on-29-nov-opec-meeting/"
+     "name": "Investing.com",
+     "url": "https://www.investing.com/news/commodities-news/oil-heads-for-first-weekly-gain-in-november-as-gulf-attacks-threaten-supply-recove-5052813"
     },
     {
-     "name": "EnergyNow",
-     "url": "https://energynow.com/2026/11/oil-prices-mixed-as-middle-east-supply-risks-clash-with-growing-u-s-inventories-ahead-of-opec-meeting/"
+     "name": "Iraqi News",
+     "url": "https://www.iraqinews.com/iraq/iraq-presses-opec-to-raise-oil-output/"
     }
    ]
   },
@@ -2608,12 +2644,24 @@
    {
     "time": "2026-11-27T12:57:01Z",
     "note": "Lex: new investment column on India, the US, Europe and developing markets"
+   },
+   {
+    "time": "2026-11-27T13:35:22Z",
+    "note": "Markets: Europe holds gains at midday and US futures jump before the half-day Black Friday session; Energy: OPEC+ reported set to hold output steady at Sunday's meeting; Tech: corrected Nvidia leadership details"
+   },
+   {
+    "time": "2026-11-27T14:35:27Z",
+    "note": "Markets: Wall Street opens Black Friday higher, led by tech; World: Zelenskyy warns of imminent strike on power grid; Europe: Bundestag passes 2027 budget; Energy: OPEC+ seen holding output steady"
+   },
+   {
+    "time": "2026-11-27T15:36:30Z",
+    "note": "Markets: US indices higher in Black Friday half-day as Nvidia lags; Politics: Trump says Iran war will end when he chooses; Energy: OPEC+ capacity dispute before Sunday meeting; Africa: DR Congo–Uganda row"
    }
   ],
   "name": "The Manu Times",
   "date": "2026-11-27",
   "edition_no": 1,
-  "updated_at": "2026-11-27T12:57:01Z"
+  "updated_at": "2026-11-27T15:36:30Z"
  },
  "explainers": {
   "items": [

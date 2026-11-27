@@ -1,8 +1,9 @@
-# The Manu Times: hourly update runbook
+# The Manu Times: update runbook
 
 The Manu Times is a static page (`index.html`) that renders `data/edition.json`.
-It is published as an Artifact at https://claude.ai/artifact/TnVFYM8ekEk7TupjVA5WAQ. A scheduled task starts a fresh
-session every hour, and that session follows this runbook.
+It is published as an Artifact at https://claude.ai/artifact/TnVFYM8ekEk7TupjVA5WAQ. Updates run only when started by
+hand: the "Manu Times hourly edition" scheduled task is paused, and each "Run now" on it
+(or a session asked to "update The Manu Times") follows this runbook once.
 
 ## 1. Get the paper
 
