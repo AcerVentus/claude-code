@@ -1,0 +1,2602 @@
+{
+ "front": {
+  "top_stories": [
+   {
+    "headline": "US proposes new tariffs on 14 trading partners over manufacturing 'excess capacity'",
+    "summary": "The Trump administration proposed Section 301 tariffs on 14 economies including China, the EU, Japan, South Korea and India after an eight-month trade investigation, with a proposed 20% rate on China and 15% for several allies. Japan and Singapore objected and Beijing called overcapacity 'a false issue', while the administration says the duties defend US workers.",
+    "section": "politics",
+    "sources": [
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/25/us-tariffs-trump-section-301.html"
+     },
+     {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/economy/policy/articles/us-proposes-tariffs-14-trading-133756472.html"
+     }
+    ]
+   },
+   {
+    "headline": "Two Italians killed in drone attack in Kuwait as Gulf tensions rise",
+    "summary": "Kuwait blamed Iran for a drone strike on an air defence site that killed two Italian technicians working for Rheinmetall Italia; Tehran denied involvement and proposed a joint investigation. The incident came as Iran's Revolutionary Guards reported tankers striking mines near the Strait of Hormuz, pushing Brent crude higher.",
+    "section": "world",
+    "sources": [
+     {
+      "name": "Al Jazeera",
+      "url": "https://www.aljazeera.com/news/2026/11/26/two-italians-killed-after-iranian-drones-strike-facility-says-kuwait"
+     },
+     {
+      "name": "CBS News",
+      "url": "https://www.cbsnews.com/live-updates/iran-war-us-military-ai-weapons-oil/"
+     }
+    ]
+   },
+   {
+    "headline": "EU leaders end special summit without budget deal; Ukraine loan pushed to December",
+    "summary": "A two-day Brussels summit failed to agree the size or shape of the EU's 2028-2034 budget, and a proposed loan of up to EUR 45bn for Ukraine in 2027 was deferred to the 17-18 December summit. Council President Antonio Costa said 24 member states back the loan.",
+    "section": "politics",
+    "sources": [
+     {
+      "name": "bne IntelliNews",
+      "url": "https://www.intellinews.com/eu-summit-breaks-up-without-budget-deal-as-holdouts-stall-45bn-ukraine-loan-489028"
+     },
+     {
+      "name": "Euronews",
+      "url": "https://www.euronews.com/2026/11/26/eu-budget-and-ukraine-aid-headed-for-collision-at-turbulent-summit"
+     }
+    ]
+   },
+   {
+    "headline": "Thanksgiving storm cuts power to hundreds of thousands on US East Coast",
+    "summary": "Wind gusts of up to 70 mph left more than 900,000 customers without power on Thursday night and disrupted flights at major Washington and New York airports. The storm forced the first weather-related postponement of the Macy's Thanksgiving Day Parade, now set for Saturday.",
+    "section": "us",
+    "sources": [
+     {
+      "name": "CBC News",
+      "url": "https://www.cbc.ca/news/world/u-s-thanksgiving-storm-power-flight-delays-9.7438358"
+     },
+     {
+      "name": "CNN",
+      "url": "https://www.cnn.com/2026/11/25/us/macys-thanksgiving-day-parade-postponed"
+     }
+    ]
+   },
+   {
+    "headline": "Trump and NATO's Rutte urge Russia not to widen Ukraine war",
+    "summary": "After talks at Mar-a-Lago, President Trump and NATO Secretary General Mark Rutte issued a joint statement warning against actions that would expand the conflict and calling for a swift peaceful settlement. Hours later Russia launched ballistic missiles and more than 100 drones at Ukraine, including Kyiv.",
+    "section": "world",
+    "sources": [
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/26/trump-nato-rutte-russia-ukraine-war.html"
+     },
+     {
+      "name": "Kyiv Independent",
+      "url": "https://kyivindependent.com/russian-attacks-kill-10-injure-58-across-ukraine-over-past-day-strike-kyiv-with-ballistic-missiles/"
+     }
+    ]
+   },
+   {
+    "headline": "US third-quarter growth revised up to 4.3%; Trump questions the data",
+    "summary": "The Bureau of Economic Analysis raised its estimate of third-quarter GDP growth to a 4.3% annual rate from 3.4%, citing stronger investment and consumer spending. In a Thanksgiving post President Trump called the revision an error and accused his own government of falsifying economic data, without offering evidence.",
+    "section": "us",
+    "sources": [
+     {
+      "name": "Forbes",
+      "url": "https://www.forbes.com/sites/antoniopequenoiv/2026/11/26/trump-blasts-economic-numbers-radical-far-left-in-thanksgiving-post/"
+     },
+     {
+      "name": "U.S. News (Reuters)",
+      "url": "https://www.usnews.com/news/world/articles/2026-11-26/trump-uses-thanksgiving-message-to-lash-out-at-political-foes-immigrants-federal-government"
+     }
+    ]
+   }
+  ],
+  "quote_of_day": {
+   "text": "This is not a close case.",
+   "who": "Loren AliKhan, US District Judge, ruling on ABC's First Amendment suit against the FCC",
+   "source": {
+    "name": "Mediaite",
+    "url": "https://www.mediaite.com/media/news/judge-hits-fcc-boss-with-stinging-rebuttal-in-abc-legal-battle-not-a-close-case/"
+   }
+  },
+  "numbers": [
+   {
+    "figure": "4.3%",
+    "label": "Revised annualised US GDP growth for Q3 2026, up from 3.4%"
+   },
+   {
+    "figure": "EUR 45bn",
+    "label": "Proposed 2027 EU loan to Ukraine, deferred to December summit"
+   },
+   {
+    "figure": "908,000",
+    "label": "US utility customers without power late Thursday after the Thanksgiving storm"
+   },
+   {
+    "figure": "$96.25",
+    "label": "Brent crude per barrel on Thursday after reported tanker mine strikes near Hormuz"
+   }
+  ]
+ },
+ "world": {
+  "lead": {
+   "headline": "Russian missiles and drones hit Kyiv and other Ukrainian cities",
+   "dek": "",
+   "dateline": "KYIV",
+   "body": [
+    "Russia launched ballistic missiles and 113 drones at Ukraine overnight into Thursday, injuring seven people in Kyiv, according to Ukrainian officials. The Kyiv Independent reported that Russian attacks killed 10 people and injured 58 across the country over the previous day, including two killed in Kharkiv."
+   ],
+   "sources": [
+    {
+     "name": "Kyiv Independent",
+     "url": "https://kyivindependent.com/russian-attacks-kill-10-injure-58-across-ukraine-over-past-day-strike-kyiv-with-ballistic-missiles/"
+    },
+    {
+     "name": "Meduza",
+     "url": "https://meduza.io/en/news/2026/11/26/russian-strikes-on-ukraine-kill-two-in-kharkiv-and-injure-seven-in-kyiv"
+    }
+   ]
+  },
+  "stories": [
+   {
+    "headline": "Gulf conflict widens as drone strike in Kuwait kills two Italians and tankers hit near Hormuz",
+    "summary": "Kuwait and Italy point to Iran over a deadly drone attack, Tehran denies involvement, and shipping incidents near the Strait of Hormuz lift oil prices.",
+    "dateline": "KUWAIT CITY",
+    "sources": [
+     {
+      "name": "Al Jazeera",
+      "url": "https://www.aljazeera.com/news/2026/11/26/two-italians-killed-after-iranian-drones-strike-facility-says-kuwait"
+     },
+     {
+      "name": "Middle East Monitor",
+      "url": "https://www.middleeastmonitor.com/20261127-oil-prices-rise-after-tankers-hit-mines-in-strait-of-hormuz/"
+     },
+     {
+      "name": "Al Jazeera",
+      "url": "https://www.aljazeera.com/news/2026/11/24/hormuz-oil-traffic-is-down-40-percent-are-irans-tanker-attacks-working"
+     }
+    ]
+   },
+   {
+    "headline": "Israeli strikes kill eight in Gaza despite ceasefire",
+    "summary": "Overnight Israeli strikes killed at least eight Palestinians in Gaza City and central Gaza, hospital officials said, among them a senior education official and his wife. Hamas's leader called the strikes unacceptable, while Gaza's Health Ministry put the war's overall death toll at more than 74,700.",
+    "dateline": "GAZA CITY",
+    "sources": [
+     {
+      "name": "AP via KSAT",
+      "url": "https://www.ksat.com/news/world/2026/11/26/israeli-strikes-kill-8-in-gaza-and-other-mideast-news/"
+     },
+     {
+      "name": "Al Jazeera",
+      "url": "https://aljazeera.com/news/2026/11/26/israeli-attacks-on-gaza-kill-senior-education-official-seven-other-people"
+     }
+    ]
+   },
+   {
+    "headline": "Fuel tanker fire on Cairo ring road kills 31",
+    "summary": "A tanker carrying petroleum products overturned and caught fire on a highway in Giza governorate, killing at least 31 people and injuring 21, Egyptian authorities said. Prosecutors said a speeding car struck the tanker and a suspect has been detained.",
+    "dateline": "CAIRO",
+    "sources": [
+     {
+      "name": "Fox News",
+      "url": "https://www.foxnews.com/world/egypt-detains-driver-suspected-causing-cairo-fuel-tanker-crash-inferno-left-31-dead"
+     },
+     {
+      "name": "Gulf News",
+      "url": "https://gulfnews.com/world/mena/cairo-ring-road-fuel-tanker-crash-fire-kills-at-least-31-people-1.500761391"
+     }
+    ]
+   },
+   {
+    "headline": "Bank of Korea raises rates to 3.25% on chip-driven boom",
+    "summary": "South Korea's central bank lifted its benchmark rate by a quarter point to 3.25% in a 5-2 vote, its third hike this year, citing strong semiconductor exports and above-target inflation. It raised its growth forecasts to 3.9% for 2026 and 4.1% for 2027.",
+    "dateline": "SEOUL",
+    "sources": [
+     {
+      "name": "Korea JoongAng Daily",
+      "url": "https://www.koreajoongangdaily.com/business/bok-lifts-rate-to-325-as-it-sharply-upgrades-growth-forecasts-through-next-year/12991322"
+     },
+     {
+      "name": "Al Jazeera",
+      "url": "https://www.aljazeera.com/economy/2026/11/26/south-koreas-central-bank-hikes-interest-rates-raises-gdp-growth-forecast"
+     }
+    ]
+   },
+   {
+    "headline": "Ethiopia offers to host Sudan peace talks; Khartoum rejects proposal",
+    "summary": "Ethiopian Prime Minister Abiy Ahmed proposed hosting talks among Sudan's warring parties, but Sudan's government rejected the offer, questioning Addis Ababa's neutrality. The African Union said it had taken note of the initiative, as Egypt and Sudan separately agreed to prioritise post-war reconstruction.",
+    "dateline": "ADDIS ABABA",
+    "sources": [
+     {
+      "name": "Sudan Tribune",
+      "url": "https://sudantribune.com/article/321679"
+     },
+     {
+      "name": "Sudan Tribune",
+      "url": "https://sudantribune.com/article/321681"
+     }
+    ]
+   },
+   {
+    "headline": "Libya's eastern government seeks UN probe after Ukraine sinks Russian warship",
+    "summary": "President Volodymyr Zelensky confirmed Ukrainian naval drones sank the Russian corvette Merkury at Benghazi and struck a cargo ship that Kyiv says carried weapons, Ukraine's first acknowledged operation in Libya. Eastern Libyan Prime Minister Osama Hamad asked the UN to investigate whether the drones were launched from western Libya.",
+    "dateline": "BENGHAZI",
+    "sources": [
+     {
+      "name": "ABC News",
+      "url": "https://abcnews.com/International/ukrainian-naval-drones-sank-russias-merkury-warship-libya/story?id=138369738"
+     },
+     {
+      "name": "The Hill",
+      "url": "https://thehill.com/policy/defense/6237786-ukraine-drones-sink-russian-ship-zelensky/"
+     }
+    ]
+   }
+  ],
+  "briefs": [
+   "Iranian lorry drivers entered a sixth day of strike action, with protests reported in about 20 cities, according to The National.",
+   "Houthi-run media said a Saudi strike on a power station in Yemen's Taiz killed 11 civilians; there was no immediate Saudi comment in the reports.",
+   "Iran's navy said it had recovered two oil tankers previously seized by the US military, according to Al Jazeera's live coverage.",
+   "China and Japan remain in a diplomatic freeze after Xi Jinping declined a formal meeting with Prime Minister Sanae Takaichi at APEC, with Beijing demanding Tokyo change its stance on Taiwan.",
+   "The Rapid Support Forces killed at least 19 people in drone attacks in Sudan's Blue Nile state, Al Jazeera reported."
+  ]
+ },
+ "politics": {
+  "lead": {
+   "headline": "Trading partners push back on proposed US Section 301 tariffs",
+   "dek": "",
+   "dateline": "WASHINGTON",
+   "body": [
+    "Washington's proposed tariffs on 14 economies, including 15% on the EU, Japan, South Korea, Taiwan and Switzerland, are described as replacing broader duties struck down by the Supreme Court in February. Japan protested, Singapore called the move very disappointing and China rejected the overcapacity rationale, while supporters argue the duties protect US manufacturing."
+   ],
+   "sources": [
+    {
+     "name": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/25/us-tariffs-trump-section-301.html"
+    },
+    {
+     "name": "The Next Web",
+     "url": "https://thenextweb.com/news/new-tariffs-14-trading-partners-china-eu-section-301-excess-capacity"
+    }
+   ]
+  },
+  "stories": [
+   {
+    "headline": "EU budget talks stall as leaders defer EUR 45bn Ukraine loan to December",
+    "summary": "A special European Council summit ended with no agreement on the bloc's 2028-2034 budget and no final decision on new loans for Kyiv.",
+    "dateline": "BRUSSELS",
+    "sources": [
+     {
+      "name": "bne IntelliNews",
+      "url": "https://www.intellinews.com/eu-summit-breaks-up-without-budget-deal-as-holdouts-stall-45bn-ukraine-loan-489028"
+     },
+     {
+      "name": "Euronews",
+      "url": "https://euronews.com/2026/11/26/eu-summit-leaders-ready-to-spar-over-new-budget-and-ukraine-aid"
+     },
+     {
+      "name": "Euronews",
+      "url": "https://www.euronews.com/2026/11/26/eu-budget-and-ukraine-aid-headed-for-collision-at-turbulent-summit"
+     }
+    ]
+   },
+   {
+    "headline": "Trump and Rutte issue joint warning against expanding Ukraine war",
+    "summary": "Meeting at Mar-a-Lago, President Trump and NATO chief Mark Rutte discussed Ukraine, Iran and allied defence spending, and Trump briefed Rutte on his recent conversation with Vladimir Putin. Their statement cautioned against actions 'intentionally or otherwise' that would widen the war; Kremlin spokesman Dmitry Peskov said he read it as directed at Kyiv's efforts to extend the fighting's geography.",
+    "dateline": "PALM BEACH",
+    "sources": [
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/26/trump-nato-rutte-russia-ukraine-war.html"
+     },
+     {
+      "name": "Washington Times",
+      "url": "https://www.washingtontimes.com/news/2026/nov/26/natos-rutte-meets-trump-amid-conflicts-ukraine-iran/"
+     }
+    ]
+   },
+   {
+    "headline": "Eisenkot's Yashar reaches coalition deal with Golan's Democrats",
+    "summary": "Gadi Eisenkot's Yashar party and Yair Golan's Democrats announced a coalition agreement giving the left-wing party four ministries, including an expanded internal security portfolio, but not education or justice. Israeli media reported Yashar now has 36 of the 61 seats needed for a Knesset majority.",
+    "dateline": "JERUSALEM",
+    "sources": [
+     {
+      "name": "Times of Israel",
+      "url": "https://www.timesofisrael.com/eisenkot-edges-closer-to-government-as-his-party-announces-coalition-deal-with-democrats/"
+     },
+     {
+      "name": "Jerusalem Post",
+      "url": "https://www.jpost.com/israel-news/politics-and-diplomacy/article-916226"
+     }
+    ]
+   },
+   {
+    "headline": "Yashar and UTJ reportedly agree principles of Haredi draft law",
+    "summary": "Yashar and the ultra-Orthodox United Torah Judaism party reportedly reached agreement on key principles of legislation governing military service for Haredi men, a long-running dispute in Israeli politics. The reported deal could widen Eisenkot's options as he seeks to form a government.",
+    "dateline": "JERUSALEM",
+    "sources": [
+     {
+      "name": "Times of Israel",
+      "url": "https://www.timesofisrael.com/liveblog-november-26-2026/"
+     }
+    ]
+   },
+   {
+    "headline": "Congress weighs Iran war funding as December shutdown deadline nears",
+    "summary": "Lawmakers have until 11 December to fund the government, and some Democrats want any package to cut off money for the Iran war. Senate Republican leaders have signalled openness to funding the Pentagon while restricting war spending, while many House Democrats are wary of forcing a shutdown.",
+    "dateline": "WASHINGTON",
+    "sources": [
+     {
+      "name": "Washington Post",
+      "url": "https://www.washingtonpost.com/business/2026/11/23/senate-gop-leaders-signal-openness-cutting-off-iran-war-funding/"
+     },
+     {
+      "name": "Axios",
+      "url": "https://www.axios.com/2026/11/19/government-shutdown-funding-iran-democrat"
+     },
+     {
+      "name": "Al Jazeera",
+      "url": "https://www.aljazeera.com/news/2026/11/26/can-trump-continue-with-iran-war-despite-funding-restrictions"
+     }
+    ]
+   },
+   {
+    "headline": "Iran pledges to break US blockade; officials give no timetable",
+    "summary": "Iranian lawmaker Esmaeil Kowsari said the armed forces would break the US naval blockade and claimed Iranian control over the Strait of Hormuz, and security official Mohsen Rezaei repeated the commitment without a timeline. Tehran links reopening normal navigation to lifting the blockade and ending the war on all fronts.",
+    "dateline": "TEHRAN",
+    "sources": [
+     {
+      "name": "ANI",
+      "url": "https://aninews.in/news/world/middle-east/iran-vows-to-break-us-naval-blockade-claims-full-control-over-strait-of-hormuz-mp-esmaeil-kowsari20261127095057/"
+     }
+    ]
+   }
+  ],
+  "briefs": [
+   "Bahrain asked the UN Security Council to hold Iran accountable for the drone attack in Kuwait that killed two Italians.",
+   "Romanian President Nicusor Dan said winter could make a Ukraine ceasefire less likely in the short term.",
+   "Croatian Prime Minister Andrej Plenkovic rejected arbitration over Croatia's border dispute with Slovenia on the sidelines of the EU summit.",
+   "House Democrats were set to formally nominate Hakeem Jeffries as their candidate for speaker ahead of their January majority, Punchbowl News reported.",
+   "Chilean President Jose Antonio Kast's approval rating has fallen to new lows eight months into his term, The Intercept reported."
+  ]
+ },
+ "us": {
+  "lead": {
+   "headline": "Thanksgiving storm knocks out power and snarls travel; Macy's parade moved to Saturday",
+   "dek": "Hurricane-force gusts and heavy rain swept the Mid-Atlantic and Northeast on the holiday, forcing the first weather postponement in the parade's history.",
+   "dateline": "NEW YORK",
+   "body": [
+    "A powerful storm battered the US East Coast on Thanksgiving Day, bringing down trees and power lines and disrupting one of the busiest travel periods of the year. More than 908,000 utility customers were without electricity late Thursday, according to PowerOutage.us, with Virginia, Maryland, Pennsylvania and New Jersey among the hardest hit.",
+    "Wind gusts reached up to 70 mph. FlightAware recorded hundreds of US flight cancellations and thousands of delays on Thursday, with airports in the Washington and New York areas most affected. Officials from North Carolina to New York had warned of torrential rain, coastal flooding and outages before the system arrived.",
+    "Organisers postponed the 100th Macy's Thanksgiving Day Parade to 8:30 a.m. ET on Saturday, 28 November, the first time the event has been rescheduled because of weather. Executive producer Will Coss said the balloons would be deflated, taken to New Jersey and reinflated on Friday afternoon. New York Mayor Zohran Mamdani will miss the rescheduled parade because of planned foot surgery.",
+    "The National Weather Service said conditions would improve on Friday as the system weakened, and utilities had begun restoring power. Storms also affected parts of the West Coast."
+   ],
+   "sources": [
+    {
+     "name": "CBC News",
+     "url": "https://www.cbc.ca/news/world/u-s-thanksgiving-storm-power-flight-delays-9.7438358"
+    },
+    {
+     "name": "Washington Post",
+     "url": "https://www.washingtonpost.com/nation/2026/11/25/macys-thanksgiving-day-parade-postponed-by-storm-rescheduled-saturday/"
+    },
+    {
+     "name": "NPR",
+     "url": "https://www.npr.org/2026/11/26/nx-s1-6054079/storms-expected-on-both-coasts-as-millions-travel-for-thanksgiving"
+    }
+   ]
+  },
+  "stories": [
+   {
+    "headline": "GDP revised up to 4.3% as Trump alleges data errors",
+    "summary": "The Commerce Department's second estimate put third-quarter growth at a 4.3% annual rate, up from 3.4% and the fastest since 2023, driven by stronger investment and consumer spending. President Trump called the revision 'A RECORD SETTING ERROR' and accused the government of falsifying data without evidence; the Bureau of Economic Analysis did not immediately comment.",
+    "dateline": "WASHINGTON",
+    "sources": [
+     {
+      "name": "Forbes",
+      "url": "https://www.forbes.com/sites/antoniopequenoiv/2026/11/26/trump-blasts-economic-numbers-radical-far-left-in-thanksgiving-post/"
+     },
+     {
+      "name": "U.S. News (Reuters)",
+      "url": "https://www.usnews.com/news/world/articles/2026-11-26/trump-uses-thanksgiving-message-to-lash-out-at-political-foes-immigrants-federal-government"
+     }
+    ]
+   },
+   {
+    "headline": "Judge blocks FCC's early license review of ABC stations",
+    "summary": "US District Judge Loren AliKhan issued a preliminary injunction barring the FCC from forcing eight ABC-owned stations into early license renewals, finding ABC likely to prove First Amendment retaliation. ABC welcomed the ruling, while the FCC called it mistaken and said it expects to prevail.",
+    "dateline": "WASHINGTON",
+    "sources": [
+     {
+      "name": "Variety",
+      "url": "https://variety.com/2026/tv/news/fcc-abc-license-renewals-injunction-1236958634/"
+     },
+     {
+      "name": "Fox News",
+      "url": "https://www.foxnews.com/media/judge-temporarily-blocks-fcc-reviewing-abc-station-licenses-amid-first-amendment-fight"
+     }
+    ]
+   },
+   {
+    "headline": "Court upholds New York City rent freeze",
+    "summary": "A Manhattan judge dismissed landlords' challenge to the Rent Guidelines Board's freeze on about 1 million rent-stabilised apartments, ruling the board acted within its authority. The judge also called Mayor Zohran Mamdani's campaign promise of a freeze 'reckless and irresponsible', and the landlords have not said whether they will appeal.",
+    "dateline": "NEW YORK",
+    "sources": [
+     {
+      "name": "Bloomberg Law",
+      "url": "https://news.bloomberglaw.com/litigation/judge-clears-new-york-city-rent-freeze-backed-by-mayor-mamdani"
+     },
+     {
+      "name": "Daily Wire",
+      "url": "https://www.dailywire.com/news/mamdanis-signature-promise-survives-with-a-rebuke-from-the-bench"
+     }
+    ]
+   },
+   {
+    "headline": "Black Friday shoppers lean on early deals, essentials and AI tools",
+    "summary": "Retailers spread discounts across weeks, and Adobe said traffic to retail sites from AI-powered tools more than doubled this month from a year earlier. Analysts told AP that cost concerns linked to the Iran war and weak consumer confidence are shaping how much Americans spend.",
+    "dateline": "NEW YORK",
+    "sources": [
+     {
+      "name": "Washington Post (AP)",
+      "url": "https://www.washingtonpost.com/business/2026/11/27/black-friday-deals-shopping-stores-online/3b7f619e-ea21-11f1-8db0-6f1e3c389e7c_story.html"
+     },
+     {
+      "name": "U.S. News (AP)",
+      "url": "https://www.usnews.com/news/business/articles/2026-11-27/black-fridays-new-playbook-early-deals-essentials-in-carts-and-ai-nudging-clicks"
+     }
+    ]
+   },
+   {
+    "headline": "Shutdown deadline looms over Iran war funding dispute",
+    "summary": "Government funding expires on 11 December, and Democrats are divided over whether to insist on curbing money for the Iran war. Republicans warn a lapse could last until Democrats take control of Congress in January, while some Senate GOP leaders have floated funding the Pentagon but not the war.",
+    "dateline": "WASHINGTON",
+    "sources": [
+     {
+      "name": "NPR",
+      "url": "https://www.npr.org/2026/11/20/nx-s1-6043190/fight-over-funding-for-iran-war-could-put-the-government-at-risk-of-a-shutdown"
+     },
+     {
+      "name": "Washington Post",
+      "url": "https://www.washingtonpost.com/business/2026/11/23/senate-gop-leaders-signal-openness-cutting-off-iran-war-funding/"
+     }
+    ]
+   },
+   {
+    "headline": "Trump's Thanksgiving message targets critics and federal statisticians",
+    "summary": "President Trump issued a formal proclamation marking Thanksgiving in the nation's 250th anniversary year, then posted a Truth Social message aimed at political opponents, immigrants and economists. He was expected to call US service members from Mar-a-Lago on Thursday.",
+    "dateline": "PALM BEACH",
+    "sources": [
+     {
+      "name": "U.S. News (Reuters)",
+      "url": "https://www.usnews.com/news/world/articles/2026-11-26/trump-uses-thanksgiving-message-to-lash-out-at-political-foes-immigrants-federal-government"
+     },
+     {
+      "name": "White House",
+      "url": "https://www.whitehouse.gov/presidential-actions/2026/11/thanksgiving-day-2026/"
+     },
+     {
+      "name": "HuffPost",
+      "url": "https://www.huffpost.com/entry/trumps-happy-thanksgiving-message-is-bursting-with-grievance_n_6b086400e4b01d8bd1dbbe24"
+     }
+    ]
+   }
+  ],
+  "briefs": [
+   "The White House pardoned two turkeys, Freedom and Feathers, which will live at Texas A&M University.",
+   "The FCC must report on its compliance with the ABC injunction by 2 December.",
+   "The Supreme Court allowed the administration to resume border wall construction in Texas's Big Bend region, SCOTUSblog reported.",
+   "Senate Minority Leader Chuck Schumer faces a leadership challenge from Senator Chris Van Hollen, Punchbowl News reported.",
+   "Adobe expects average TV discounts of 23% on Black Friday, compared with 11% earlier in the month."
+  ]
+ },
+ "europe": {
+  "lead": {
+   "headline": "EU summit ends without budget deal as €45bn Ukraine loan stalls",
+   "dek": "European leaders left Brussels early on Friday with no agreement on the bloc's next seven-year budget or on financing for Ukraine in 2027, pushing both decisions to a December summit.",
+   "dateline": "BRUSSELS",
+   "body": [
+    "A two-day meeting of the European Council broke up in the early hours of 27 November without agreement on the EU's 2028-2034 budget or on a proposed €45 billion loan to cover Ukraine's needs next year. European Council President António Costa said leaders had not settled any of the budget's three core elements: its overall size, how it is divided between priorities, and new sources of EU revenue. Costa had put forward a compromise framework of about €1.78 trillion.",
+    "On Ukraine, the main obstacle is that Hungary, Slovakia and Czechia have not agreed to join the loan. The European Commission has floated a way around the impasse that would let governments take part in the loan's €20 billion budget-support strand while staying out of its €25 billion military strand; Bulgaria has said it would join only the civilian portion. Costa has also proposed a separate mechanism to cover interest payments on loans to Ukraine, alongside a €100 billion Ukraine Reserve suggested by the Commission for the period after 2027.",
+    "Leaders were divided over whether the two files should be linked. German Chancellor Friedrich Merz said he saw a connection between support for Ukraine and the EU budget, while Hungarian Prime Minister Péter Magyar and Czech Prime Minister Andrej Babiš rejected tying them together. France and Germany both want a deal before the end of the year but differ on how large the budget should be.",
+    "French President Emmanuel Macron warned that budget talks could not run beyond December, citing France's 2027 elections, according to Euronews' live coverage of the summit. Some reports described the effort as an attempt to secure long-term commitments before political changes in member states could complicate them.",
+    "Costa is expected to present a revised proposal in the coming weeks, with leaders aiming to reach agreement at their next scheduled summit on 17-18 December."
+   ],
+   "sources": [
+    {
+     "name": "Euronews",
+     "url": "https://www.euronews.com/2026/11/26/eu-summit-leaders-ready-to-spar-over-new-budget-and-ukraine-aid"
+    },
+    {
+     "name": "Yahoo News",
+     "url": "https://www.yahoo.com/news/politics/articles/eu-summit-breaks-without-budget-103628690.html"
+    },
+    {
+     "name": "U.S. News & World Report (Reuters)",
+     "url": "https://www.usnews.com/news/world/articles/2026-11-26/eu-leaders-to-wrestle-with-seven-year-budget-ukraine-financing-as-they-seek-december-deal"
+    }
+   ]
+  },
+  "stories": [
+   {
+    "headline": "Russian strikes kill at least 10 across Ukraine as ballistic missiles hit Kyiv",
+    "summary": "Russian attacks killed at least 10 people and injured dozens across Ukraine over 25-26 November, according to Ukrainian officials, with ballistic missiles striking Kyiv, where Mayor Vitali Klitschko said a shopping centre was hit. Ukraine's air force said Russia launched ballistic missiles and 113 drones overnight, of which 87 drones were downed or neutralised by morning. Deaths were also reported in Donetsk and Kharkiv regions.",
+    "dateline": "KYIV",
+    "sources": [
+     {
+      "name": "Kyiv Independent",
+      "url": "https://kyivindependent.com/russian-attacks-kill-10-injure-58-across-ukraine-over-past-day-strike-kyiv-with-ballistic-missiles/"
+     },
+     {
+      "name": "ZMINA",
+      "url": "https://zmina.info/en/news-en/russian-attacks-on-25-november-leave-at-least-10-dead-and-70-injured-across-ukraine/"
+     }
+    ]
+   },
+   {
+    "headline": "Zelenskyy warns of major attack on power grid as US envoy describes talks as deadlocked",
+    "summary": "Ukrainian President Volodymyr Zelenskyy said Russia is preparing another large-scale assault on Ukraine's energy system, logistics and critical services. US envoy Jared Kushner described peace negotiations as being in 'a little bit of a deadlock' over the future of Ukrainian territory, while saying he believes President Vladimir Putin wants peace. Ukraine separately said its drones hit an oil refinery in Russia's Krasnodar region; local Russian officials said four people were wounded.",
+    "dateline": "KYIV",
+    "sources": [
+     {
+      "name": "The Washington Times (AP)",
+      "url": "https://www.washingtontimes.com/news/2026/nov/26/volodymyr-zelenskyy-warns-imminent-major-russian-attack-ukraines/"
+     },
+     {
+      "name": "National Herald",
+      "url": "https://www.nationalheraldindia.com/international/volodymyr-zelenskyy-warns-of-fresh-russian-strikes-as-donald-trump-pushes-for-a-deal"
+     }
+    ]
+   },
+   {
+    "headline": "Spain heads to Sunday election with conservatives leading polls",
+    "summary": "Spaniards vote in a general election on 29 November, with most private polls putting the conservative Popular Party ahead of Prime Minister Pedro Sánchez's Socialists and suggesting a PP-led right-wing bloc including Vox could reach a majority. Poll averages put the PP at around 31-32%, the Socialists at about 29% and Vox near 17-18%. The state-run CIS pollster is an outlier, placing the Socialists first.",
+    "dateline": "MADRID",
+    "sources": [
+     {
+      "name": "Euronews",
+      "url": "https://www.euronews.com/2026/11/22/polls-put-spains-pp-ahead-of-psoe-a-week-before-29-november-election"
+     },
+     {
+      "name": "The Local Spain",
+      "url": "https://www.thelocal.es/20261124/latest-who-do-polls-say-will-win-the-spanish-election"
+     }
+    ]
+   },
+   {
+    "headline": "Hungary's Magyar and Zelenskyy hail 'new chapter' at Uzhhorod meeting",
+    "summary": "Hungarian Prime Minister Péter Magyar made his first official visit to Ukraine on 24 November, meeting Zelenskyy in the western city of Uzhhorod. Magyar announced humanitarian aid worth about 1 billion hryvnias, including medicine and generators, and pressed Kyiv to speed up agreements on the rights of the Hungarian minority. Both leaders called the talks substantive, while Magyar stressed that Hungary does not supply weapons to Ukraine.",
+    "dateline": "UZHHOROD",
+    "sources": [
+     {
+      "name": "Euronews",
+      "url": "https://www.euronews.com/2026/11/25/peter-magyar-and-volodymyr-zelenskyy-open-new-chapter-in-ukraine-hungary-relations"
+     },
+     {
+      "name": "UNITED24 Media",
+      "url": "https://united24media.com/world/the-hungarian-people-stand-with-you-magyar-meets-zelenskyy-in-first-official-talks-24684"
+     }
+    ]
+   },
+   {
+    "headline": "German parliament votes on record-borrowing 2027 budget",
+    "summary": "The Bundestag was scheduled to hold its final vote on Friday on Germany's 2027 federal budget, which foresees spending of roughly €556-561 billion and about €210 billion in new borrowing across the core budget and special funds. Chancellor Merz's coalition added a cut in electricity taxes late in the process. Lawmakers from the CDU/CSU and SPD were expected to provide enough votes for passage.",
+    "dateline": "BERLIN",
+    "sources": [
+     {
+      "name": "Yahoo News (DW)",
+      "url": "https://www.yahoo.com/news/world/articles/german-lawmakers-vote-556-billion-040333694.html"
+     },
+     {
+      "name": "FINCHANNEL",
+      "url": "https://finchannel.com/germanys-2027-budget-advances-with-near-record-borrowing-after-coalition-deal/141569/world-2/2026/11/"
+     }
+    ]
+   },
+   {
+    "headline": "Estonia prepares to shut road crossings with Russia from 1 December",
+    "summary": "Estonia's government has approved a preliminary six-month closure of all its road border crossings with Russia, starting on 1 December, after blaming Russian military intelligence for a foiled arson plot against a drone manufacturer. Rail freight is exempt. Moscow, which denies the accusations, has accused Tallinn of building a 'new Iron Curtain' and promised a response.",
+    "dateline": "TALLINN",
+    "sources": [
+     {
+      "name": "Al Jazeera",
+      "url": "https://www.aljazeera.com/news/2026/11/20/russia-complains-of-new-iron-curtain-as-estonia-shuts-its-borders"
+     },
+     {
+      "name": "Meduza",
+      "url": "https://meduza.io/en/news/2026/11/20/estonia-to-close-all-road-crossings-with-russia"
+     }
+    ]
+   }
+  ],
+  "briefs": [
+   "UK Prime Minister Andy Burnham told parliament on 25 November that any future UK-EU agreement on university tuition fees would be handled separately from the deals announced at last week's EU-UK summit.",
+   "The UK government has announced an independent panel on nuclear weapons testing, followed by a prime ministerial statement to parliament on nuclear test veterans.",
+   "In France, a joint committee of deputies and senators failed to agree on the social security budget, sending the bill back to the National Assembly.",
+   "French Prime Minister Sébastien Lecornu said he will meet the leaders of each parliamentary group next week to continue talks on the 2027 budget.",
+   "Ukraine said its drones also struck oil storage facilities in Bashkortostan and a military airfield in Russia's Volgograd region."
+  ]
+ },
+ "africa": {
+  "lead": {
+   "headline": "Congo's Ebola outbreak passes 12,000 cases as violence hampers response",
+   "dek": "The Bundibugyo-strain outbreak in eastern Democratic Republic of Congo is still growing by hundreds of cases a week, and some responders have been pulled out of areas hit by fighting.",
+   "dateline": "KINSHASA",
+   "body": [
+    "The Ebola outbreak in the Democratic Republic of Congo has surpassed 12,000 confirmed cases, according to the European Centre for Disease Prevention and Control, which recorded 12,021 cases and 5,904 related deaths in its latest update. Congo's health ministry has described it as the fastest-growing Ebola outbreak on record, and the US Centers for Disease Control and Prevention calls it the second-largest ever recorded.",
+    "The outbreak, caused by the Bundibugyo species of the virus, has spread to eight provinces and 69 health zones. The World Health Organization says between 400 and 500 new cases are still being reported each week, and medical charity Médecins Sans Frontières says the epidemic remains out of control. Many deaths are occurring outside treatment centres, which health officials say indicates infections are being detected late.",
+    "Insecurity in the east is a major obstacle. Fighting between armed groups and the army has prevented teams from reaching some communities, and UN agencies have reported repeated attacks on civilians and health workers. NPR reported on 26 November that some responders had been evacuated from affected areas.",
+    "Children have been especially hard hit: UNICEF says 72% of confirmed cases among children under five have been fatal. Officials and researchers have also warned that deaths may be undercounted; one analysis of satellite imagery of cemeteries in Bunia suggested more excess deaths than were officially recorded by early November.",
+    "Cases linked to the outbreak were reported in Kenya and Nigeria in October, and an outbreak in Uganda has since been declared over. The CDC says no cases from this outbreak have been confirmed in the United States."
+   ],
+   "sources": [
+    {
+     "name": "NPR",
+     "url": "https://www.npr.org/2026/11/26/g-s1-155957/congo-ebola-responders"
+    },
+    {
+     "name": "ECDC",
+     "url": "https://www.ecdc.europa.eu/en/ebola-outbreak-democratic-republic-congo-and-uganda"
+    },
+    {
+     "name": "UN News",
+     "url": "https://news.un.org/en/story/2026/11/1168797"
+    }
+   ]
+  },
+  "stories": [
+   {
+    "headline": "South African court sets aside Phala Phala impeachment panel report",
+    "summary": "The Western Cape High Court on 25 November set aside in full the Section 89 panel report on the Phala Phala matter, which had been the basis for impeachment proceedings against President Cyril Ramaphosa, finding that the panel applied the wrong legal test. The ruling did not examine the president's conduct itself. The African Transformation Movement, which brought the original motion, says it is consulting lawyers on an appeal, while parliament is seeking legal advice.",
+    "dateline": "CAPE TOWN",
+    "sources": [
+     {
+      "name": "News24",
+      "url": "https://www.news24.com/politics/ramaphosa-wins-phala-phala-impeachment-report-set-aside-20261125-0516"
+     },
+     {
+      "name": "The Citizen",
+      "url": "https://www.citizen.co.za/news/south-africa/courts/ramaphosa-phala-phala-report-set-aside/"
+     },
+     {
+      "name": "IOL",
+      "url": "https://iol.co.za/mercury/news/2026-11-26-atm-considers-appeal-after-court-sets-aside-phala-phala-panel-report"
+     }
+    ]
+   },
+   {
+    "headline": "Fuel tanker fire on Cairo ring road kills 31",
+    "summary": "At least 31 people were killed when a fuel tanker crashed and caught fire on the Ring Road in Giza's densely populated Waraq district on 25 November, Egyptian authorities said. Prosecutors ordered the detention of a 21-year-old driver suspected of causing the collision, though accounts of how the crash happened differ. President Abdel Fattah el-Sisi ordered full medical care for the injured and support for victims' families.",
+    "dateline": "CAIRO",
+    "sources": [
+     {
+      "name": "Al Jazeera",
+      "url": "https://www.aljazeera.com/news/2026/11/26/egypt-detains-driver-over-cairo-fuel-tanker-fire-that-killed-31"
+     },
+     {
+      "name": "NBC News",
+      "url": "https://www.nbcnews.com/world/africa/fuel-tanker-crash-ignites-massive-fire-highway-surrounding-cairo-killi-rcna611418"
+     }
+    ]
+   },
+   {
+    "headline": "Guinea-Bissau junta postpones elections to 2028",
+    "summary": "Guinea-Bissau's military government has delayed presidential and legislative elections planned for 6 December by two years, to 26 November 2028, citing insufficient technical, material and financial conditions. The decree came on the first anniversary of the November 2025 coup that halted the release of disputed election results. The regional bloc ECOWAS has called for a return to civilian rule.",
+    "dateline": "BISSAU",
+    "sources": [
+     {
+      "name": "RTÉ",
+      "url": "https://www.rte.ie/news/2026/1127/1600846-guinea-bissau/"
+     },
+     {
+      "name": "Yahoo News",
+      "url": "https://www.yahoo.com/news/world/articles/guinea-bissau-presidential-election-delayed-180718006.html"
+     }
+    ]
+   },
+   {
+    "headline": "Sudan fighting continues as RSF commander defects to army",
+    "summary": "A senior Rapid Support Forces commander has defected to Sudan's army along with eight other commanders, according to a report by The New Arab, and made allegations about mass graves near El Fasher that have not been independently verified. The Council on Foreign Relations' conflict tracker lists RSF drone attacks that killed 19 people in Blue Nile state on 25 November. Analysts estimate the army holds about 60% of the country's territory and the RSF about 40%, mostly in Darfur.",
+    "dateline": "KHARTOUM",
+    "sources": [
+     {
+      "name": "The New Arab",
+      "url": "https://newarab.com/news/sudan-rsf-commander-defects-says-israelis-training-militia"
+     },
+     {
+      "name": "Council on Foreign Relations",
+      "url": "https://www.cfr.org/global-conflict-tracker/conflict/power-struggle-sudan"
+     },
+     {
+      "name": "TIME",
+      "url": "https://time.com/article/2026/11/25/sudan-war-rsf-elfasher-journalists-killed-arrested"
+     }
+    ]
+   },
+   {
+    "headline": "Kenyan High Court quashes Ruto's new state departments",
+    "summary": "Kenya's High Court has struck down new state departments created by President William Ruto, according to the Nation newspaper. In a separate case reported by the paper, two Kenya Wildlife Service officers were convicted and four acquitted over the killing of Brian Odhiambo.",
+    "dateline": "NAIROBI",
+    "sources": [
+     {
+      "name": "Nation",
+      "url": "https://nation.africa/kenya"
+     }
+    ]
+   },
+   {
+    "headline": "Nigeria joins UN High Seas Treaty",
+    "summary": "Nigeria has deposited its instrument of ratification of the UN agreement on marine biodiversity in areas beyond national jurisdiction at UN headquarters in New York, Premium Times reported. The move makes Nigeria a party to the treaty ahead of its first Conference of the Parties in January 2027.",
+    "dateline": "ABUJA",
+    "sources": [
+     {
+      "name": "Premium Times",
+      "url": "https://www.premiumtimesng.com/business/business-news/928016-exclusive-nigeria-submits-bbnj-treaty-ratification-instrument-to-un.html"
+     }
+    ]
+   }
+  ],
+  "briefs": [
+   "UNICEF says 72% of children under five with confirmed Ebola infection in the DR Congo outbreak have died.",
+   "Five EU countries' plan for a migrant return hub in Rwanda has drawn concern from UN human rights chief Volker Türk, whose office says it has not seen the text of the arrangement.",
+   "Human Rights Watch says Burkina Faso's military government is pursuing critics abroad through arrest warrants and extradition requests.",
+   "South Sudan has pushed its first elections back to February, with results expected on 15 February.",
+   "Egyptian officials said early local reports that a fallen high-voltage cable contributed to the Cairo tanker crash had not been confirmed."
+  ]
+ },
+ "americas": {
+  "lead": {
+   "headline": "Argentina enters technical recession as Congress approves Milei's central bank overhaul",
+   "dek": "Data showing a second straight quarterly contraction landed the same day lawmakers gave final approval to a law that largely bars the central bank from financing government spending.",
+   "dateline": "BUENOS AIRES",
+   "body": [
+    "Argentina's economy contracted by 1.8% in the third quarter, its second consecutive decline, putting the country in a technical recession, Euronews reported on 26 November. The figures add to signs of strain on the labour market: unemployment reached 7.9% in the second quarter, the highest level since President Javier Milei took office.",
+    "Also on 26 November, Congress gave final approval to Milei's overhaul of the central bank's charter, Bloomberg reported. The new law essentially prohibits the bank from financing government spending in the future, a central plank of the president's push to end chronic inflation. However, the vote fell short of the two-thirds majority Milei needed to restore his original wording on some provisions.",
+    "Public opinion has turned against the government. An AtlasIntel poll for Bloomberg published earlier this month found 62% of Argentines held a negative view of Milei and 36% a positive one, with jobs replacing inflation as the top concern about a year before the next presidential election.",
+    "The government is meanwhile seeking new investment. Milei has proposed cutting corporate income tax to 15% from 25% for projects of at least $1 billion in artificial intelligence and other emerging industries, pitching Argentina as a lightly regulated destination for data centres.",
+    "Supporters of the government argue the reforms are laying the groundwork for lasting stability after decades of fiscal deficits, while critics say austerity has deepened the downturn and hurt employment."
+   ],
+   "sources": [
+    {
+     "name": "Euronews",
+     "url": "https://www.euronews.com/2026/11/26/argentina-enters-technical-recession-despite-mileis-economic-reforms"
+    },
+    {
+     "name": "Bloomberg",
+     "url": "https://www.bloomberg.com/news/articles/2026-11-26/milei-s-overhaul-of-argentina-s-central-bank-wins-final-approval-in-congress"
+    },
+    {
+     "name": "Bloomberg",
+     "url": "https://www.bloomberg.com/news/articles/2026-11-13/milei-s-image-sours-with-argentines-as-jobs-become-top-concern"
+    }
+   ]
+  },
+  "stories": [
+   {
+    "headline": "Lula turns to Bradesco chairman for finance ministry",
+    "summary": "Brazilian President Luiz Inácio Lula da Silva has chosen Bradesco chairman Luiz Carlos Trabuco Cappi as finance minister for his fourth term, Bloomberg reported, a move aimed at reassuring investors about the country's public finances. Some reports said Trabuco had not yet formally accepted. Lula's new term begins on 5 January 2027.",
+    "dateline": "BRASILIA",
+    "sources": [
+     {
+      "name": "Bloomberg",
+      "url": "https://bloomberg.com/news/articles/2026-11-26/lula-taps-bradesco-chairman-as-finance-chief-to-reassure-markets"
+     },
+     {
+      "name": "The Sun (Malaysia)",
+      "url": "https://thesun.my/news/lula-turns-to-banking-veteran-to-calm-brazils-markets/"
+     }
+    ]
+   },
+   {
+    "headline": "Sheinbaum calls DEA cartel tip line 'interference' in Mexico",
+    "summary": "Mexican President Claudia Sheinbaum criticised a new anonymous tip line launched by the US Drug Enforcement Administration, calling it interference in Mexico's affairs and saying the agency should focus on corruption linked to organised crime inside the United States. Her comments followed an AP report alleging the DEA failed to seize at least 1.4 million counterfeit fentanyl pills while tracking a trafficking ring. Sheinbaum has expanded security cooperation with Washington while objecting to what she considers US overreach.",
+    "dateline": "MEXICO CITY",
+    "sources": [
+     {
+      "name": "Bloomberg",
+      "url": "https://www.bloomberg.com/news/articles/2026-11-26/sheinbaum-slams-dea-s-cartel-tip-line-as-interference-in-mexico"
+     },
+     {
+      "name": "The Hill",
+      "url": "https://thehill.com/policy/international/6244966-sheinbaum-rebukes-dea-tip-line/"
+     }
+    ]
+   },
+   {
+    "headline": "Machado holds first large Caracas rally since return, pushes for 2027 vote",
+    "summary": "Venezuelan opposition leader María Corina Machado addressed thousands of students at the Central University of Venezuela on 25 November, her first major rally since returning from exile in October, and toured Caracas neighbourhoods the next day to promote a nationwide consultation. The campaign is intended to press for credible elections in 2027 under the interim government of Delcy Rodríguez. Separately, police clashed with protesters demanding higher minimum wages near the presidential palace.",
+    "dateline": "CARACAS",
+    "sources": [
+     {
+      "name": "Particle",
+      "url": "https://particle.news/story/mara-corina-machado-returns-to-caracas-launches-nationwide-consultation"
+     },
+     {
+      "name": "Al Jazeera",
+      "url": "https://www.aljazeera.com/where/venezuela/"
+     },
+     {
+      "name": "NBC News",
+      "url": "https://www.nbcnews.com/world/south-america/venezuelas-opposition-leader-machado-returns-rcna605540"
+     }
+    ]
+   },
+   {
+    "headline": "Carney courts provinces as Canada-US trade talks inch forward",
+    "summary": "Prime Minister Mark Carney met Saskatchewan Premier Scott Moe on 26 November as Ottawa seeks provincial backing to conclude a trade deal with the United States, after talks resumed following Canada's suspension of negotiations in August. Carney has said Canada will sign only an agreement that keeps its auto sector viable. The government also referred the Whitehorse Power Centres project to its Major Projects Office on the same day.",
+    "dateline": "OTTAWA",
+    "sources": [
+     {
+      "name": "CBC News",
+      "url": "https://www.cbc.ca/news/politics/canada-us-trade-deal-must-include-viable-auto-sector-9.7422076"
+     },
+     {
+      "name": "Prime Minister of Canada",
+      "url": "https://www.pm.gc.ca/en"
+     },
+     {
+      "name": "Hashtag Investing",
+      "url": "https://www.hashtaginvesting.com/blog/carney-seeks-scott-moes-help-to-get-u-s-trade-deal-over-the-line-as-saskatchewan-faces-tariff-pressure"
+     }
+    ]
+   },
+   {
+    "headline": "Bolivia and Peru hold first joint cabinet in five years",
+    "summary": "Bolivian President Rodrigo Paz travelled to Lima for a binational cabinet meeting with Peruvian President Keiko Fujimori, the first such session in five years. Port access for landlocked Bolivia and border security were on the agenda, and an agreement on port services was being drafted.",
+    "dateline": "LIMA",
+    "sources": [
+     {
+      "name": "The Rio Times",
+      "url": "https://www.riotimesonline.com/bolivia-president-paz-peru-binational-cabinet-2026/"
+     }
+    ]
+   },
+   {
+    "headline": "Mexico's opposition PAN weighs sitting out 2027 midterms",
+    "summary": "Sheinbaum said the opposition National Action Party is free to stay out of next year's midterm elections if it chooses, after the party raised the possibility. The PAN is expected to decide after the electoral authority INE rules on 30 November on how 200 proportional-representation seats are allocated.",
+    "dateline": "MEXICO CITY",
+    "sources": [
+     {
+      "name": "The Rio Times",
+      "url": "https://www.riotimesonline.com/sheinbaum-pan-threat-skip-2027-mexico-election-2026/"
+     }
+    ]
+   }
+  ],
+  "briefs": [
+   "Brazil's main stock index rose 3.6% on 26 November and the real strengthened after reports of Lula's finance minister choice.",
+   "Mexico is seeking talks with US aviation authorities over permits for SpaceX to use Mexican airspace, Sheinbaum said.",
+   "Peru has declared an emergency in 21 districts of the Piura region after heavy rain and an earthquake that killed one person.",
+   "Environment Canada issued a freezing rain warning for Ottawa and parts of eastern Ontario as the season's first winter storm arrived.",
+   "Mexico's Sheinbaum said US officials are not permitted to operate on Mexican soil after a US military surveillance drone helped track a Sinaloa cartel figure."
+  ]
+ },
+ "asia": {
+  "lead": {
+   "headline": "Taiwan heads to local polls as Beijing steps up air activity and targets Taipei candidate",
+   "dek": "Voters choose mayors and county chiefs on Saturday after a campaign in which China denounced the governing party's Taipei nominee and sent dozens of military aircraft around the island.",
+   "dateline": "TAIPEI",
+   "body": [
+    "Taiwan's parties wrapped up campaigning on Friday ahead of Saturday's local elections for mayors and county chiefs, a contest widely watched as a gauge of support for President Lai Ching-te's Democratic Progressive Party (DPP) and the opposition Kuomintang (KMT) midway through his term.",
+    "The most closely followed race is in Taipei, where KMT incumbent Chiang Wan-an is seeking a second four-year term against the DPP's Puma Shen. A Shen victory would make him the first DPP mayor of the capital in nearly three decades. Shen has largely steered his campaign towards local issues such as transport and the environment rather than cross-strait relations.",
+    "Beijing has nonetheless made Shen a focus. Chinese authorities have labelled him a separatist, police in mainland China have listed him as wanted, and China's Taiwan Affairs Office earlier sanctioned him and announced punitive measures against a business run by his father. Beijing describes such steps as action against Taiwan independence forces; Taipei and the DPP say they amount to interference in a democratic vote.",
+    "Taiwan's defence ministry reported a renewed surge of Chinese military flights on the final days of campaigning, counting 30 aircraft operating around the island on one day, 26 of which crossed the median line of the Taiwan Strait. Separately, satellite imagery and a research report published this week indicated that a weeks-long Chinese amphibious landing exercise opposite Taiwan has been testing makeshift floating bridges for putting forces ashore.",
+    "The vote comes as tensions also run high between China and Japan, whose prime minister, Sanae Takaichi, angered Beijing last year by suggesting Japan could respond militarily to an attack on Taiwan."
+   ],
+   "sources": [
+    {
+     "name": "AsiaOne",
+     "url": "https://www.asiaone.com/asia/taiwan-local-election-campaigns-enter-final-day-china-sends-warplanes"
+    },
+    {
+     "name": "The Japan Times",
+     "url": "https://www.japantimes.co.jp/news/2026/11/24/asia-pacific/politics/taiwan-elections-china-beijing/"
+    },
+    {
+     "name": "NBC News",
+     "url": "https://nbcnews.com/world/china/china-taiwan-floating-bridges-amphibious-landing-drills-rcna611530"
+    }
+   ]
+  },
+  "stories": [
+   {
+    "headline": "Pakistani astronaut becomes first foreign visitor to China's Tiangong station",
+    "summary": "China's Shenzhou-24 mission docked with the Tiangong space station hours after launching on 25 November (Beijing time), carrying two Chinese crew members and Pakistan's Muhammad Zeeshan Ali. It is the first time China has flown a non-Chinese astronaut, a milestone under a 2025 Pakistan-China astronaut cooperation agreement. Ali is expected to return after about a week alongside two members of the Shenzhou-23 crew.",
+    "dateline": "BEIJING",
+    "sources": [
+     {
+      "name": "Dawn",
+      "url": "https://www.dawn.com/news/2046753"
+     },
+     {
+      "name": "Space.com",
+      "url": "https://www.space.com/space-exploration/human-spaceflight/pakistani-astronaut-becomes-1st-international-visitor-to-chinas-tiangong-space-station-photos"
+     }
+    ]
+   },
+   {
+    "headline": "Nvidia pauses AI server deliveries to four Southeast Asian countries after US rule change",
+    "summary": "Nvidia has told server makers including Dell and Super Micro to halt deliveries of systems carrying its chips to Malaysia, Singapore, Thailand and Indonesia, according to reports by the Financial Times and Wall Street Journal. The pause follows a US Commerce Department rule, effective 19 November, that requires licences for advanced chip exports to those countries and Brazil, aimed at closing routes by which Chinese firms could access restricted computing power. The length of the halt is unclear, and Thailand said it would scrutinise data centres importing high-end chips.",
+    "dateline": "SINGAPORE",
+    "sources": [
+     {
+      "name": "TechCrunch",
+      "url": "https://techcrunch.com/2026/11/26/nvidia-hits-pause-on-chip-shipments-to-southeast-asia/"
+     },
+     {
+      "name": "Bangkok Post",
+      "url": "https://www.bangkokpost.com/business/general/3361629/nvidia-halts-server-shipments-to-southeast-asia"
+     }
+    ]
+   },
+   {
+    "headline": "Japan and China trade accusations after coast guard encounter near disputed islands",
+    "summary": "Japan's coast guard repeatedly ordered two Chinese coast guard ships to leave waters around the Senkaku Islands after they approached a Japanese fishing boat, calling their presence a breach of international law. Beijing, which claims the islands as the Diaoyu, said its vessels acted lawfully and accused Japan of infringing Chinese territory. Japan's coast guard said it was the fifth such approach to a Japanese fishing vessel this year.",
+    "dateline": "TOKYO",
+    "sources": [
+     {
+      "name": "The Manila Times (AFP)",
+      "url": "https://www.manilatimes.net/2026/11/27/world/asia-oceania/japan-warns-china-ships-to-leave-waters-near-disputed-islands/2478686"
+     },
+     {
+      "name": "The China-Global South Project",
+      "url": "https://chinaglobalsouth.com/2026/11/25/japan-china-coast-guard-senkaku-diaoyu-islands/"
+     }
+    ]
+   },
+   {
+    "headline": "India's cabinet revives bill to expand parliament and fast-track women's quota",
+    "summary": "Prime Minister Narendra Modi's cabinet on Friday approved legislation to enlarge India's parliament and state assemblies and speed up the reservation of one-third of seats for women, setting up a second attempt to pass it after a bid failed in April. The bill is expected to be taken up when parliament's winter session opens on Monday. Reports say the DMK, with 22 MPs, has aligned with the government on the measure.",
+    "dateline": "NEW DELHI",
+    "sources": [
+     {
+      "name": "Reuters via WTVB",
+      "url": "https://wtvbam.com/2026/11/27/indias-modi-to-revive-parliament-expansion-bill-tied-to-womens-quota-sources-say/"
+     },
+     {
+      "name": "Zoom News",
+      "url": "https://www.zoomnews.in/en/news-detail/modi-cabinet-approves-delimitation-and-women-reservation-legislation-latest-key-updates.html"
+     }
+    ]
+   },
+   {
+    "headline": "China's industrial profits grow at fastest pace in five months on AI demand",
+    "summary": "Profits at Chinese industrial firms rose 20.1% year on year in October, up from 14.4% in September, official data showed on Friday, bringing growth for the first ten months to about 16%. Electronics and telecommunications equipment makers led the gains on demand for AI-related products, while consumer-facing and construction-linked sectors continued to struggle. Analysts said the export outlook that has supported manufacturers this year is becoming less certain.",
+    "dateline": "BEIJING",
+    "sources": [
+     {
+      "name": "Bloomberg",
+      "url": "https://bloomberg.com/news/articles/2026-11-27/china-s-industrial-profits-jump-at-fastest-pace-in-five-months"
+     },
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/27/china-industrial-profits-october.html"
+     }
+    ]
+   },
+   {
+    "headline": "Australian inflation accelerates to 4.9% as fuel costs climb",
+    "summary": "Australia's monthly consumer price index rose 0.5% in October, above forecasts, lifting annual inflation to 4.9%, the highest reading of the monthly series, as fuel prices jumped on higher global oil costs. The trimmed mean core measure climbed to 3.8% from 3.6%. The Australian dollar weakened on the data, and some economists, including at Westpac, expect October to mark the peak.",
+    "dateline": "SYDNEY",
+    "sources": [
+     {
+      "name": "RTE / Reuters",
+      "url": "https://www.rte.ie/news/business/2026/1125/1600578-australia-inflation-figures/"
+     },
+     {
+      "name": "Westpac IQ",
+      "url": "https://www.westpaciq.com.au/economics/2026/11/cpi-monthly-preview-25-november-2026"
+     },
+     {
+      "name": "ABC News",
+      "url": "https://www.abc.net.au/news/2026-11-26/asx-markets-business-news-live-updates-thursday-26-november/107428134"
+     }
+    ]
+   },
+   {
+    "headline": "South Korea's Lee overhauls foreign policy and security team",
+    "summary": "President Lee Jae-myung has named new foreign and unification ministers and a new intelligence chief, citing stalled relations with North Korea, strains in intelligence cooperation with the United States and friction between ministries. Unification minister nominee Hong Ihk-pyo said he would pursue peaceful coexistence with Pyongyang through incremental, practical steps rather than high-profile summits. The nominees still face confirmation hearings.",
+    "dateline": "SEOUL",
+    "sources": [
+     {
+      "name": "NK News",
+      "url": "https://www.nknews.org/2026/11/lee-jae-myung-names-new-unification-foreign-ministers-amid-north-korea-deadlock/"
+     },
+     {
+      "name": "Korea JoongAng Daily",
+      "url": "https://www.koreajoongangdaily.com/korea/lee-benches-autonomy-camp-in-security-team-overhaul-as-intelligence-ties-with-us-fray/12988335"
+     }
+    ]
+   }
+  ],
+  "briefs": [
+   "Residents of Tai Po in Hong Kong held memorial gatherings on Thursday to mark the first anniversary of the deadly Wang Fuk Court fire, as officials defended police inquiries into some memorial events.",
+   "Australia's federal parliament ended its sitting year after passing a gas reservation scheme requiring the largest exporters to set aside up to 20% of supply for the domestic market.",
+   "Pakistan and China agreed to pursue government-to-government arrangements for Chinese investment in Pakistan's energy sector.",
+   "Miners were trapped after flooding at an illegal gold mine in Bogor, West Java, with authorities reportedly alerted only 16 hours after the incident.",
+   "Thailand's vehicle production fell to a six-year low after flooding disrupted output, Nikkei Asia reported."
+  ]
+ },
+ "gulf": {
+  "lead": {
+   "headline": "Two Italians killed in drone attack on Kuwait as Rome and Kuwait blame Iran",
+   "dek": "Tehran denied involvement and called the strike a 'false flag', while Gulf states condemned the attack and the EU urged more pressure on Iran.",
+   "dateline": "KUWAIT CITY",
+   "body": [
+    "Two Italian nationals were killed in a drone attack on a site in Kuwait on Thursday, in what are among the first officially confirmed European deaths of the war between Iran and the United States that began in late February. Kuwait's defence ministry, which had initially reported four people wounded by falling debris, later confirmed that the two Italians had died of their injuries.",
+    "Italian Foreign Minister Antonio Tajani said the victims worked for the German defence company Rheinmetall and that the drone used was made in Iran. Kuwait described the attack as a 'heinous Iranian aggression' against a 'vital site', without specifying the target; some reports cited Tajani as saying several drones had been aimed at military facilities.",
+    "Iran rejected the accusation. Armed forces spokesman Abolfazl Shekarchi called it a 'false flag' operation intended to escalate regional insecurity, and Foreign Minister Abbas Araghchi described the incident as 'suspicious' and a 'precooked recipe for war', offering a joint investigation with Kuwait and Italy.",
+    "Saudi Arabia, Bahrain, Qatar and the United Arab Emirates condemned the attack, and European Commission President Ursula von der Leyen called for greater pressure on Tehran.",
+    "The incident adds to a week of attacks on Gulf states. Yemen's Houthis, who are aligned with Iran, struck Saudi refineries at Ras Tanura and Jazan, while Iran's Revolutionary Guard said tankers moving through the Strait of Hormuz without its authorisation had hit sea mines, and the US said it was continuing to enforce a naval blockade of Iranian ports."
+   ],
+   "sources": [
+    {
+     "name": "CNN",
+     "url": "https://www.cnn.com/2026/11/26/middleeast/italians-killed-iranian-attack-kuwait-intl"
+    },
+    {
+     "name": "Reuters via Internazionale",
+     "url": "https://www.internazionale.it/ultime-notizie-reuters/2026/11/26/two-italians-killed-in-iranian-drone-attack-in-kuwait-italy-says"
+    },
+    {
+     "name": "Gulf News",
+     "url": "https://gulfnews.com/world/mena/middle-east-conflict-saudi-refinery-attack-kills-worker-iran-denies-deadly-kuwait-strike-1.500761343"
+    }
+   ]
+  },
+  "stories": [
+   {
+    "headline": "Houthi strikes hit Saudi refineries at Ras Tanura and Jazan, killing a worker",
+    "summary": "A Houthi attack on the Jazan refinery in south-western Saudi Arabia on Thursday killed a Nepali worker, injured several others and temporarily halted some operations, Saudi state media reported, a day after the group said it targeted the kingdom's largest refinery at Ras Tanura. The Saudi-led coalition said it intercepted drones over Ras Tanura, vowed a 'firm response' and said it destroyed a ballistic missile launch platform in Hodeidah used in the Jazan strike. Earlier in the week a Houthi attack on a tower in Riyadh's King Abdullah Financial District injured 11 people, according to Saudi Civil Defense.",
+    "dateline": "RIYADH",
+    "sources": [
+     {
+      "name": "Arab News",
+      "url": "https://www.arabnews.com/saudi-arabia/houthi-attack-on-saudi-arabias-jazan-refinery-kills-nepali-worker-3014153"
+     },
+     {
+      "name": "NBC News",
+      "url": "https://www.nbcnews.com/world/saudi-arabia/yemen-houthi-rebels-attack-saudi-arabia-largest-oil-refinery-rcna611319"
+     },
+     {
+      "name": "Middle East Monitor",
+      "url": "https://www.middleeastmonitor.com/20261126-houthi-attack-targets-oil-refinery-in-southwestern-saudi-arabia-coalition/"
+     }
+    ]
+   },
+   {
+    "headline": "Israel threatens mass displacement in Gaza unless Hamas disarms",
+    "summary": "Israeli Defence Minister Israel Katz said on Thursday that about one million Palestinians in Gaza could be forcibly moved if Hamas does not voluntarily surrender its weapons, which Israel says the group committed to under the ceasefire deal reached more than a year ago. Near-daily Israeli fire has continued despite the truce, which Palestinian sources describe as repeated ceasefire violations. Israel says its operations target Hamas members and infrastructure.",
+    "dateline": "JERUSALEM",
+    "sources": [
+     {
+      "name": "France 24",
+      "url": "https://www.france24.com/en/middle-east/20261126-israel-threatens-to-displace-one-million-palestinians-in-gaza-unless-hamas-disarms"
+     },
+     {
+      "name": "Anadolu Agency",
+      "url": "https://www.aa.com.tr/en/middle-east/israeli-attacks-kill-11-palestinians-in-gaza/4121545"
+     }
+    ]
+   },
+   {
+    "headline": "Israeli strikes kill Gaza education official and Hamas-run security chiefs",
+    "summary": "An Israeli air strike in western Deir el-Balah killed Khaled Abu Nada, undersecretary of Gaza's education ministry, and his wife, Al Jazeera reported; Prime Minister Benjamin Netanyahu and Katz described him as a Hamas figure responsible for economic and education affairs. The strike followed the killings within two days of Gaza's internal security director, Naim Abu Nahl, and northern Gaza's internal security chief, Mohammed Abu al-Ouf, who was killed with his wife and two daughters. At least eight people in total were reported killed in the latest attacks.",
+    "dateline": "GAZA CITY",
+    "sources": [
+     {
+      "name": "Al Jazeera",
+      "url": "https://www.aljazeera.com/news/2026/11/26/israeli-attacks-on-gaza-kill-senior-education-official-seven-other-people"
+     },
+     {
+      "name": "The New Arab",
+      "url": "https://www.newarab.com/news/israel-targets-gaza-governance-third-hamas-official-killed"
+     }
+    ]
+   },
+   {
+    "headline": "Iran says tankers hit mines in Hormuz as US tightens sanctions",
+    "summary": "Iran's Revolutionary Guard said oil tankers transiting the Strait of Hormuz without Tehran's permission struck sea mines near the Omani port of Khasab, claims that could not be independently verified. Iran says the waterway is closed to unauthorised traffic and that ships must use northern lanes near its coast, while Washington says it is enforcing a naval blockade of Iranian ports. The US Treasury also announced sanctions on more than two dozen Iranian exchange houses, front companies and officials.",
+    "dateline": "DUBAI",
+    "sources": [
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/24/iran-trump-hormuz-crude-.html"
+     },
+     {
+      "name": "CBS News",
+      "url": "https://www.cbsnews.com/live-updates/iran-war-us-military-ai-weapons-oil/"
+     }
+    ]
+   },
+   {
+    "headline": "Oil extends rally on Gulf supply fears ahead of OPEC+ meeting",
+    "summary": "Brent crude rose for a third straight session on Thursday, trading in the mid-$90s a barrel, as attacks on Saudi refineries and reports of mine strikes on tankers in Hormuz heightened supply concerns. OPEC+ ministers meet on Sunday to set 2027 output policy, and sources cited by Reuters expect current targets to be rolled over at least through the first quarter.",
+    "dateline": "DUBAI",
+    "sources": [
+     {
+      "name": "Nation Thailand",
+      "url": "https://www.nationthailand.com/news/world/40073981"
+     },
+     {
+      "name": "FinanceFeeds",
+      "url": "https://financefeeds.com/brent-crude-oil-price-95-58-thursday-three-day-rally-before-opec-plus-sunday-bull-100-bear-91/"
+     }
+    ]
+   },
+   {
+    "headline": "Israel strikes Hezbollah sites in Lebanon despite June framework",
+    "summary": "The Israeli military said it struck dozens of rockets and launchers at a Hezbollah Radwan Force training camp in West Bekaa on Thursday, while Lebanese state media reported further strikes and shelling in the south. Israel says Hezbollah is rearming faster than it is being disarmed under a June framework that also provides for a gradual Israeli withdrawal; Hezbollah has refused to give up its weapons, and critics say Israel's continued strikes and troop presence undermine the arrangement.",
+    "dateline": "BEIRUT",
+    "sources": [
+     {
+      "name": "Xinhua",
+      "url": "https://english.news.cn/20261127/e823f4a19fde460382aafea1091e38b8/c.html"
+     },
+     {
+      "name": "Middle East Online",
+      "url": "https://www.middle-east-online.com/en/israeli-strikes-hit-eastern-and-southern-lebanon-despite-june-agreement"
+     }
+    ]
+   },
+   {
+    "headline": "Gulf leaders send condolences after death of Qatari naval serviceman",
+    "summary": "Qatar's defence ministry announced the death on 23 November of a member of the Qatar Amiri Naval Forces while on military duty, without giving the circumstances. UAE President Sheikh Mohamed bin Zayed sent condolences to Emir Sheikh Tamim bin Hamad Al Thani on Thursday, following an earlier statement of solidarity from the UAE foreign ministry.",
+    "dateline": "DOHA",
+    "sources": [
+     {
+      "name": "The Peninsula",
+      "url": "https://thepeninsulaqatar.com/article/23/11/2026/mod-mourns-a-member-of-qatar-amiri-naval-forces"
+     },
+     {
+      "name": "Gulf News",
+      "url": "https://gulfnews.com/uae/government/uae-president-offers-condolences-to-emir-of-qatar-over-death-of-naval-forces-member-1.500761836"
+     }
+    ]
+   }
+  ],
+  "briefs": [
+   "Formula E has moved its Jeddah double-header from 18-19 December to 16-17 April 2027, citing the regional conflict.",
+   "Saudi Arabia's business confidence index fell to 55.5 in October, its second monthly decline and lowest reading since April, according to the statistics authority.",
+   "Cargo handled at Saudi ports in October fell 11.7% year on year to 22.36 million tonnes.",
+   "The Times of Israel reported that the Yashar party and United Torah Judaism had reached agreement on key principles of a law on military conscription for ultra-Orthodox men.",
+   "Iraq has reportedly added Hezbollah to its banking sanctions list as the government moves against armed groups."
+  ]
+ },
+ "markets": {
+  "lead": {
+   "headline": "AI shares lead a holiday rebound as Wall Street returns for a half-day Black Friday",
+   "dek": "Futures pointed sharply higher before Friday's 1pm close as investors bought beaten-down chip stocks, though a near-certain December Fed hike and a fear gauge near 28 kept the mood fragile.",
+   "dateline": "NEW YORK",
+   "body": [
+    "US stock futures climbed ahead of Friday's shortened session, the last trading day of Thanksgiving week, as buyers returned to artificial-intelligence stocks that have been battered through November. Early Friday, S&P 500 futures were up about 1.7% and Dow futures about 1%, while Nasdaq 100 futures gained close to 3%. Nvidia rose roughly 4% in premarket trading and memory maker Micron about 6%. The NYSE and Nasdaq close at 1pm ET and the bond market at 2pm ET.",
+    "The bounce follows a turbulent week. On Wednesday, the last full session before the holiday, the S&P 500 fell as much as 3.2% and the Nasdaq as much as 4.6% intraday before clawing back most of the losses. The S&P closed down 0.3% at 7,182.78, the Nasdaq down 0.6% at 23,585.80, and the Dow rose 0.3% to 50,182.95 after erasing a drop of more than 1,100 points. Small caps did better still. Even so, the indexes were on track for strong weekly gains, with the S&P up about 3.9% for the week through Wednesday, according to AP figures.",
+    "The swings have centred on AI. Nvidia shares jumped 31% on Monday after its board reinstated Jensen Huang as chief executive, then gave back ground as doubts resurfaced over whether heavy borrowing to build data centres will pay off. Hotter-than-expected core inflation data also cut short the early-week rally. The VIX volatility index closed Wednesday at 28.03, a level that signals continued nervousness, and analysts were divided on whether the selling has run its course.",
+    "Monetary policy is the other weight on markets. Traders see a quarter-point Federal Reserve rate increase at the 8-9 December meeting as all but certain after October PCE inflation reached 3.8%, and some Fed officials have floated larger or additional moves. Treasury yields have nonetheless eased from their mid-November highs above 5%, with the 10-year near 4.86% at Wednesday's close.",
+    "Thin holiday trading can magnify price moves, and Black Friday volumes are typically well below average. Investors will also be watching early holiday-shopping data for signs of how consumers are holding up under higher rates and new tariffs."
+   ],
+   "sources": [
+    {
+     "name": "Forbes",
+     "url": "https://www.forbes.com/sites/siladityaray/2026/11/27/stock-futures-surge-as-battered-ai-shares-rebound-ahead-of-shorterned-friday-trading/"
+    },
+    {
+     "name": "AP via WTOP",
+     "url": "https://wtop.com/national/2026/11/how-major-us-stock-indexes-fared-wednesday-11-25-2026"
+    },
+    {
+     "name": "Yahoo Finance",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-firday-november-27-dow-sp-500-nasdaq-black-friday-holiday-091152065.html"
+    }
+   ]
+  },
+  "stories": [
+   {
+    "headline": "Markets price in a December Fed hike as yields slip from 5%",
+    "summary": "CME FedWatch showed a quarter-point rate rise at the December meeting fully priced as of 24 November, after New York Fed President John Williams said there was still work to do to bring inflation back to 2%. The 10-year Treasury yield, which topped 5% earlier in the month, edged down to about 4.90% on Tuesday as investors weighed the economy's resilience against the hawkish outlook.",
+    "dateline": "NEW YORK",
+    "sources": [
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/amp/2026/11/24/treasury-yields-bonds-inflation.html"
+     },
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/12/us-treasurys-bonds-yields.html"
+     }
+    ]
+   },
+   {
+    "headline": "Brent heads for first weekly gain in four weeks on Middle East supply fears",
+    "summary": "Brent crude traded near $96.60 a barrel early Friday, on course for a weekly rise of about 4% after a Houthi attack on a Saudi refinery and attacks on tankers near the Strait of Hormuz revived supply concerns. Prices are still down sharply for November amid expectations of a supply glut, and OPEC+ meets online on Sunday to consider its output policy for 2027.",
+    "dateline": "LONDON",
+    "sources": [
+     {
+      "name": "CNBC",
+      "url": "https://cnbc.com/2026/11/25/oil-wti-brent-hormuz-middle-east.html"
+     },
+     {
+      "name": "Zee Business",
+      "url": "https://www.zeebiz.com/markets/commodities/news-brent-crude-rises-4-in-a-week-set-for-first-weekly-gain-in-four-weeks-whats-driving-oil-prices-406068"
+     },
+     {
+      "name": "Admiral Markets",
+      "url": "https://admiralmarkets.com/analytics/traders-blog/opec-meeting-november-29-2026-preview"
+     }
+    ]
+   },
+   {
+    "headline": "European shares rally as tech leads a Thanksgiving rebound",
+    "summary": "With Wall Street shut on Thursday, the Stoxx 600 rose 1.83% to 637.50, Germany's DAX gained 2.14% and London's FTSE 100 climbed 1.75% to 10,609.30, led by technology stocks after Wednesday's sell-off. Gains carried into Friday morning, with all major regional indices trading higher in early deals.",
+    "dateline": "LONDON",
+    "sources": [
+     {
+      "name": "investingLive",
+      "url": "https://investinglive.com/stocks/european-stocks-surge-s-p-500-futures-finish-higher-in-thanksgiving-trading/"
+     },
+     {
+      "name": "Edge Consultancy",
+      "url": "https://edgeconsultancykw.com/europe-market-wrap-27-november-2026/"
+     }
+    ]
+   },
+   {
+    "headline": "Asia extends recovery from tech rout while Indian stocks slide on oil",
+    "summary": "Japan's Nikkei 225 rose 2.11% to 58,711.11 on Friday and South Korea's Kospi jumped 4.34% as chip stocks recovered. India bucked the trend: the Sensex fell 989 points, or 1.17%, to 83,339.26 as Brent topped $97, with IT and private bank shares the weakest groups.",
+    "dateline": "TOKYO",
+    "sources": [
+     {
+      "name": "Bangkok Post",
+      "url": "https://www.bangkokpost.com/business/general/3362244/asian-stocks-mostly-rise-as-markets-calm-after-tech-rout"
+     },
+     {
+      "name": "Business Standard",
+      "url": "https://www.business-standard.com/markets/news/stock-market-live-november-27-nse-bse-sensex-today-nifty50-gift-nifty-crude-oil-prices-mahanadi-coalfields-share-price-ipo-today-126112700100_1.html"
+     }
+    ]
+   },
+   {
+    "headline": "Bitcoin steadies near $62,000 after dipping below $60,000",
+    "summary": "Bitcoin traded around $61,775 early Friday, up about 1.4% over 24 hours, after slipping under $60,000 earlier in the week. The token remains far below its all-time high near $126,000, and record outflows from bitcoin exchange-traded funds have weighed on sentiment.",
+    "dateline": "SINGAPORE",
+    "sources": [
+     {
+      "name": "Crypto Times",
+      "url": "https://www.cryptotimes.io/2026/11/27/bitcoin-price-today-btc-rebounds-slightly-to-61800-amid-growing-public-key-exposure-concerns/"
+     },
+     {
+      "name": "Univest",
+      "url": "https://univest.in/blogs/bitcoin-price-today-60948-dollars-etf-outflows-death-cross-options-expiry-key-levels-26-november-2026"
+     }
+    ]
+   },
+   {
+    "headline": "Euro range-bound as twin December hikes from ECB and Fed are priced",
+    "summary": "EUR/USD held near 1.0970 on Friday, with markets assigning better than 90% odds to an ECB rate rise on 17 December after minutes of the October meeting made a hike the base case. Because the Fed is also expected to tighten, the rate gap is little changed, limiting the euro's upside; the dollar held just above 159 yen as Tokyo inflation came in at 2.8%.",
+    "dateline": "FRANKFURT",
+    "sources": [
+     {
+      "name": "FXStreet",
+      "url": "https://www.fxstreet.com/news/euro-stable-near-10970-against-us-dollar-as-ecb-path-priced-danske-bank-202611270721"
+     },
+     {
+      "name": "FXStreet",
+      "url": "https://fxstreet.com/news/forex-today-us-dollar-struggles-to-find-demand-after-thanksgiving-gold-extends-rebound-202611270737"
+     }
+    ]
+   }
+  ],
+  "briefs": [
+   "Gold rebounded more than 2% to above $3,650 an ounce on Friday after touching a 15-month low near $3,427 on Wednesday (FXStreet).",
+   "US October PCE inflation reached 3.8%, with core inflation at 3.3%, reinforcing expectations for Fed tightening (INDmoney).",
+   "Pablo Hernandez de Cos has been endorsed to succeed Christine Lagarde as ECB president; analysts expect little change in policy direction (FXStreet).",
+   "Polymarket put the odds of a quarter-point Fed hike in December at 93.5% as of 25 November (Rio Times).",
+   "ANZ analysts said Brent could still top $100 a barrel without a new Middle East escalation, but only with evidence of tighter supply (Zee Business)."
+  ],
+  "snapshot": [
+   {
+    "name": "S&P 500",
+    "value": "7,182.78",
+    "change": "-0.25%",
+    "asof": "Nov 25 close"
+   },
+   {
+    "name": "Dow Jones",
+    "value": "50,182.95",
+    "change": "+0.33%",
+    "asof": "Nov 25 close"
+   },
+   {
+    "name": "Nasdaq Composite",
+    "value": "23,585.80",
+    "change": "-0.62%",
+    "asof": "Nov 25 close"
+   },
+   {
+    "name": "FTSE 100",
+    "value": "10,609.30",
+    "change": "+1.75%",
+    "asof": "Nov 26 close"
+   },
+   {
+    "name": "Stoxx 600",
+    "value": "637.50",
+    "change": "+1.83%",
+    "asof": "Nov 26 close"
+   },
+   {
+    "name": "Nikkei 225",
+    "value": "58,711.11",
+    "change": "+2.11%",
+    "asof": "Nov 27 close"
+   },
+   {
+    "name": "Sensex",
+    "value": "83,339.26",
+    "change": "-1.17%",
+    "asof": "Nov 27 close"
+   },
+   {
+    "name": "US 10Y yield",
+    "value": "4.86%",
+    "change": "-7 bp",
+    "asof": "Nov 25 close"
+   },
+   {
+    "name": "Brent",
+    "value": "$96.61",
+    "change": "+$0.04",
+    "asof": "Nov 27, 04:50 GMT"
+   },
+   {
+    "name": "WTI",
+    "value": "$85.78",
+    "change": "n/a",
+    "asof": "Nov 27, early Asia"
+   },
+   {
+    "name": "Gold",
+    "value": "above $3,650",
+    "change": "+2% (approx.)",
+    "asof": "Nov 27, European morning"
+   },
+   {
+    "name": "EUR/USD",
+    "value": "1.0970",
+    "change": "flat",
+    "asof": "Nov 27, European morning"
+   },
+   {
+    "name": "USD/JPY",
+    "value": "159.0+",
+    "change": "flat",
+    "asof": "Nov 27, European morning"
+   },
+   {
+    "name": "Bitcoin",
+    "value": "$61,775",
+    "change": "+1.4% (24h)",
+    "asof": "Nov 27, 05:55 UTC"
+   }
+  ]
+ },
+ "stocks": {
+  "lead": {
+   "headline": "Nvidia's whiplash week: a CEO restored, a 31% surge and a fresh test for the AI trade",
+   "dek": "Shares in the world's most-watched chipmaker swung wildly after Jensen Huang's reinstatement, setting the tone for a volatile holiday week across tech.",
+   "dateline": "SANTA CLARA",
+   "body": [
+    "Nvidia's board reinstated Jensen Huang as president and chief executive on Monday 23 November, about 11 days after he resigned. Interim chief Colette Kress returned to her role as chief financial officer, and Huang rejoined the board. The company said a committee of independent directors had investigated the circumstances, and also said Huang had been the target of a foreign intelligence effort.",
+    "Investors cheered. Nvidia's shares closed up 31% on the day of the announcement, pulling the wider market sharply higher. But the rally proved hard to hold: the stock fell back on Tuesday and slid 3.9% on Wednesday as worries returned about whether AI customers borrowing heavily to build data centres can earn back their spending. By Monday the company had lost more than $2 trillion in market value from its October peak, according to reports.",
+    "The reinstatement has drawn political attention. NBC reported that President Donald Trump welcomed Huang's return and said he had spoken with the board, while congressional Democrats criticised the move and pledged an investigation. CNBC noted that an internal review and California and federal scrutiny are continuing.",
+    "On Friday, Nvidia rose about 4% in premarket trading to around $155 as investors returned from the holiday to buy beaten-down AI names. Whether that bounce sticks may depend on the Fed's December decision and on fresh evidence about AI spending, with analysts split on whether the sell-off has stabilised."
+   ],
+   "sources": [
+    {
+     "name": "Nvidia",
+     "url": "https://nvidianews.nvidia.com/news/nvidia-board-reinstates-jensen-huang-as-president-ceo-and-board-director"
+    },
+    {
+     "name": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/23/nvidia-jensen-huang-ceo.html"
+    },
+    {
+     "name": "NBC News",
+     "url": "https://www.nbcnews.com/tech/tech-news/nvidia-reinstates-jensen-huang-rcna610864"
+    }
+   ]
+  },
+  "stories": [
+   {
+    "headline": "Anthropic slips below its $83 IPO price days after debut",
+    "summary": "Anthropic shares closed at about $81.91 on 24 November, down 6.5% and below their $83 offer price in only the fourth trading session, and traded near $79 the next day. Coverage linked the slide to the end of underwriter price support, large committed spending disclosed in its filing and share sales by its co-founders, though many analysts kept positive ratings.",
+    "dateline": "SAN FRANCISCO",
+    "sources": [
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/24/anthropic-stock-ipo-price.html"
+     },
+     {
+      "name": "Bloomberg",
+      "url": "https://www.bloomberg.com/news/articles/2026-11-24/anthropic-breaks-below-83-ipo-price-in-premarket-trading"
+     }
+    ]
+   },
+   {
+    "headline": "Dell beats on AI servers after a 12% sell-off",
+    "summary": "Dell shares fell 12% to $295.28 on Tuesday amid a broad AI-hardware sell-off, then rose about 3% after hours when the company reported revenue of $54.9 billion and AI-server revenue of $22 billion. It raised its full-year revenue guidance to $202 billion and approved another $25 billion of buybacks.",
+    "dateline": "ROUND ROCK, TEXAS",
+    "sources": [
+     {
+      "name": "The Motley Fool",
+      "url": "https://www.fool.com/investing/2026/11/24/dell-just-reported-earnings-and-raised-its-forecast-by-usd10-billion-is-the-stock-a-buy-after-tuesday-s-selloff/"
+     },
+     {
+      "name": "The Next Web",
+      "url": "https://thenextweb.com/news/dell-q3-fy27-earnings-ai-server-backlog-202bn-forecast"
+     }
+    ]
+   },
+   {
+    "headline": "Memory makers lead Friday's premarket chip bounce",
+    "summary": "Micron rose about 6.4% to $640 before Friday's open as investors returned to semiconductor names, with memory chipmakers among the strongest gainers. Nasdaq 100 futures were up nearly 3%, though the VIX near 28 pointed to lingering caution.",
+    "dateline": "NEW YORK",
+    "sources": [
+     {
+      "name": "Forbes",
+      "url": "https://www.forbes.com/sites/siladityaray/2026/11/27/stock-futures-surge-as-battered-ai-shares-rebound-ahead-of-shorterned-friday-trading/"
+     },
+     {
+      "name": "The Globe and Mail",
+      "url": "https://www.theglobeandmail.com/investing/markets/inside-the-market/market-news/article-premarket-nasdaq-futures-surge-as-investors-pile-back-into-battered-ai/"
+     }
+    ]
+   },
+   {
+    "headline": "Chip and hardware earnings disappoint as ADI and Ambarella tumble",
+    "summary": "Analog Devices fell 17.4% on 24 November after its results, well beyond the move options traders had priced, while Ambarella dropped sharply after missing earnings forecasts and issuing weak guidance. Semtech and Dycom also fell around 17-18% on the day.",
+    "dateline": "NEW YORK",
+    "sources": [
+     {
+      "name": "Earnings Watcher",
+      "url": "https://earnings-watcher.com/wiki/earnings-reactions-2026-11-24"
+     },
+     {
+      "name": "GuruFocus",
+      "url": "https://www.gurufocus.com/news/9218592/ambarella-amba-shares-plunge-44-after-earnings-miss-and-weak-guidance"
+     }
+    ]
+   },
+   {
+    "headline": "Japan Tobacco climbs on talk of an Imperial carve-up",
+    "summary": "Japan Tobacco shares closed up about 4.5% in Tokyo on Friday, outpacing a 1.7% gain in the Topix, after reports that it is studying a deal for Imperial Brands, possibly alongside Altria. The stock had slumped earlier in November after JT lost control of its Russian subsidiaries.",
+    "dateline": "TOKYO",
+    "sources": [
+     {
+      "name": "Reuters via Investing.com",
+      "url": "https://www.investing.com/news/stock-market-news/japan-tobacco-shares-surge-on-talk-it-may-acquire-part-of-imperial-5053257"
+     }
+    ]
+   },
+   {
+    "headline": "Insmed and Sanofi both rise on $41 billion takeover",
+    "summary": "Insmed shares jumped about 14% in premarket trading to around $170 after Sanofi agreed to buy the company for $175 a share in cash, while Sanofi's own stock rose about 5% to a more than one-year high. Insmed had already rallied on earlier reports of the approach.",
+    "dateline": "PARIS",
+    "sources": [
+     {
+      "name": "Investing.com",
+      "url": "https://www.investing.com/news/stock-market-news/sanofi-to-acquire-insmed-in-41-billion-cash-deal-5047167"
+     }
+    ]
+   }
+  ],
+  "briefs": [
+   "Kohl's shares rose 19.5% on 24 November, while Dollar Tree gained 11.2% (Earnings Watcher).",
+   "Amentum Holdings climbed 20.1% on 24 November (Earnings Watcher).",
+   "Li Auto rose 11% after its third-quarter revenue beat estimates (Zacks via MetaTrader).",
+   "Small caps outperformed on Wednesday, with the Russell 2000 up 0.7% to 2,704.06 (AP).",
+   "South Korea's Kospi jumped 4.34% to 4,915.68 on Friday as chip stocks rebounded (Bangkok Post)."
+  ],
+  "movers": [
+   {
+    "ticker": "NVDA",
+    "name": "Nvidia",
+    "move": "+4.2%",
+    "why": "Premarket rebound in battered AI stocks after a volatile week following Jensen Huang's reinstatement",
+    "asof": "Nov 27 premarket"
+   },
+   {
+    "ticker": "MU",
+    "name": "Micron",
+    "move": "+6.4%",
+    "why": "Memory makers led Friday's early chip-stock bounce",
+    "asof": "Nov 27 premarket"
+   },
+   {
+    "ticker": "ANT",
+    "name": "Anthropic",
+    "move": "-6.5%",
+    "why": "Fell below its $83 IPO price in its fourth trading session",
+    "asof": "Nov 24 close"
+   },
+   {
+    "ticker": "DELL",
+    "name": "Dell Technologies",
+    "move": "-12%",
+    "why": "Caught in AI-hardware sell-off before results; rose about 3% after hours on strong AI-server sales",
+    "asof": "Nov 24 close"
+   },
+   {
+    "ticker": "ADI",
+    "name": "Analog Devices",
+    "move": "-17.4%",
+    "why": "Shares slumped after quarterly results",
+    "asof": "Nov 24 close"
+   },
+   {
+    "ticker": "IMB.L",
+    "name": "Imperial Brands",
+    "move": "+13.3%",
+    "why": "Altria confirmed it is weighing an all-cash bid; Japan Tobacco also reported to be interested",
+    "asof": "Nov 26 close"
+   },
+   {
+    "ticker": "2914.T",
+    "name": "Japan Tobacco",
+    "move": "+4.5%",
+    "why": "Reports it may acquire part of Imperial Brands",
+    "asof": "Nov 27 close"
+   },
+   {
+    "ticker": "INSM",
+    "name": "Insmed",
+    "move": "+14%",
+    "why": "Agreed $175-a-share cash takeover by Sanofi",
+    "asof": "Nov 24 premarket"
+   }
+  ]
+ },
+ "business": {
+  "lead": {
+   "headline": "Altria weighs cash bid for Imperial Brands as Japan Tobacco circles",
+   "dek": "The Marlboro maker's confirmation of interest sent Imperial's shares to their best day in decades and raised the prospect of a transatlantic carve-up of the British tobacco group.",
+   "dateline": "LONDON",
+   "body": [
+    "Altria, the US maker of Marlboro cigarettes, confirmed on Thursday 26 November that it is considering a possible offer for Imperial Brands, the UK owner of brands including Winston, and said any bid would likely be entirely in cash. It also disclosed talks with a third party about that party acquiring part of Imperial's business, though no agreement has been reached and no price was named.",
+    "The statement followed a Bloomberg report that Japan Tobacco was studying a potential deal for Imperial, possibly with a partner, that would split up its global assets. Analysts suggested a logical division would see JT take Imperial's US operations and Altria some or all of its international business, a structure one RBC analyst said could help avoid antitrust problems.",
+    "Imperial said it had received no approach and held no talks with Altria or the third party, but that its board would consider any proposal made. Its shares nonetheless jumped 13.3% to 3,432 pence on Thursday, their highest since 2017, giving the company a market value of about £25.9 billion. Japan Tobacco's shares rose roughly 4.5% in Tokyo on Friday.",
+    "Under UK takeover rules, Altria has until 5pm GMT on 24 December to announce a firm offer or walk away. Deutsche Bank and Perella Weinberg are advising Altria.",
+    "For Japan Tobacco, a deal could help offset a setback earlier this month, when its shares fell sharply after it lost control of its Russian subsidiaries, which were seized by Moscow."
+   ],
+   "sources": [
+    {
+     "name": "Bloomberg",
+     "url": "https://www.bloomberg.com/news/articles/2026-11-26/altria-studies-deal-for-cigarette-maker-imperial-brands"
+    },
+    {
+     "name": "Sharecast",
+     "url": "https://www.sharecast.com/news/news-and-announcements/ftse-imperial-brands-altria-group-takeover-tobacco-japan-tobacco--24305250.html"
+    },
+    {
+     "name": "Reuters via Investing.com",
+     "url": "https://www.investing.com/news/stock-market-news/japan-tobacco-shares-surge-on-talk-it-may-acquire-part-of-imperial-5053257"
+    }
+   ]
+  },
+  "stories": [
+   {
+    "headline": "Sanofi agrees $41 billion cash deal for Insmed",
+    "summary": "Sanofi will pay $175 per share in cash for US drugmaker Insmed, valuing it at about $41 billion and marking 2026's largest pharmaceutical deal, to strengthen its respiratory and rare-disease pipeline. The deal, announced on 24 November and backed by both boards, is expected to close in the first half of 2027 and will be funded with cash and debt.",
+    "dateline": "PARIS",
+    "sources": [
+     {
+      "name": "Sanofi",
+      "url": "https://www.sanofi.com/en/media-room/press-releases/2026/2026-11-24-06-30-00-3409002"
+     },
+     {
+      "name": "BioSpace",
+      "url": "https://www.biospace.com/business/sanofis-new-ceo-garijo-strikes-2026s-largest-pharma-deal-with-41b-for-insmed"
+     }
+    ]
+   },
+   {
+    "headline": "CrowdStrike to buy Zscaler in $43.9 billion all-stock deal",
+    "summary": "CrowdStrike agreed on 23 November to acquire Zscaler, with Zscaler holders receiving 1.135 CrowdStrike shares for each share, adding network security to its platform. CrowdStrike is targeting $500 million in annual cost savings within two years; Zscaler founder Jay Chaudhry will run the business and join CrowdStrike's board.",
+    "dateline": "AUSTIN",
+    "sources": [
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/23/crowdstrike-zscaler-aquisition-ai-cyberattacks.html"
+     },
+     {
+      "name": "Cybersecurity Dive",
+      "url": "https://www.cybersecuritydive.com/news/crowdstrike-acquire-zscaler-439-billion-turbulent-threat/875477/"
+     }
+    ]
+   },
+   {
+    "headline": "Black Friday online sales forecast at $12.9 billion as shoppers hunt bargains",
+    "summary": "Adobe expects US online spending of about $12.9 billion on Black Friday, up 9.2% from last year, after tracking $82.5 billion in online sales from 1 to 22 November. The National Retail Federation says fewer people plan to shop over the holiday weekend as households watch budgets, even as it expects November-December sales to top $1 trillion.",
+    "dateline": "NEW YORK",
+    "sources": [
+     {
+      "name": "Digital Commerce 360",
+      "url": "https://www.digitalcommerce360.com/2026/11/25/adobe-online-holiday-spending-data/"
+     },
+     {
+      "name": "Forbes",
+      "url": "https://www.forbes.com/sites/gabrielalinzainescu/2026/11/16/black-friday-2026-becomes-stock-up-season-for-everyday-essentials/"
+     }
+    ]
+   },
+   {
+    "headline": "Trading partners push back against new US tariffs of up to 20%",
+    "summary": "China, Japan and other partners protested on Thursday against planned US tariff increases of up to 20% on China, the EU and 12 other countries, and rejected US claims of excess manufacturing capacity. Some countries, including Vietnam and Thailand, are negotiating, while the US and China have extended their trade truce by two months.",
+    "dateline": "WASHINGTON",
+    "sources": [
+     {
+      "name": "US News / AP",
+      "url": "https://www.usnews.com/news/business/articles/2026-11-26/china-and-other-u-s-trading-partners-hit-back-at-trumps-new-tariff-plans"
+     },
+     {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/markets/article/us-announces-new-tariffs-of-up-to-20-on-china-the-eu-and-12-other-nations-131802359.html"
+     }
+    ]
+   },
+   {
+    "headline": "Dell's AI order book swells to $132 billion",
+    "summary": "Dell said it ended its fiscal third quarter with a record $132.3 billion backlog of AI-server orders after booking $60.2 billion in the period, and raised its AI-server revenue forecast for next year to $78 billion. The board added $25 billion to its share buyback programme after a record $4.9 billion returned to shareholders in the quarter.",
+    "dateline": "ROUND ROCK, TEXAS",
+    "sources": [
+     {
+      "name": "The Next Web",
+      "url": "https://thenextweb.com/news/dell-q3-fy27-earnings-ai-server-backlog-202bn-forecast"
+     },
+     {
+      "name": "Dell 8-K (SEC)",
+      "url": "https://www.sec.gov/Archives/edgar/data/0001571996/000157199626000050/exhibit991earnings8kq3fy27.htm"
+     }
+    ]
+   },
+   {
+    "headline": "Nvidia's governance questions linger after Huang's return",
+    "summary": "Although Nvidia restored Jensen Huang as chief executive, an internal investigation and state and federal scrutiny are continuing, and California's attorney general has said its probe will go on. Democrats in Congress have also promised to investigate the company and the Commerce Department over the circumstances of his reinstatement.",
+    "dateline": "SANTA CLARA",
+    "sources": [
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/24/nvidia-jensen-huang-ceo-return.html"
+     },
+     {
+      "name": "NBC News",
+      "url": "https://www.nbcnews.com/tech/tech-news/nvidia-reinstates-jensen-huang-rcna610864"
+     }
+    ]
+   }
+  ],
+  "briefs": [
+   "JPMorgan and BNP Paribas are splitting a $35 billion bridge loan to help finance Sanofi's Insmed purchase, according to Bloomberg (Investing.com).",
+   "Adobe forecasts Cyber Monday online sales of $15.1 billion, which would be the first day above $15 billion, and $47.5 billion across Cyber Week (Digital Commerce 360).",
+   "Americans are expected to finance $21.3 billion of online holiday purchases through buy-now-pay-later services, up 6.6% on last year, Adobe estimates (Digital Commerce 360).",
+   "OPEC+ ministers meet online on Sunday 29 November, with the group's current output agreement expiring at the end of 2026 (Admiral Markets).",
+   "Anthropic co-founders Dario and Daniela Amodei each sold roughly $280 million worth of shares, according to TheStreet."
+  ]
+ },
+ "tech": {
+  "lead": {
+   "headline": "US curbs on chip exports reach Southeast Asia as Nvidia reportedly halts server shipments to four countries",
+   "dek": "A new Commerce Department licensing regime for advanced chips is cutting into Southeast Asia's data-centre boom, and Nvidia's partners and resellers are now tightening supply to customers linked to China.",
+   "dateline": "WASHINGTON",
+   "body": [
+    "Nvidia has told server partners to stop shipping AI systems to Malaysia, Singapore, Thailand and Indonesia, the Financial Times reported this week. If confirmed, the move would be the clearest sign yet of how far new US export rules on advanced semiconductors reach beyond China. The report, which Forbes and others followed up on 26 November, rests on unnamed sources. Nvidia has not publicly confirmed the pause.",
+    "The trigger is an interim final rule that the Commerce Department's Bureau of Industry and Security announced on 16 November, Bloomberg reported. It requires licences, reviewed case by case, to export advanced chips to Indonesia, Malaysia, Singapore, Thailand and Brazil. It also targets data centres anywhere in the world that provide large amounts of compute to companies headquartered in China and other restricted destinations. Washington says the rule closes a loophole: Chinese firms have been reaching cutting-edge GPUs remotely through facilities in third countries. The rule also formally rescinds the Biden-era AI Diffusion Rule.",
+    "Downstream, resellers of Nvidia hardware have reportedly begun refusing to supply cloud operators that count any Chinese company among their clients, according to the Seoul Economic Daily. Singapore, meanwhile, is seeking talks with Washington over the rules as investigators examine Singapore-based operator Megaspeed, the South China Morning Post reported.",
+    "Opinion in Washington is divided. Treasury Secretary Scott Bessent said on 21 November that no further restrictions are needed on sales of older Nvidia chips to China. Critics in Congress, however, have questioned how the Commerce Department has handled licences for China-bound chips. Regional coverage warns that the curbs threaten Southeast Asia's AI build-out, and lenders have reportedly paused billions of dollars of financing for related projects. US officials argue that diversion risks in those markets justify closer scrutiny.",
+    "The shipment reports add to a turbulent month for Nvidia. Co-founder Jensen Huang resigned as chief executive on 12 November, and the company named chief financial officer Colette Kress as interim CEO while the board searches for a permanent successor."
+   ],
+   "sources": [
+    {
+     "name": "Forbes",
+     "url": "https://www.forbes.com/sites/siladityaray/2026/11/26/nvidia-reportedly-halts-ai-chip-shipments-to-southeast-asia-as-us-tightens-china-curbs/"
+    },
+    {
+     "name": "Bloomberg",
+     "url": "https://www.bloomberg.com/news/articles/2026-11-16/us-moves-to-limit-remote-access-to-advanced-ai-chips"
+    },
+    {
+     "name": "South China Morning Post",
+     "url": "https://scmp.com/week-asia/economics/article/3374665/singapore-seeks-us-talks-ai-chip-export-rules-amid-nvidia-fallout-megaspeed-probe"
+    }
+   ]
+  },
+  "stories": [
+   {
+    "headline": "OpenAI pilots 'Private Inference' for enterprise customers",
+    "summary": "OpenAI chief executive Sam Altman said the company is piloting Private Inference with its first enterprise customers. The service is designed to let businesses run prompts through OpenAI models without OpenAI being able to read them. OpenAI's business pages describe it as an alpha API preview. The company has not named the participating customers or given a timeline for wider release.",
+    "dateline": "SAN FRANCISCO",
+    "sources": [
+     {
+      "name": "Venture Atlas",
+      "url": "https://www.ventureatlas.org/news/2026-11-25-openai-private-inference"
+     },
+     {
+      "name": "The Neuron",
+      "url": "https://www.theneuron.ai/digest/everything-that-happened-in-ai-today-november-26-2026/"
+     }
+    ]
+   },
+   {
+    "headline": "State attorneys general press for privacy safeguards in Character.AI bankruptcy",
+    "summary": "A bipartisan coalition of about 40 state attorneys general, led by New York's Letitia James, is pressing the Delaware bankruptcy court to attach strict privacy and child-safety conditions to any sale of Character.AI's assets. The coalition is especially concerned about users' private chat logs. Character.AI's lawyer has said that no buyer has yet bid for the company's user data or its chatbot business.",
+    "dateline": "NEW YORK",
+    "sources": [
+     {
+      "name": "New York Attorney General",
+      "url": "https://ag.ny.gov/press-release/2026/attorney-general-james-urges-court-protect-children-and-consumers-characterai"
+     },
+     {
+      "name": "The Neuron",
+      "url": "https://www.theneuron.ai/digest/everything-that-happened-in-ai-today-november-26-2026/"
+     }
+    ]
+   },
+   {
+    "headline": "Appeals court sets January arguments in Google search and Meta antitrust cases",
+    "summary": "The US Court of Appeals for the D.C. Circuit has scheduled oral arguments for January in the Justice Department's search monopolisation case against Google and in the Federal Trade Commission's case against Meta. Both the government and Google are appealing parts of Judge Amit Mehta's rulings in the search case. Apple has filed a brief opposing any ban on Google's payments for default search placement.",
+    "dateline": "WASHINGTON",
+    "sources": [
+     {
+      "name": "Law360",
+      "url": "https://www.law360.com/telecom/articles/2558630"
+     },
+     {
+      "name": "PYMNTS",
+      "url": "https://www.pymnts.com/cpi-posts/apple-defends-google-search-payments-as-antitrust-fight-heads-to-appeals-court/"
+     }
+    ]
+   },
+   {
+    "headline": "EU AI Act bans on AI-generated abuse imagery take effect next week",
+    "summary": "Two new prohibitions added to the EU AI Act by the Digital Omnibus take effect on 2 December. They cover AI-generated non-consensual intimate imagery and AI-generated child sexual abuse material. The same date is the deadline for generative AI systems already on the market to add machine-readable content marking. Obligations for standalone high-risk systems have been pushed back to December 2027.",
+    "dateline": "BRUSSELS",
+    "sources": [
+     {
+      "name": "i-SCOOP",
+      "url": "https://www.i-scoop.eu/eu-ai-act-timeline-digital-omnibus/"
+     },
+     {
+      "name": "eGov Magazine",
+      "url": "https://egov.eletsonline.com/2026/11/eu-digital-omnibus-reshapes-ai-act-timelines-and-adds-new-prohibitions/"
+     }
+    ]
+   },
+   {
+    "headline": "Ransomware gang claims theft of 166 million USA Today subscriber records",
+    "summary": "A ransomware group calling itself n0n has listed USA Today on its leak site. The group claims to hold about 166 million subscriber records, including email and home addresses, and threatens to publish them unless it is paid. USA Today has not confirmed the claim. The listing came in a busy week for extortion groups: one tracker counted 33 victims posted to leak sites in a single 24-hour period.",
+    "dateline": "LONDON",
+    "sources": [
+     {
+      "name": "Cybernews",
+      "url": "https://cybernews.com/security/usa-today-hacker-data-breach/"
+     },
+     {
+      "name": "RansomNews",
+      "url": "https://ransomnews.com/ransomware-attacks-today/"
+     }
+    ]
+   },
+   {
+    "headline": "Electric truck maker Harbinger adds more than $100 million in financing",
+    "summary": "Los Angeles-based Harbinger said on 24 November that it has secured more than $100 million in new financing. The package includes a convertible note and senior debt from Erebor Bank, the lender backed by Palmer Luckey. The financing comes less than three weeks after Harbinger closed a $240 million Series D round.",
+    "dateline": "LOS ANGELES",
+    "sources": [
+     {
+      "name": "TechCrunch",
+      "url": "https://techcrunch.com/2026/11/24/electric-truck-startup-harbinger-gets-financing-boost-from-palmer-luckeys-bank"
+     }
+    ]
+   }
+  ],
+  "briefs": [
+   "AMD's rack-scale Helios systems, each with 72 Instinct MI455X GPUs, are reportedly installed and being tested at Meta ahead of a broader deployment.",
+   "Anthropic has reportedly rewritten the API service that routes Claude conversations from Python to Rust, cutting CPU use per request by about 70% in one region.",
+   "OpenAI published a preprint saying its GPT-6 model family can design protein structures and sequences; the work has not been peer reviewed.",
+   "Singapore has charged a fifth person in an AI server fraud case, and Malaysia is investigating whether imported AI chips were re-exported.",
+   "Treasury Secretary Scott Bessent said on 21 November that no further restrictions are needed on sales of older Nvidia chips to China."
+  ]
+ },
+ "healthcare": {
+  "lead": {
+   "headline": "Sanofi agrees to buy Insmed for $41 billion, the largest biopharma deal in three years",
+   "dek": "The French drugmaker will pay $175 a share in cash for the maker of bronchiectasis drug Brinsupri as it prepares for Dupixent's loss of patent protection.",
+   "dateline": "PARIS",
+   "body": [
+    "Sanofi said on 24 November that it will acquire US drugmaker Insmed for $175 per share in cash, an equity value of about $41.0 billion (EUR 37.6 billion). The boards of both companies have approved the deal. It is the largest biopharma acquisition of 2026 and the biggest in the sector since Pfizer bought Seagen in 2023.",
+    "The price is roughly 46% above Insmed's closing share price on 18 November, the last trading day before Bloomberg reported that Sanofi was weighing a bid. Insmed shares rose about 14% on the day of the announcement, CNBC reported.",
+    "The main prize is Brinsupri (brensocatib), an oral treatment for non-cystic fibrosis bronchiectasis, a chronic lung disease. Brinsupri has generated about $1.09 billion in revenue since its US launch in August 2025. Sanofi also gets Arikayce, an inhaled antibiotic, and TPIP (treprostinil palmitil inhalation powder), which is in Phase 3 development. TPIP has not been approved for any use.",
+    "The deal is designed to reduce Sanofi's reliance on Dupixent, its immunology blockbuster, which faces patent expiry later this decade. Sanofi said it expects the acquisition to add to earnings by the end of 2028. It will pay for the deal with cash on hand and new debt, and says it has committed financing in place.",
+    "Closing is expected in the first half of 2027, subject to approval by Insmed shareholders and US antitrust clearance."
+   ],
+   "sources": [
+    {
+     "name": "Sanofi",
+     "url": "https://www.sanofi.com/en/media-room/press-releases/2026/2026-11-24-06-30-00-3409002"
+    },
+    {
+     "name": "CNBC",
+     "url": "https://www.cnbc.com/2026/11/24/insmed-sanofi-deal-stock-pharma.html"
+    },
+    {
+     "name": "BioPharma Dive",
+     "url": "https://www.biopharmadive.com/news/sanofi-insmed-acquisition-deal-immunology-rare-disease/875627/"
+    }
+   ]
+  },
+  "stories": [
+   {
+    "headline": "WHO reports three H5N1 infections among Washington dairy workers, one fatal",
+    "summary": "The World Health Organization said on 24 November that three adults who work on dairy farms in Yakima County, Washington, were infected with H5N1 avian influenza, and that one of them died. WHO described the death as the first reported after exposure to infected dairy cattle. Viruses sequenced from the patients matched the B3.13 genotype circulating in cattle. WHO rates the overall public health risk as low and has found no evidence of human-to-human transmission.",
+    "dateline": "GENEVA",
+    "sources": [
+     {
+      "name": "WHO Disease Outbreak News",
+      "url": "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON629"
+     },
+     {
+      "name": "Xinhua",
+      "url": "https://english.news.cn/20261125/c69b11555fb9439c966dc47ffa78bd76/c.html"
+     }
+    ]
+   },
+   {
+    "headline": "FDA approves Cogent's bezuclastinib for advanced GIST",
+    "summary": "The FDA on 24 November approved Cogent Biosciences' bezuclastinib, used in combination with sunitinib, for advanced gastrointestinal stromal tumours, a rare cancer of the digestive tract. The drug will be sold as Ekitna and is approved as a second-line treatment. The approval adds to a busy month for the agency, which cleared a string of novel drugs in mid-November.",
+    "dateline": "WASHINGTON",
+    "sources": [
+     {
+      "name": "STAT",
+      "url": "https://statnews.com/2026/11/25/biotech-news-fda-approves-cogents-drug-for-rare-stomach-cancer"
+     },
+     {
+      "name": "FDA",
+      "url": "https://www.fda.gov/drugs/news-events-human-drugs/whats-new-related-drugs"
+     }
+    ]
+   },
+   {
+    "headline": "Congo's Bundibugyo Ebola outbreak still not under control, Africa CDC says",
+    "summary": "The Africa Centres for Disease Control and Prevention said the Ebola outbreak in the Democratic Republic of the Congo remains uncontrolled, with more than 10,400 confirmed cases of Bundibugyo virus disease. WHO's latest update reports further cases and deaths in Congo and no new cases in Kenya or Nigeria. There is no licensed vaccine for the Bundibugyo strain; results from trials of candidate vaccines are expected in early 2027. Only $1.3 billion of $2.9 billion pledged by donors has been released.",
+    "dateline": "KINSHASA",
+    "sources": [
+     {
+      "name": "Al Jazeera",
+      "url": "https://www.aljazeera.com/amp/news/2026/11/15/africa-cdc-says-ebola-outbreak-in-dr-congo-still-not-under-control"
+     },
+     {
+      "name": "WHO",
+      "url": "https://www.who.int/emergencies/situations/ebola-outbreak---drc-2026"
+     },
+     {
+      "name": "MSF",
+      "url": "https://www.doctorswithoutborders.org/latest/msf-calls-broader-access-ervebo-vaccine-during-ebola-outbreak"
+     }
+    ]
+   },
+   {
+    "headline": "Lilly signs $725 million deal with LoQus23 on Huntington's target",
+    "summary": "Eli Lilly has signed a deal worth up to $725 million with LoQus23 Therapeutics to pursue a genetic target in Huntington's disease, Fierce Biotech reported. The agreement is part of a cluster of licensing deals announced in the holiday-shortened week. Fierce Biotech also reported that Schroedinger signed a EUR 22 million biologics collaboration with Enpicom.",
+    "dateline": "INDIANAPOLIS",
+    "sources": [
+     {
+      "name": "Fierce Biotech",
+      "url": "https://www.fiercebiotech.com/deals"
+     }
+    ]
+   },
+   {
+    "headline": "Bayer to pull Kerendia from German market after pricing impasse",
+    "summary": "Bayer said it will withdraw Kerendia, a kidney and heart drug, from the German market after failing to agree a viable reimbursement arrangement with authorities, Fierce Pharma reported.",
+    "dateline": "BERLIN",
+    "sources": [
+     {
+      "name": "Fierce Pharma",
+      "url": "https://www.fiercepharma.com/"
+     }
+    ]
+   },
+   {
+    "headline": "Molecular glue stabilises chromosomes in ageing mouse eggs",
+    "summary": "Researchers have used an engineered 'molecular glue' to stabilise chromosomes in eggs from older mice, STAT reported on 26 November. The work could eventually improve IVF success for older women. The findings come from animal studies and have not been tested in humans.",
+    "dateline": "BOSTON",
+    "sources": [
+     {
+      "name": "STAT",
+      "url": "https://www.statnews.com/"
+     }
+    ]
+   }
+  ],
+  "briefs": [
+   "Bayer has licensed a Phase 1 antibody-drug conjugate from China's Hansoh Pharma in a deal valued at up to $3.3 billion, Fierce Biotech reported.",
+   "Bristol Myers Squibb reported mixed results for Sotyktu in lupus, according to Fierce Pharma.",
+   "Medicare's final 2027 physician fee schedule cuts payment per service by 2.31% for most doctors, a deeper cut than CMS proposed in July.",
+   "WHO has reported Switzerland's first locally acquired cases of chikungunya and judges the risk of further local spread to be low.",
+   "The FDA approved Roche's giredestrant for adjuvant treatment of early-stage breast cancer at intermediate to high risk of recurrence on 23 November."
+  ]
+ },
+ "energy": {
+  "lead": {
+   "headline": "Oil heads for first weekly gain of November as Gulf attacks overshadow OPEC+ meeting",
+   "dek": "Strikes on tankers near the Strait of Hormuz and on Saudi energy facilities have lifted Brent off a three-month low ahead of Sunday's OPEC+ meeting on 2027 output.",
+   "dateline": "LONDON",
+   "body": [
+    "Oil prices were on course on Friday for their first weekly rise of November. A wave of attacks on shipping and energy infrastructure in the Gulf revived worries about supply only days after concerns about a glut had pushed Brent crude to a three-month low. Market reports put Brent at about $89 a barrel on 24 November. It recovered to around $95-97 by Friday, its strongest level since early November.",
+    "The UK Maritime Trade Operations centre reported that an unidentified projectile struck an outbound tanker near the Strait of Hormuz. Iran's navy gave a different account, saying two oil tankers caught fire after hitting mines east of the strait. In Saudi Arabia, a projectile hit Saudi Aramco's Jazan refinery, and the energy ministry said some operations there were temporarily suspended. The Saudi-led coalition blamed Yemen's Houthis, who also claimed attacks on Ras Tanura. Container line Hapag-Lloyd estimates that rerouting ships around the strait costs it more than EUR 60 million a week.",
+    "Attention now turns to Vienna, where OPEC and its allies meet on Sunday, 29 November, to set production policy for 2027. Analysts quoted by ICIS and others expect the group to consider keeping current output targets through the first quarter of 2027. Members are reported to disagree: some producers favour defending prices, while Saudi Arabia appears under less pressure to support the market with deeper cuts.",
+    "The fundamental picture remains bearish. US crude inventories have been rising, and both the IEA and the US Energy Information Administration have estimated that global oil demand contracted in 2026. Analysts say steady flows and looser quotas would confirm the surplus and push prices back toward the high $80s. Further disruption in Hormuz, failed diplomacy with Iran or an OPEC+ cut could instead lift Brent back toward $100."
+   ],
+   "sources": [
+    {
+     "name": "The National",
+     "url": "https://www.thenationalnews.com/business/energy/2026/11/27/oil-set-to-post-weekly-gain-as-middle-east-attacks-stoke-supply-concerns/"
+    },
+    {
+     "name": "ICIS",
+     "url": "https://www.icis.com/explore/resources/news/2026/11/25/11243387/oil-falls-on-supply-glut-concerns-eyes-on-29-nov-opec-meeting/"
+    },
+    {
+     "name": "EnergyNow",
+     "url": "https://energynow.com/2026/11/oil-prices-mixed-as-middle-east-supply-risks-clash-with-growing-u-s-inventories-ahead-of-opec-meeting/"
+    }
+   ]
+  },
+  "stories": [
+   {
+    "headline": "COP31 ends without a pact after split over fossil fuels",
+    "summary": "The UN climate summit in Antalya closed on 22 November without adopting its main political text, the proposed Antalya Pact. The European Union, Panama and the Marshall Islands refused to back a draft that did not mention fossil fuels. Negotiators did agree on how workers and communities can shape the just-transition mechanism and on next steps for reviewing climate finance. UN Secretary-General Antonio Guterres called the outcome deeply disappointing. COP32 will be held in Addis Ababa.",
+    "dateline": "ANTALYA",
+    "sources": [
+     {
+      "name": "UN News",
+      "url": "https://news.un.org/en/story/2026/11/1168855"
+     },
+     {
+      "name": "CNN",
+      "url": "https://www.cnn.com/2026/11/22/climate/cop31-summit-collapses-in-fossil-fuel-failure"
+     },
+     {
+      "name": "CBC",
+      "url": "https://www.cbc.ca/news/world/cop31-talks-collapse-fossil-fuel-9.7431847"
+     }
+    ]
+   },
+   {
+    "headline": "Tepco delays Kashiwazaki-Kariwa unit 7 restart over concrete problem",
+    "summary": "Tokyo Electric Power has pushed back the restart of reactor No. 7 at its Kashiwazaki-Kariwa plant in Niigata. Construction of a required anti-terrorism facility has stalled because of a problem with the strength of the concrete used in the structure. Tepco now aims to finish the facility by April 2031, well beyond its earlier target of August 2029.",
+    "dateline": "TOKYO",
+    "sources": [
+     {
+      "name": "Bloomberg",
+      "url": "https://www.bloomberg.com/news/articles/2026-11-26/japan-s-tepco-delays-nuclear-reactor-restart-on-building-issue"
+     },
+     {
+      "name": "The Japan Times",
+      "url": "https://www.japantimes.co.jp/business/2026/11/27/companies/tepco-kashiwazaki-kariwa-delay-antiterrorism/"
+     }
+    ]
+   },
+   {
+    "headline": "First fuel delivered for China's Tianwan unit 8",
+    "summary": "Russia has delivered the first fuel for the eighth and final reactor at China's Tianwan nuclear power plant. The unit has also completed hot functional tests. Once all eight units are running, Tianwan's installed capacity of about 9.1 gigawatts will make it the world's largest nuclear power plant.",
+    "dateline": "BEIJING",
+    "sources": [
+     {
+      "name": "Interesting Engineering",
+      "url": "https://interestingengineering.com/energy/chinas-tianwan-nuclear-plant-gets-fuel"
+     }
+    ]
+   },
+   {
+    "headline": "France plans state-led rare earths stockpile",
+    "summary": "France plans to build a strategic rare earths stockpile, led by the state-controlled bank Caisse des Depots, and to encourage manufacturers in sectors such as defence to buy jointly, Reuters reported on 24 November. The plan is part of a broader European push to reduce dependence on Chinese supplies of critical minerals.",
+    "dateline": "PARIS",
+    "sources": [
+     {
+      "name": "MINING.COM",
+      "url": "https://www.mining.com/category/critical-minerals/"
+     }
+    ]
+   },
+   {
+    "headline": "Rare earth stocks slide as China extends mineral export pause",
+    "summary": "Shares of US rare earth and critical minerals companies fell on 25 November after China extended a pause on some mineral exports and a pending US tariff probe added uncertainty. USA Rare Earth fell about 6% and MP Materials about 3%, reversing part of a broad rally two days earlier.",
+    "dateline": "NEW YORK",
+    "sources": [
+     {
+      "name": "24/7 Wall St.",
+      "url": "https://247wallst.com/investing/2026/11/25/usa-rare-earth-drops-6-as-china-extends-mineral-export-pause-and-new-u-s-tariffs-loom-critical-metals-declines-5-mp-materials-falls-3/"
+     }
+    ]
+   },
+   {
+    "headline": "EU curbs on Chinese inverters could slow European solar build-out, analysts say",
+    "summary": "Analysis from Wood Mackenzie suggests that EU restrictions on power inverters supplied from China could cut solar deployments by about 6% in roughly half of European markets.",
+    "dateline": "BRUSSELS",
+    "sources": [
+     {
+      "name": "reNEWS",
+      "url": "https://www.renews.biz/"
+     },
+     {
+      "name": "PV Tech",
+      "url": "https://www.pv-tech.org/category/news/"
+     }
+    ]
+   }
+  ],
+  "briefs": [
+   "More than 90 countries signed a pledge at COP31 to accelerate the electrification of their economies, according to the summit's negotiations president, Chris Bowen.",
+   "Thailand said it will move to block exports of chemicals used in Myanmar's rare earth mining, which has been linked to river contamination in northern Thailand.",
+   "Sweden's Blykalla and enricher Urenco announced what they called the first HALEU enrichment contract for a commercial lead-cooled reactor.",
+   "Greenvolt Power has started building its Alamogordo project in New Mexico, which pairs 100 MWac of solar with a 50 MW/200 MWh battery.",
+   "South Korea has named seven priority critical minerals, including rare earths, and pledged support for overseas mining and refining investments."
+  ]
+ },
+ "opinion": {
+  "editorial": {
+   "headline": "Divided Government Is a Chance to Fix Health Care, Not an Excuse to Stall",
+   "body": [
+    "The midterms handed Democrats both chambers of Congress, and Washington is already settling into its familiar post-election posture: each side declaring a mandate, each side daring the other to blink. Health care is where that reflex would do the most harm. The president says his team is negotiating with lawmakers and has floated sending government money “directly to the people” rather than to insurers. Michigan Senator-elect Abdul El-Sayed has publicly invited him to put his name on a streamlined, Medicare-style programme, mock gold “TrumpCare” card and all. Much of this is theatre. But theatre that admits the other side might have a point is a better starting position than either party has had in years.",
+    "Both camps should be honest about the trade-offs. Progressives who want universal coverage have to reckon with cost, with the disruption to the roughly half of Americans who get insurance through work and like it, and with a federal budget already strained by a war and high energy prices. Conservatives who want more consumer control and less insurer middleman have to reckon with the fact that cash in hand does not buy coverage for people with chronic illness unless the rules on pre-existing conditions and risk pools hold firm. Price transparency, site-neutral payments, faster generic and biosimilar approvals and a durable fix to premium subsidies are not the whole answer, but they are the part on which credible economists of both left and right broadly agree.",
+    "The temptation for a newly empowered Democratic Congress will be to pass maximal bills for the 2028 campaign; the temptation for the White House will be to sign nothing that hands the opposition a win. Voters, who just punished the governing party in large part over the cost of living, deserve better than a two-year standoff. A modest, bipartisan bill that lowers what families actually pay would not settle the larger argument about who should run American health care. It would show that divided government can still deliver, which may be the most valuable thing either side could offer right now."
+   ]
+  },
+  "debates": [
+   {
+    "topic": "California death row",
+    "question": "Was Governor Newsom right to commute every death sentence in California?",
+    "context": "On 5 November Governor Gavin Newsom announced he would commute all 548 California death sentences to life without parole, saying the state “cannot morally kill them.” District attorneys from 30 counties and the Criminal Justice Legal Foundation have asked the courts to halt the move, and 382 of the cases, involving prisoners with more than one felony conviction, require approval by at least four of the seven California Supreme Court justices before Newsom leaves office in January. President Trump said this week that the Justice Department is working to overturn the decision.",
+    "views": [
+     {
+      "label": "Yes",
+      "lean": "centre-left",
+      "headline": "A Punishment the State Will Not Carry Out Is Not Justice",
+      "body": [
+       "California has not executed anyone since 2006. Newsom imposed a moratorium in 2019, and long before that, litigation over lethal-injection protocols had frozen the machinery. The result is a death row that functions as an extraordinarily expensive form of life imprisonment, with years of mandatory appeals, separate housing and specialised counsel, while victims’ families are promised a finality that never arrives. Converting those sentences to life without parole does not release anyone. It replaces a fiction with a sentence the state will actually enforce.",
+       "The moral case matters too, and Newsom made it plainly. The death penalty is the one punishment that cannot be corrected when the system errs, and the American system does err: more than 190 people sentenced to death nationwide have later been exonerated since the 1970s. California’s death row also reflects the familiar distortions of capital punishment, in which the county where a crime occurred and the quality of a defendant’s lawyer can matter as much as the facts of the case. A governor who believes the state cannot fairly administer irreversible punishment has not only the right but arguably the duty to say so.",
+       "Clemency is not a loophole. It is written into the California constitution precisely as a check on the courts and the legislature, and the framers attached a safeguard to it: for repeat felons, the state Supreme Court must concur. That review is happening now. If the justices conclude that individual cases deserve a different outcome, the constitution lets them say so. The process critics call lawless is in fact the process the constitution prescribes.",
+       "None of this diminishes the suffering of victims’ families, and Newsom was right to acknowledge that the announcement could reopen wounds. The state should have done far better at notifying them, and should invest in the services, restitution and support that matter to survivors long after the headlines fade. But decades of unfulfilled promises have not served those families either. An honest sentence of life behind bars, with no further rounds of appeals and hearings, may offer them more peace than a death sentence that exists only on paper."
+      ]
+     },
+     {
+      "label": "No",
+      "lean": "centre-right",
+      "headline": "One Governor Should Not Erase Hundreds of Verdicts at Once",
+      "body": [
+       "Every one of the 548 sentences Newsom commuted was handed down by a jury, reviewed by judges and, in most cases, upheld on appeal. California voters have repeatedly declined to abolish capital punishment: they rejected repeal measures in 2012 and 2016, and in 2016 approved a measure to speed up executions instead. Whatever one thinks of the death penalty, that is a democratic verdict. A blanket commutation announced two months before a governor leaves office substitutes the conviction of one official for the repeated judgment of the electorate.",
+       "Clemency exists to correct injustice in particular cases: a doubtful conviction, an inadequate defence, a prisoner transformed by decades of reflection. That is why it has traditionally been granted case by case. The Criminal Justice Legal Foundation’s lawsuit makes exactly this point, arguing that commuting every sentence without individualised review stretches the power beyond its purpose. Treating the man who murdered several children identically to a defendant with a plausible innocence claim is not mercy. It is a policy change dressed in the language of mercy.",
+       "The process has also been hard on the people with the most at stake. Former Sacramento District Attorney Anne Marie Schubert has said victims’ families were not notified in advance, and relatives have described learning the news from the media. Many of those families spent years in courtrooms trusting that the law would mean what it said. Telling them, all at once and after an election, that it will not, is a breach of faith that will make future victims less willing to trust the system.",
+       "There is a better path for those who want to end the death penalty in California: persuade voters or the legislature to repeal it, and let the change apply openly and prospectively. The 30 county prosecutors challenging the commutations are not asking for executions tomorrow. They are asking the California Supreme Court to insist that the gravest sentences the state imposes be reconsidered on their individual merits, not swept away by decree. That is a reasonable request, and the court should grant it."
+      ]
+     }
+    ],
+    "bottom_line": "Both sides agree that California’s current system, in which death sentences are imposed but not carried out, serves neither justice nor victims’ families, and that survivors deserved better notice and support. The open question is who should end the impasse: a governor using a constitutional clemency power, or voters and courts weighing each case on its own merits?",
+    "sources": [
+     {
+      "name": "CalMatters: Newsom death penalty commutation",
+      "url": "https://calmatters.org/justice/2026/11/gavin-newsom-death-penalty-commutation/"
+     },
+     {
+      "name": "CalMatters via Palo Alto Online: Prosecutors ask California Supreme Court to halt commutations",
+      "url": "https://paloaltoonline.com/calmatters/2026/11/16/prosecutors-ask-california-supreme-court-to-halt-newsoms-death-penalty-commutations"
+     },
+     {
+      "name": "KQED: Victims’ families react to Newsom’s death row decision",
+      "url": "https://www.kqed.org/news/12108800/soul-hurting-pain-victims-families-enraged-at-newsoms-death-row-decision"
+     },
+     {
+      "name": "Daily Journal: Lawsuit challenges Newsom’s plan to commute 548 death sentences",
+      "url": "https://dailyjournal.com/articles/396203-lawsuit-challenges-newsom-s-plan-to-commute-548-death-sentences"
+     },
+     {
+      "name": "The Daily Signal: Newsom moves to spare 548 death row inmates",
+      "url": "https://www.dailysignal.com/?p=257280"
+     },
+     {
+      "name": "The Hill: Rising, November 25, 2026",
+      "url": "https://thehill.com/hilltv/6232540-rising-november-25-2026/"
+     }
+    ]
+   },
+   {
+    "topic": "Iran blockade",
+    "question": "Should the United States ease its naval blockade of Iran to get formal peace talks started?",
+    "context": "A US naval blockade has largely choked off Iran’s crude exports since mid-July, and Tehran says it will not reopen formal negotiations or the Strait of Hormuz until the blockade ends, sanctions are eased and frozen assets released. This week President Trump gave Iran until early 2027 to reach a deal, warned that ships trying to breach the blockade would be sunk, and suggested strikes could resume next year if talks fail; Qatar and Pakistan are mediating. Elevated fuel and shipping costs have become a domestic political issue.",
+    "views": [
+     {
+      "label": "Yes",
+      "lean": "centre-left / realist",
+      "headline": "Leverage Is Only Worth Something If You Are Willing to Spend It",
+      "body": [
+       "The blockade has done its job. It has squeezed Iran’s oil revenue for more than four months and demonstrated that Washington can impose real costs without a ground war. But leverage is a means, not an end. A blockade that continues indefinitely, with no diplomatic process attached, turns from pressure into a standoff, and standoffs at sea have a way of ending in accidents. When the president is warning that ships will be sunk and Iran is vowing to break the cordon, the risk of an incident that drags both sides back into open war is not hypothetical.",
+       "The costs are not borne only by Tehran. Disruption around the Strait of Hormuz has kept shipping and fuel costs high, and that has hit American households and US allies in Europe and Asia. Voters just registered their frustration with the cost of living at the ballot box. A carefully sequenced easing of the blockade, tied to verifiable steps such as safe passage through the strait and a return to the table, would ease that pain while keeping most of Washington’s pressure, including sanctions, in place.",
+       "Easing is not the same as surrender. The United States could offer a partial, reversible step, such as allowing limited humanitarian or civilian shipping, in exchange for Iran beginning formal talks through the Qatari and Pakistani channels and halting drone launches. If Tehran stalls, the cordon can be restored within days; the Navy is not going anywhere. That is a far smaller gamble than letting the deadline approach with no process at all and then facing a choice between climbing down and resuming strikes.",
+       "History counsels humility about maximalist goals in this region. Trump’s own talk of “total victory” sits awkwardly with his statement that the war is effectively over militarily. If the military phase is done, the task now is to convert battlefield gains into a durable settlement on Iran’s nuclear programme and on freedom of navigation. That requires talks, and talks require a reason for the other side to come. A measured, conditional gesture is the cheapest way to provide one."
+      ]
+     },
+     {
+      "label": "No",
+      "lean": "centre-right",
+      "headline": "Lifting the Pressure First Would Reward the Tactic That Started This",
+      "body": [
+       "Iran’s position is straightforward: end the blockade, waive oil sanctions and release frozen funds, and only then will it talk seriously. Accepting those terms would mean paying the full price of a deal before negotiations begin. That is not diplomacy; it is ransom. The leverage that brought Tehran to indirect contact through Qatar and Pakistan is the blockade itself, and giving it away up front would leave Washington with little to trade when the hard questions about uranium enrichment and missile programmes finally arrive.",
+       "The record of this conflict argues for caution. An April ceasefire collapsed within two weeks after attacks on shipping in the Strait of Hormuz, and a later memorandum proved no more durable. Each pause gave Iran room to regroup. The president said this week that Iran has launched more drones and missiles in the past week than at any time in over a year. That is not the behaviour of a government preparing to bargain in good faith, and it is not the moment to signal that pressure will lift if Tehran simply waits.",
+       "The economic argument for easing is weaker than it looks. Oil has kept moving through the strait with US military assistance, while Iran’s own exports remain choked off. Analysts have noted that this asymmetry steadily erodes Iran’s bargaining power over time. High fuel prices are painful, but a premature deal that leaves Iran free to threaten the world’s most important energy chokepoint again would impose far larger costs on consumers in the years ahead.",
+       "None of this means ruling out a settlement. The administration has set a clear window, through early 2027, and kept channels open through two credible mediators. The right sequence is for Iran to take concrete steps first, such as halting attacks on shipping and agreeing to formal talks, with relief on the blockade offered in return for verifiable commitments. Firmness now is what makes a lasting agreement possible later."
+      ]
+     }
+    ],
+    "bottom_line": "Both sides want an end to the war that secures shipping through Hormuz and constrains Iran’s nuclear programme, and both accept that some sequencing of blockade relief and Iranian concessions will eventually be needed. The open question is who moves first: does a conditional easing now lower the risk of a wider war, or does it squander the leverage that makes a durable deal possible?",
+    "sources": [
+     {
+      "name": "News Tribune (AP): Trump suggests Iran strikes will resume next year if talks fail",
+      "url": "https://www.newstribune.com/news/2026/nov/24/trump-suggests-iran-strikes-will-resume-next-year/"
+     },
+     {
+      "name": "Alhurra: Trump gives Iran until early 2027 to strike a deal",
+      "url": "https://alhurra.com/en/57025"
+     },
+     {
+      "name": "Signal SCV: Iran vows to confront US naval blockade",
+      "url": "https://signalscv.com/2026/11/iran-vows-to-confront-us-naval-blockade-after-trump-warns-ships-will-be-sunk/"
+     },
+     {
+      "name": "Townhall: Trump on Iranian attempts to break the blockade",
+      "url": "https://townhall.com/news/dmitri-bolt/2026/11/23/president-trump-responds-to-iranian-plot-to-challenge-us-naval-blockade-n2686884"
+     },
+     {
+      "name": "Al Jazeera: Is Iran losing its leverage over the Strait of Hormuz?",
+      "url": "https://aljazeera.com/news/2026/9/30/economic-war-is-iran-losing-its-leverage-over-the-strait-of-hormuz"
+     },
+     {
+      "name": "Argus Media: Iran official downplays talk of peace deal",
+      "url": "https://www.argusmedia.com/en/news-and-insights/latest-market-news/2899660-iran-official-downplays-talk-of-peace-deal"
+     },
+     {
+      "name": "Arms Control Association: Fighting mars US-Iranian pledges to end war",
+      "url": "https://www.armscontrol.org/act/2026-07/news/fighting-mars-us-iranian-pledges-end-war-restart-nuclear-talks"
+     }
+    ]
+   },
+   {
+    "topic": "Nvidia and Jensen Huang",
+    "question": "Was Nvidia’s board right to reinstate Jensen Huang as chief executive?",
+    "context": "Jensen Huang resigned as Nvidia’s CEO on 12 November after reports of an extramarital relationship, with one woman tied in reports to suspected Chinese espionage; on 17 November the board said it did not intend to reinstate him and hired a search firm. On 23 November the board voted unanimously to bring him back, saying it had received input from senior US government officials, while an independent committee continues its investigation. Shares jumped sharply, but governance experts and some large investors have questioned the board’s independence, and a congressional interview with Huang is scheduled for 1 December.",
+    "views": [
+     {
+      "label": "Yes",
+      "lean": "centre-right / market pragmatist",
+      "headline": "The Board’s Duty Is to Shareholders, and Shareholders Voted With Their Feet",
+      "body": [
+       "Few companies are as identified with a single leader as Nvidia is with Jensen Huang, who co-founded it in 1993 and steered it from a graphics-card maker into the central supplier of the AI era. Boards owe their duty to shareholders, and the market’s verdict on his return was immediate: the stock rose sharply on the announcement. Directors who ignored that signal, and the operational risk of a leaderless company in the middle of an intense global race for AI chips, would have been failing at their core job.",
+       "Reinstatement is not exoneration, and the board has not pretended otherwise. Its filing says a committee of independent directors will carry the investigation to its conclusion, that Colette Kress returns to her role as finance chief, and that the company will search for a new chief compliance officer. Those are serious structural commitments. If the investigation turns up wrongdoing, the board retains every power to act. Bringing Huang back while it finishes is a judgement about who is best placed to run the business in the meantime, not a verdict on the facts.",
+       "The national-security dimension cuts in favour of continuity, not against it. Nvidia’s chips sit at the heart of US export-control policy and America’s technological contest with China. If senior government officials concluded that stable leadership at Nvidia serves the national interest, the board was right to weigh that view, especially when Huang has agreed to sit for questioning by congressional committees. A drawn-out succession fight would have handed competitors and adversaries an opening.",
+       "Corporate governance is supposed to protect owners, not to satisfy abstract standards at their expense. The board made a hard call quickly, reversed itself when it received new information, and attached safeguards to the decision. That is not a failure of independence. It is what a board does when it takes both its oversight role and its fiduciary duty seriously."
+      ]
+     },
+     {
+      "label": "No",
+      "lean": "centre-left / governance-minded",
+      "headline": "A Board That Reverses Itself Under Political Pressure Has a Problem",
+      "body": [
+       "Six days after telling investors it did not intend to reinstate Huang, Nvidia’s board did exactly that, before its own investigation had concluded. New York City Comptroller Mark Levine, who oversees pension money invested in the company, has said directors reversed course without explanation. Governance experts quoted by Reuters made the same point: the purpose of an independent investigation is to establish the facts before deciding who leads the company, not after.",
+       "The most troubling detail is the board’s own acknowledgement that it received input from senior US government officials, alongside reports that the president urged the move and the vice president worked with directors on it. Whatever one thinks of the outcome, the precedent is corrosive. Shareholders, not the White House, own Nvidia. If the government can shape the leadership of the world’s most valuable chipmaker by phone call, every board of a strategically important company will now have to wonder whose interests it is really serving.",
+       "The underlying questions are not trivial. California’s Justice Department is examining whether Nvidia chips or confidential information may have reached China and whether investors were misled, and congressional committees want to hear from Huang. Those inquiries go to the heart of the company’s compliance with export controls that underpin US national security. Restoring the chief executive before they are resolved suggests that the outcome was settled in advance, which undercuts the credibility of the very investigation the board says it is continuing.",
+       "A share-price jump is not a governance argument. Markets reward short-term certainty, but they also punish companies when hidden risks surface later, and boards exist precisely to take the longer view. The better course would have been an interim leadership team, a swift and transparent investigation, and a decision on Huang’s future once the facts were in. Nvidia’s shareholders, and the country that depends on its chips, deserved that patience."
+      ]
+     }
+    ],
+    "bottom_line": "Both sides agree that Huang has been central to Nvidia’s success, that the investigation into his conduct and any China-related risks must be completed rigorously, and that the company’s chips matter to US national security. The open question is how much weight a board should give to market reaction and government input when deciding who leads a company before the facts are fully known.",
+    "sources": [
+     {
+      "name": "Nvidia Form 8-K press release, 23 November 2026 (SEC)",
+      "url": "https://www.sec.gov/Archives/edgar/data/0001045810/000104581026000090/nov23pressrelease.htm"
+     },
+     {
+      "name": "CNN: Nvidia reinstates Jensen Huang as CEO",
+      "url": "https://www.cnn.com/2026/11/23/business/live-news/jensen-huang-reinstated-as-ceo-of-nvidia"
+     },
+     {
+      "name": "Reuters via Investing.com: Nvidia board’s Huang reversal raises doubts about independence",
+      "url": "https://www.investing.com/news/stock-market-news/nvidia-boards-huang-reversal-raises-doubts-about-independence-critics-say-5047621"
+     },
+     {
+      "name": "The Globe and Mail: Nvidia’s board under scrutiny after reinstating Huang",
+      "url": "https://www.theglobeandmail.com/business/article-nvidia-board-jensen-huang-ceo-scrutiny/"
+     },
+     {
+      "name": "GPB (NPR): Nvidia board says it does not intend to reinstate Huang",
+      "url": "https://www.gpb.org/news/2026/11/17/nvidia-board-says-it-does-not-intend-reinstate-jensen-huang-ceo"
+     },
+     {
+      "name": "The Hill: Rising, November 25, 2026",
+      "url": "https://thehill.com/hilltv/6232540-rising-november-25-2026/"
+     }
+    ]
+   },
+   {
+    "topic": "Data centers and power bills",
+    "question": "Should states pause new AI data center construction until rules on power costs are in place?",
+    "context": "Data centers and electricity prices became a major issue in this month’s midterms, in which Democrats won both chambers of Congress; voters in about a dozen states backed ballot measures restricting data centers, and more than 100 moratoriums have been proposed at various levels of government. Senator Bernie Sanders and Representative Alexandria Ocasio-Cortez have proposed a national moratorium, while most federal lawmakers, Arizona Governor Katie Hobbs and a range of analysts oppose one, arguing instead for making data centers pay their own grid costs.",
+    "views": [
+     {
+      "label": "Yes",
+      "lean": "centre-left",
+      "headline": "Hit Pause Until the Rules Protect Ratepayers",
+      "body": [
+       "Voters have spoken with unusual clarity. Data centers were one of the defining local issues of the midterms, ballot measures restricting them passed across roughly a dozen states, and polling shows large majorities would oppose a new facility in their own area, with rising electricity prices the leading reason. When a technology that promises enormous benefits generates that much grassroots resistance, the problem is not public ignorance. It is that the rules governing who pays for the grid were written for a different era.",
+       "A data center campus can demand as much power as a small city, and the transmission lines, substations and generation built to serve it are typically financed through rates that every customer pays. Companies have offered voluntary pledges, and the White House introduced a Ratepayer Protection Pledge in March, but voluntary commitments are not enforceable tariffs. A time-limited pause, such as the moratorium Maine has moved toward, gives regulators breathing room to write binding rules: large loads pay the full cost of the infrastructure they require, and projects bring their own new generation rather than drawing down existing capacity.",
+       "A pause is also about more than electricity. Communities have legitimate questions about water use, noise, land and the modest number of permanent jobs these facilities create relative to their footprint and tax incentives. Pausing new approvals for a defined period, while letting projects already under construction proceed, is a measured way to answer those questions before commitments are locked in for decades.",
+       "Nothing here is anti-technology. America should lead in artificial intelligence. But public consent is a resource too, and it is being spent fast. A short, rules-focused pause now is far more likely to secure a durable licence for AI infrastructure than pressing ahead and inviting the outright bans that some communities, such as Monterey Park in California, have already chosen."
+      ]
+     },
+     {
+      "label": "No",
+      "lean": "centre-right / abundance",
+      "headline": "Fix the Tariffs, Not the Construction Schedule",
+      "body": [
+       "The intuition that data centers are driving up household power bills is understandable but incomplete. Analysts at the Information Technology and Innovation Foundation note that retail electricity prices track fuel costs, especially natural gas, far more closely than any single source of demand. A City Journal analysis of Berkeley Lab data found that inflation-adjusted residential electricity prices actually fell in 23 states between 2019 and 2025. Where bills have risen, policy choices about transmission, generation and rate design are usually the bigger culprits.",
+       "A moratorium would not even address the problem it targets. Projects already approved and under construction would still come online and still draw power. What a pause would do is freeze new investment, push it to other states or countries, and raise the cost of the computing capacity on which American competitiveness in AI increasingly depends. That is why most federal lawmakers have rejected the idea, and why a Democratic governor in Arizona, Katie Hobbs, has also declined to impose one.",
+       "The better answer is already emerging across party lines: make large loads pay their own way. Regulators can require data centers to fund the grid upgrades they trigger, sign long-term contracts that protect other ratepayers if demand falls short, and bring new generation, from gas to nuclear to renewables plus storage, onto the grid. Turning voluntary pledges into enforceable tariff rules would address the legitimate fairness concern without halting construction.",
+       "Data centers also bring real benefits to the communities that host them: property-tax revenue that funds schools and services, construction work, and large private investment in grid capacity that can strengthen reliability for everyone if planned well. States that write clear rules will capture those benefits; states that simply say no will watch them go elsewhere. The goal should be abundant, affordable power for households and industry alike, not scarcity managed by moratorium."
+      ]
+     }
+    ],
+    "bottom_line": "Both sides agree that households should not be left paying for grid upgrades that serve large data centers, and that voluntary corporate pledges are not enough. The open question is sequencing: is a temporary pause the only way to get binding cost-allocation rules written, or can regulators impose those rules while construction continues?",
+    "sources": [
+     {
+      "name": "Faegre Drinker: How the midterm results could reshape AI and data center regulation",
+      "url": "https://www.faegredrinker.com/en/insights/publications/2026/11/how-the-midterm-results-could-reshape-ai-and-data-center-regulations-and-more-developments"
+     },
+     {
+      "name": "WJLA: AI industry faces new political reality after Democratic gains",
+      "url": "https://wjla.com/news/nation-world/ai-industry-faces-new-political-reality-after-democratic-gains-in-midterms-data-centers-moratorium-regulations"
+     },
+     {
+      "name": "PBS NewsHour: Ocasio-Cortez and Sanders push AI data center moratorium bill",
+      "url": "https://www.pbs.org/newshour/politics/ocasio-cortez-and-sanders-push-bill-to-impose-ai-data-center-moratorium"
+     },
+     {
+      "name": "ITIF: Data centers and electricity costs",
+      "url": "https://itif.org/publications/2026/11/18/data-centers-and-electricity-costs-assessment-leads-to-bad-policy/"
+     },
+     {
+      "name": "City Journal: Data centers aren’t raising your power bill",
+      "url": "https://cityjournal.substack.com/p/data-centers-arent-raising-your-power"
+     },
+     {
+      "name": "Forbes: Data centers a key issue in midterm battleground states",
+      "url": "https://www.forbes.com/sites/maryroeloffs/2026/11/02/data-centers-are-key-issue-in-midterm-battleground-states-as-household-electric-rates-soar/"
+     },
+     {
+      "name": "Data Center Frontier: AI’s fragmented regulatory landscape",
+      "url": "https://www.datacenterfrontier.com/machine-learning/article/55413450/ais-fragmented-regulatory-landscape-becomes-a-data-center-design-challenge"
+     }
+    ]
+   }
+  ]
+ },
+ "research": {
+  "pieces": [
+   {
+    "headline": "Held Up by Silicon: How the AI Building Boom Is Masking an Oil Shock and a Debt Problem",
+    "dek": "Global growth has survived the largest energy disruption on record largely because a handful of companies are pouring concrete and chips into data centres, a support that is real, concentrated and increasingly debt-financed.",
+    "theme": "Economy",
+    "key_findings": [
+     "The IMF's October 2026 World Economic Outlook projects global growth of 3.1% in 2026 and 3.4% in 2027, and attributes its slight upgrade largely to continued AI infrastructure investment.",
+     "The OECD is more cautious, putting 2026 growth at 2.9% and 2027 at 3.0% in its September interim outlook, and estimating that combined downside risks could cut growth by 0.7 percentage points and add 1.1 points to inflation.",
+     "Big Tech capital spending plans for 2026 are estimated at roughly $650-800bn across the four largest US hyperscalers, with one tally putting it at $725bn, up 77% on 2025.",
+     "The BIS warns that a rising share of AI capex is debt-financed, including off-balance-sheet 'shadow borrowing' through special-purpose vehicles held by private credit funds and insurers.",
+     "Global public debt stood at just under 94% of GDP in 2025 and the IMF projects it will reach 100% by around the end of the decade, limiting governments' room to cushion any reversal."
+    ],
+    "body": [
+     "On paper, 2026 should have been a recession year. The disruption to flows through the Strait of Hormuz, which the International Energy Agency now calls the largest energy supply shock the world has faced, pushed oil above $100 a barrel for much of the year. Yet the world's two main macroeconomic forecasters ended the autumn with growth projections close to 3%. The IMF's October World Economic Outlook, titled 'Resilience Under Strain, Urgent Choices', puts global growth at 3.1% this year and 3.4% in 2027. The OECD's September interim report has 2.9% and 3.0%, a touch better than the 2.8% it pencilled in for 2026 in June.",
+     "The explanation both institutions reach for is the same: investment in artificial intelligence infrastructure. The IMF said its small upgrade was largely due to continued strong spending on data centres, chips and the power to run them. The scale is unusual for any single category of private investment. Estimates of 2026 capital expenditure by Microsoft, Alphabet, Amazon and Meta compiled from mid-year earnings range from about $650bn to $800bn; one widely cited tally put it at $725bn, a 77% rise on a record $410bn in 2025. Company guidance has repeatedly been revised up: Microsoft has pointed to around $190bn for calendar 2026, Alphabet to $180-190bn earlier in the year, Meta to $125-145bn, and Amazon to somewhere between $200bn and $220bn depending on the source and date.",
+     "There are good reasons to be cautious about reading this as broad-based strength. First, the boost is geographically narrow. The IMF expects US growth of 2.3% in both 2026 and 2027, and notes that the AI lift to US output is partly offset by the large import content of servers and components, meaning that some of the demand leaks to chip and hardware producers in Asia. Second, the boom is itself inflationary at the margin. The IMF projects global headline inflation of 4.7% in 2026 and 4.1% in 2027, and says AI investment adds upward pressure on prices, on top of the energy shock. Microsoft's own guidance attributed about $25bn of its 2026 spending to higher component prices rather than extra capacity.",
+     "Third, the financing is changing character. In its January bulletin and a March Quarterly Review box, the Bank for International Settlements documented how hyperscaler spending has outgrown internal cash flow, so that a rising share is borrowed. Corporate bonds remain the main channel, but the BIS highlights joint ventures and special-purpose vehicles that raise debt via private placements, serviced by lease payments from the tech companies and held by private credit funds and insurers. It describes these as 'shadow borrowing' and flags new transmission channels: refinancing pressure at vehicle level, procyclical swings in private credit appetite, and bank credit lines to the vehicles. Credit default swap spreads widened during the year, especially for lower-rated hyperscalers.",
+     "The bullish reading is that this is productive capital deepening, analogous to railways or fibre, financed by some of the most profitable companies in history, and that the IMF itself lists more persistent AI investment as an upside risk. Markets have been discriminating rather than indiscriminate: according to earnings-season coverage, firms that tied capex to visible demand were rewarded while those that raised guidance without a clear monetisation story were sold off. On this view, the energy shock was absorbed because the world economy had a genuine new source of demand at exactly the right moment.",
+     "The bearish reading is that the global outlook has become dependent on a concentrated bet whose returns are not yet visible, and that a reversal would hit at a bad time. The IMF's downside scenario, in which AI-related investment unwinds, reduces global GDP by as much as 0.4% and investment by as much as 1.3% by 2028. That sounds modest, but it would coincide with the OECD's other identified risks, including renewed trade tensions and the energy shock, which together it reckons could subtract 0.7 percentage points from growth next year.",
+     "The public sector is poorly placed to cushion such a turn. The IMF's April Fiscal Monitor put global public debt at just under 94% of GDP in 2025, and IMF messaging at the October Annual Meetings in Bangkok warned it is on course to reach 100% of GDP by around the end of the decade; reports differ on whether that is 2029 or 2030. With headline inflation still above 4% globally, monetary policy also has less room than in 2020 or 2008.",
+     "Oil prices have offered some relief this month. Brent fell from above $100 at the start of November to the low-to-mid $90s by mid-month, according to market reports, on hopes of de-escalation and the IEA's projection that the market returns to surplus in the fourth quarter. If that holds, the energy drag on 2027 growth should fade, leaving AI investment to do less of the heavy lifting.",
+     "The upshot is a global economy that is more resilient than feared but less diversified than it looks. The key indicators to watch into 2027 are not only GDP prints but hyperscaler capex guidance in the coming earnings rounds, private credit spreads and redemptions, and whether data-centre utilisation and AI revenues begin to justify the build-out. The OECD's next full Economic Outlook, due in early December, will be the first major forecast to incorporate November's oil price retreat."
+    ],
+    "methodology": "We compared the IMF's October 2026 World Economic Outlook and April 2026 Fiscal Monitor, the OECD's June 2026 Economic Outlook and September 2026 interim report, and BIS publications from January and March 2026, alongside press coverage of company capex guidance and oil markets. Hyperscaler capex figures come from mid-2026 earnings coverage and differ by source and date; we were unable to verify guidance from the most recent (October 2026) earnings round, so totals should be treated as ranges. We could not open the October 2026 Fiscal Monitor directly; debt figures are from the April edition and reporting on October briefings. Daily oil prices vary by source and are cited only approximately.",
+    "data": [
+     {
+      "label": "IMF global growth 2026",
+      "value": 3.1,
+      "unit": "%"
+     },
+     {
+      "label": "IMF global growth 2027",
+      "value": 3.4,
+      "unit": "%"
+     },
+     {
+      "label": "OECD global growth 2026",
+      "value": 2.9,
+      "unit": "%"
+     },
+     {
+      "label": "OECD global growth 2027",
+      "value": 3.0,
+      "unit": "%"
+     },
+     {
+      "label": "IMF global inflation 2026",
+      "value": 4.7,
+      "unit": "%"
+     }
+    ],
+    "sources": [
+     {
+      "name": "IMF World Economic Outlook, October 2026 - Executive Summary",
+      "url": "https://www.imf.org/-/media/files/publications/weo/2026/october/english/execsum.pdf"
+     },
+     {
+      "name": "IMF World Economic Outlook, October 2026",
+      "url": "https://www.imf.org/en/publications/weo/issues/2026/10/13/world-economic-outlook-october-2026"
+     },
+     {
+      "name": "OECD press release: Global growth holds up despite successive shocks (Sept 2026)",
+      "url": "https://www.oecd.org/en/about/news/press-releases/2026/09/global-growth-holds-up-despite-successive-shocks-but-risks-persist.html"
+     },
+     {
+      "name": "OECD press release: Global economic outlook weakens amid energy shock (June 2026)",
+      "url": "https://www.oecd.org/en/about/news/press-releases/2026/06/global-economic-outlook-weakens-amid-energy-shock-and-rising-inflationary-pressures.html"
+     },
+     {
+      "name": "Al-Monitor: AI investment props up global growth, IMF says",
+      "url": "https://al-monitor.com/originals/2026/10/ai-investment-props-global-growth-war-and-debt-threaten-outlook-imf-says"
+     },
+     {
+      "name": "Yahoo Finance: Hyperscaler capex set to reach $725 billion in 2026",
+      "url": "https://finance.yahoo.com/markets/article/magnificent-7-earnings-rush-reveals-ai-spending-surge-with-hyperscaler-capex-set-to-reach-725-billion-in-2026-224901707.html"
+     },
+     {
+      "name": "AlphaSense: Big Tech AI capex earnings",
+      "url": "https://www.alpha-sense.com/resources/research-articles/big-tech-ai-capex-earnings/"
+     },
+     {
+      "name": "BIS Quarterly Review, March 2026: Financing the AI infrastructure boom",
+      "url": "https://www.bis.org/publ/qtrpdf/r_qt2603u.htm"
+     },
+     {
+      "name": "BIS Bulletin No. 120: Financing the AI boom - from cash flows to debt",
+      "url": "https://www.bis.org/publ/bisbull120.htm"
+     },
+     {
+      "name": "IMF Fiscal Monitor, April 2026 - Executive Summary",
+      "url": "https://www.imf.org/-/media/files/publications/fiscal-monitor/2026/april/english/execsum.pdf"
+     },
+     {
+      "name": "Ahram Online: Global public debt to exceed 100% of GDP by 2030 - IMF",
+      "url": "https://english.ahram.org.eg/News/578840.aspx"
+     },
+     {
+      "name": "BOE Report: Oil prices fall on expectations of coming supply surplus",
+      "url": "https://boereport.com/2026/11/15/oil-prices-fall-on-expectations-of-coming-supply-surplus/amp/"
+     }
+    ]
+   },
+   {
+    "headline": "No Way Back: What the IEA's Hormuz Outlook Says About the Next Decade of Energy",
+    "dek": "The International Energy Agency's 2026 World Energy Outlook treats this year's Gulf disruption as a structural break that will accelerate electrification and supply diversification, but the speed of change depends on how long the risk lingers.",
+    "theme": "Energy",
+    "key_findings": [
+     "Oil flows through the Strait of Hormuz fell from about 20 million barrels a day to around 3 mb/d between March and May 2026, which the IEA calls the largest energy supply shock the world has faced.",
+     "In a prolonged-risk case, bypass pipelines, alternative supply and demand displacement could cut the world's need for Hormuz oil to 8.5 mb/d by 2030 and below 2 mb/d by 2035.",
+     "Electricity's share of final energy consumption approaches 30% by 2035 in all of the IEA's exploratory scenarios, up from about 23% today.",
+     "Global energy investment is set to reach about $3.4 trillion in 2026, with roughly $2.2 trillion going to clean energy and grids against about $1.2 trillion for fossil fuels; oil upstream investment falls for a third year to below $500bn.",
+     "Under the Current Policies Scenario, energy-related CO2 emissions stay near today's level, underlining that security-driven change is not automatically climate-aligned."
+    ],
+    "body": [
+     "Every November the IEA's World Energy Outlook sets the terms of the global energy debate. This year's edition, published on 19 November, opens with an unusually blunt judgement. The disruption to flows through the Strait of Hormuz in 2026, it says, has been the largest energy supply shock the world has faced and, as of November, it is not over. Fatih Birol, the agency's executive director, said he saw no 'credible pathway' for the energy world to return to the way it was before.",
+     "The physical numbers explain the language. According to the report, oil flows through the strait fell from roughly 20 mb/d to about 3 mb/d between March and May. The IEA's November Oil Market Report, cited in the outlook, puts the resulting decline in 2026 world oil demand at around 2.7 mb/d, demand destruction on a scale normally associated with deep recessions. Prices followed: Brent spent much of the year above $100 a barrel before easing into the $90s in November as Middle Eastern output recovered.",
+     "Rather than a single central forecast, the outlook is built around scenarios that vary by how long the threat to Gulf flows persists. The most striking is a prolonged-risk case in which governments and companies act to reduce exposure. Investment in bypass pipelines, alternative suppliers and demand displacement could reduce the world's need for oil to transit Hormuz from 20 mb/d to 8.5 mb/d by 2030 and to under 2 mb/d by 2035. In an extreme long-run disruption case, 2035 oil demand would be 4.4 mb/d below the Stated Policies Scenario, and the IEA says the conflict could cut world oil demand by more than 4% by 2035 if electrification, efficiency and fuel-switching accelerate.",
+     "The common thread across scenarios is electricity. The IEA projects electricity's share of final energy consumption approaching 30% by 2035 in all of its exploratory scenarios, from about 23% now, with demand already growing around 3.3% a year since 2019. Renewables grow faster than any other major source in every scenario, led by solar PV. Investment data back this up: the IEA's World Energy Investment 2026 report, published in May, projected total energy investment rising about 5% to $3.4 trillion this year, of which roughly $2.2 trillion goes to renewables, nuclear, grids, storage, efficiency and electrification and about $1.2 trillion to oil, gas and coal. Battery storage spending was expected to exceed $100bn, up more than 35%, while oil investment falls for a third consecutive year to below $500bn.",
+     "Gas is the most contested piece. The outlook says that in its Current Policies Scenario global gas demand still grows, but more slowly than in the Stated Policies case, and LNG demand takes a hit. That is a notable shift from last year's edition, which under current policies had LNG trade rising from about 560 bcm in 2024 to 880 bcm in 2035, partly on data-centre power demand. Importers that saw Gulf LNG cargoes disrupted are now weighing diversification against the risk of locking in another exposed supply chain.",
+     "Critics come from both directions. Some, such as the US-based Institute for Energy Research, which reviewed the report critically, argue that the IEA consistently understates the durability of oil and gas demand and that security concerns will drive more domestic fossil production, not less. Climate analysts counter that the Current Policies Scenario, in which only laws already on the books are implemented, leaves energy-related CO2 emissions roughly flat at today's level, far from any Paris-aligned path. Security-driven change, in other words, does not automatically mean decarbonisation; it can just as easily mean more coal in import-dependent Asia or more domestic oil elsewhere.",
+     "There is also a timing question. Oil markets are already pricing relief: the IEA's own November market report points to a significant production recovery and a return to surplus in the fourth quarter. If tensions ease and flows normalise, the political urgency behind diversification could fade, as it did after the 1970s shocks in some countries and not in others. The IEA's framing, that the duration of the shock will determine the scale of the change, is effectively an admission that policy, not geology, now drives the forecast.",
+     "The release came days after COP31 in Antalya, the largest climate conference on record by attendance, where the energy-security framing loomed over negotiations. The WEO gives both camps material: evidence that electrification is the most robust hedge against supply shocks, and evidence that without new policy, the system's emissions trajectory barely bends.",
+     "For governments and investors the practical takeaways are threefold. Grids and storage are now the binding constraint across all scenarios; the pace of supply-chain diversification for oil, LNG and clean-tech components will shape costs; and the gap between security-led and climate-led policy needs to be closed deliberately rather than assumed away."
+    ],
+    "methodology": "We drew on the IEA's World Energy Outlook 2026 (executive summary, scenario chapters and press release), the IEA's World Energy Investment 2026 report, and the November 2026 Oil Market Report as cited in the WEO, supplemented by trade-press and analytical coverage. We were unable to read the full WEO text directly; some figures (such as the 4.4 mb/d extreme-case gap and the 3.3% annual electricity demand growth) are drawn from secondary summaries of the report. LNG trade projections cited are from the 2025 WEO for comparison and are not directly comparable with 2026 scenarios. A third-party estimate of cumulative supply lost was not verifiable and was excluded. We could not confirm the final outcome of COP31.",
+    "data": [
+     {
+      "label": "Hormuz oil flows pre-crisis",
+      "value": 20,
+      "unit": "mb/d"
+     },
+     {
+      "label": "Hormuz flows Mar-May 2026",
+      "value": 3,
+      "unit": "mb/d"
+     },
+     {
+      "label": "Needed via Hormuz 2030 (prolonged risk)",
+      "value": 8.5,
+      "unit": "mb/d"
+     },
+     {
+      "label": "Needed via Hormuz 2035 (under)",
+      "value": 2,
+      "unit": "mb/d"
+     }
+    ],
+    "sources": [
+     {
+      "name": "IEA World Energy Outlook 2026 - Executive Summary",
+      "url": "https://www.iea.org/reports/world-energy-outlook-2026/executive-summary"
+     },
+     {
+      "name": "IEA World Energy Outlook 2026 (PDF)",
+      "url": "https://www.iea.org/files/1027b259-ce5a-4f0d-8d03-3ba0338eaa18/WorldEnergyOutlook2026.pdf"
+     },
+     {
+      "name": "IEA press release: As an unprecedented shock reshapes the energy world",
+      "url": "https://www.iea.org/news/as-an-unprecedented-shock-reshapes-the-energy-world-its-duration-will-determine-the-scale-of-the-change"
+     },
+     {
+      "name": "IEA WEO 2026: The Current Policies Scenario",
+      "url": "https://www.iea.org/reports/world-energy-outlook-2026/the-current-policies-scenario"
+     },
+     {
+      "name": "IEA WEO 2026: The Stated Policies Scenario",
+      "url": "https://www.iea.org/reports/world-energy-outlook-2026/the-stated-policies-scenario"
+     },
+     {
+      "name": "World Oil: IEA - No credible pathway back to pre-Hormuz energy world",
+      "url": "https://www.worldoil.com/news/2026/11/19/iea-no-credible-pathway-back-to-pre-hormuz-energy-world-latest-outlook-finds/"
+     },
+     {
+      "name": "Hydrocarbon Engineering: IEA World Energy Outlook 2026",
+      "url": "https://www.hydrocarbonengineering.com/special-reports/24112026/iea-world-energy-outlook-2026/"
+     },
+     {
+      "name": "Institute for Energy Research: IEA World Energy Outlook 2026",
+      "url": "https://www.instituteforenergyresearch.org/international-issues/iea-world-energy-outlook-2026/"
+     },
+     {
+      "name": "BigGo Finance: Hormuz crisis could cut global oil demand by more than 4% by 2035",
+      "url": "https://finance.biggo.com/news/b92f3a5d-3620-4eef-ba0b-f46e96808e78"
+     },
+     {
+      "name": "IEA World Energy Investment 2026 - Executive Summary",
+      "url": "https://www.iea.org/reports/world-energy-investment-2026/executive-summary"
+     },
+     {
+      "name": "WAM: Global energy investment projected to reach $3.4 trillion in 2026",
+      "url": "https://www.wam.ae/en/article/c0fuuxe-global-energy-investment-projected-reach-34"
+     },
+     {
+      "name": "Zawya: World oil and gas demand could grow until 2050, IEA says (WEO 2025)",
+      "url": "https://www.zawya.com/en/business/commodities/world-oil-and-gas-demand-could-grow-until-2050-iea-says-fwpkxxe1"
+     },
+     {
+      "name": "Daily Sabah: COP31 opens in Turkiye",
+      "url": "https://www.dailysabah.com/turkiye/cop31-opens-in-turkiye-with-push-to-turn-climate-pledges-into-action/news/amp"
+     }
+    ]
+   },
+   {
+    "headline": "The Great Retreat: Global Health Aid Falls to Its Lowest Level Since 2012",
+    "dek": "As World AIDS Day approaches, new estimates show donor funding for health in poorer countries shrinking for a second year, with the burden shifting to multilateral banks, philanthropy and stretched domestic budgets.",
+    "theme": "Health",
+    "key_findings": [
+     "IHME's preliminary estimates put development assistance for health at $42.6bn in 2026, the lowest since 2012, after a further fall of about 5% following a steeper drop in 2025.",
+     "The UK made the largest absolute cut in 2026, reducing health aid by 37% ($891m); the US cut by 8% ($668m), and Canada and Germany by more than $100m each.",
+     "Disbursements by UN agencies fell an estimated 18% ($873m) and by Gavi 15% ($447m), while regional development banks rose 32% ($270m) and the Gates Foundation 4%.",
+     "The OECD projects ODA for health will fall 29-46% between 2024 and 2026, to its lowest level in almost two decades.",
+     "UNAIDS reports 1.2 million new HIV infections and 570,000 AIDS-related deaths in 2025, near 30-year lows, but warns that prevention funding cuts could push new infections up to 1.4 million a year by 2030."
+    ],
+    "body": [
+     "For two decades, international health aid was one of the most reliable growth stories in development finance, peaking during the pandemic. That era is over. Preliminary estimates from the Institute for Health Metrics and Evaluation (IHME), summarised in October by the Council on Foreign Relations' Think Global Health, put development assistance for health at $42.6bn in 2026, its lowest level since 2012. The decline this year, of about 5%, is smaller than the collapse of 2025, but it is a second consecutive fall from an already reduced base.",
+     "The donor picture has shifted markedly. In 2026 the largest absolute cut came not from Washington but from London: IHME estimates the UK reduced its health aid by 37%, or $891m, as it redirected its aid budget. The US, after the dismantling of USAID in 2025, cut a further $668m, or 8%. Canada and Germany each reduced funding by more than $100m. Among major governments, Japan was a rare riser, up 2% ($32m). The OECD's own projections, using a different measure, are bleaker still: bilateral ODA for health is projected to fall by 29-46% between 2024 and 2026, to its lowest level in almost two decades.",
+     "The pain is transmitted through the multilateral system. IHME estimates that disbursements by UN agencies fell by 18% ($873m) and by Gavi, the vaccine alliance, by 15% ($447m) between 2025 and 2026. Sub-Saharan Africa, historically the largest recipient, has absorbed the biggest reduction relative to other regions. There are partial offsets: regional development banks increased health financing by an estimated 32% ($270m), and the Gates Foundation, now the second-largest single source behind the US, rose 4%. But neither is large enough to fill the gap left by bilateral donors.",
+     "HIV is the clearest test case of what the cuts mean in practice. UNAIDS data show 1.2 million new infections and 570,000 AIDS-related deaths in 2025, the lowest in more than 30 years. Yet the agency's July special report described the response as 'extremely fragile' and said prevention, which received only 11% of HIV funding in 2024, had been hit hardest. If current funding levels persist, UNAIDS projects new infections could rise to as many as 1.4 million a year by 2030. Conversely, the political declaration adopted by 149 member states in June could avert 3.2 million infections and 1.3 million deaths by 2030 if fully implemented. UNAIDS had flagged a Global AIDS Update for November ahead of World AIDS Day on 1 December.",
+     "The interpretive debate is real. One school argues the retrenchment is a long-overdue correction: donor-driven 'vertical' programmes created parallel systems, crowded out domestic investment and left countries dependent on foreign priorities. On this view, the rise of regional development banks and calls for countries to finance their own health systems signal a healthier, more sovereign model. Proponents point to middle-income countries that have taken over HIV treatment costs as evidence that transition is feasible.",
+     "The other school notes that the transition is happening by default rather than design, and at a moment when many recipient countries have the least fiscal room. The IMF projects global public debt approaching 100% of GDP by the end of the decade, and many low-income countries spend more on debt service than on health. This year's energy shock has added to import bills and inflation. Asking governments to absorb abrupt cuts to commodities such as antiretrovirals, vaccines and malaria nets risks interruptions whose costs, in drug resistance and resurgent transmission, appear only with a lag.",
+     "There are also measurement uncertainties. The 2026 IHME figures are preliminary and may be revised. Different data series produce different totals: one widely cited analysis of IHME data describes a fall of roughly half from an $80bn peak in 2021 to around $39bn, while the $42.6bn figure reflects a different vintage or definition. And aid data capture disbursements, not health outcomes; the epidemiological consequences of cuts in 2025-26 will take years to show up in mortality and infection statistics.",
+     "What is clear is the direction of travel. Health aid is now smaller, more concentrated in philanthropy and development banks, and less reliable year to year. The question for 2027 is whether the multilateral system, Gavi's and the Global Fund's next replenishment cycles, and recipient governments' budgets can adapt fast enough to protect the programmes, especially prevention, where gains are easiest to lose.",
+     "World AIDS Day next week will put the HIV numbers in the spotlight, but the same arithmetic applies to immunisation, maternal health and malaria. The evidence suggests the world is running an unplanned experiment in how quickly global health gains can be sustained without the funding that built them."
+    ],
+    "methodology": "We examined IHME's preliminary Financing Global Health estimates for 2026 as reported by Think Global Health and the Ghana News Agency, OECD 2026 ODA projections for health, UNAIDS reports and press releases from June and July 2026, and IMF fiscal data. IHME's 2026 figures are preliminary and differ from other series; we note one conflicting total from secondary reporting. We could not confirm whether UNAIDS's planned November 2026 Global AIDS Update had been published at the time of writing. Aid flows measure inputs, not health outcomes, and attribution of future infection or mortality changes to funding cuts involves modelling assumptions.",
+    "data": [
+     {
+      "label": "UK health aid change 2025-26",
+      "value": -37,
+      "unit": "%"
+     },
+     {
+      "label": "UN agencies change",
+      "value": -18,
+      "unit": "%"
+     },
+     {
+      "label": "Gavi change",
+      "value": -15,
+      "unit": "%"
+     },
+     {
+      "label": "US health aid change",
+      "value": -8,
+      "unit": "%"
+     },
+     {
+      "label": "Gates Foundation change",
+      "value": 4,
+      "unit": "%"
+     },
+     {
+      "label": "Regional dev. banks change",
+      "value": 32,
+      "unit": "%"
+     }
+    ],
+    "sources": [
+     {
+      "name": "Think Global Health: The state of global health funding, October 2026",
+      "url": "https://www.thinkglobalhealth.org/article/the-state-of-global-health-funding-october-2026"
+     },
+     {
+      "name": "Ghana News Agency: Global health funding estimated to fall to $42.6 billion in 2026",
+      "url": "https://gna.org.gh/2026/11/global-health-funding-estimated-to-fall-to-42-6-billion-in-2026/"
+     },
+     {
+      "name": "OECD: The latest 2026 ODA projections reveal aid for health is further at risk",
+      "url": "https://www.oecd.org/en/data/insights/data-explainers/2026/06/the-latest-2026-oda-projections-reveal-aid-for-health-is-further-at-risk.html"
+     },
+     {
+      "name": "UNAIDS press release: Special report at AIDS 2026 (July 2026)",
+      "url": "https://www.unaids.org/en/resources/presscentre/pressreleaseandstatementarchive/2026/july/20260727_pr_unaids_special_report_aids2026"
+     },
+     {
+      "name": "UNAIDS Global AIDS brief (June 2026)",
+      "url": "https://www.unaids.org/sites/default/files/2026-06/20260612_global_aids_brief_0.pdf"
+     },
+     {
+      "name": "DevelopmentAid: Global HIV response falters as reemergence looms",
+      "url": "https://www.developmentaid.org/news-stream/post/209199/global-hiv-response-falters-as-reemergence-looms-warns-unaids-report"
+     },
+     {
+      "name": "UN News: UNAIDS report (July 2026)",
+      "url": "https://news.un.org/en/story/2026/07/1168033"
+     },
+     {
+      "name": "Fair Observer: Rebalancing power in global health",
+      "url": "https://www.fairobserver.com/politics/rebalancing-power-in-global-health-the-end-of-donor-driven-models/"
+     },
+     {
+      "name": "IMF Fiscal Monitor, April 2026",
+      "url": "https://www.imf.org/en/publications/fm/issues/2026/04/15/fiscal-monitor-april-2026"
+     }
+    ]
+   }
+  ]
+ },
+ "meta": {
+  "update_log": [
+   {
+    "time": "2026-11-27T12:28:37Z",
+    "note": "Morning edition: all desks filed"
+   }
+  ],
+  "name": "The Manu Times",
+  "date": "2026-11-27",
+  "edition_no": 1,
+  "updated_at": "2026-11-27T12:28:37Z"
+ }
+}
