@@ -40,7 +40,7 @@ only the sections that need changing to `<raw>/<desk>.json` and validates it wit
 | Science and industry | tech, energy, healthcare |
 | Opinion (morning only) | opinion |
 | Research (morning only) | research |
-| Illustrator (morning only) | cartoon |
+| Illustrator (morning only) | cartoon (front page) and cartoons (2-3 more, for Opinion and other pages) |
 | Graphics (morning, plus any hour with a big data-heavy story) | explainers |
 
 Run the Graphics desk after the others have filed, telling it to build from their
@@ -88,6 +88,9 @@ opinion  = {"editorial": {"headline","body"}, "debates": [{"topic","question","c
 cartoon  = {"title","caption","alt","story","section","svg"}   // single-panel pen-and-ink editorial cartoon;
             // gentle, non-partisan, no caricatures of real people; colours only via
             // classes ink / paper / tint / line / line-tint (see art/vignettes.json for the style)
+cartoons = {"items": [ same fields as cartoon, "section" = the page it runs on ]}
+            // drawings may carry one subtle animated group: classes anim-bob, anim-sway,
+            // anim-steam, anim-blink, anim-drift, anim-spin (see index.html for the full set)
 explainers = {"items": [{"id","section","title","dek","sources",
             "slides": [{"kicker","title","text","visual"}] (5-7)}]}
             // visual is one of: {"type":"stat","value","label","sub"}
@@ -114,7 +117,14 @@ The note appears in the front page's "Latest Updates" column; write it for a rea
    (on a rejected push, fetch and merge, then push again).
 2. Republish the Artifact: call the Artifact tool with `url` https://claude.ai/artifact/TnVFYM8ekEk7TupjVA5WAQ,
    `file_path` `manu-times/index.html` and
-   `files: {"data/edition.json": "manu-times/data/edition.json", "art/vignettes.json": "manu-times/art/vignettes.json"}`. If it asks you
+   `files: {"data/edition.json": "manu-times/data/edition.json", "art/vignettes.json": "manu-times/art/vignettes.json", "art/scenes.json": "manu-times/art/scenes.json", "art/spots.json": "manu-times/art/spots.json"}`. If it asks you
    to read the artifact first, do so, then publish again.
 
 Open copies of the page pick up the new edition by themselves within ten minutes.
+
+## Evergreen art (no daily work needed)
+
+`art/vignettes.json` (page-title drawings), `art/spots.json` (one illustration per
+section page) and `art/scenes.json` (the animated masthead ears: market weather from
+the S&P 500 move, and a daily scene that rotates by date) are reused every day.
+The page's entrance animation also rotates by date. Redraw these only when asked.

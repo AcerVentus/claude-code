@@ -20,7 +20,7 @@ EDITION = ROOT / "data" / "edition.json"
 LAUNCH = dt.date(2026, 11, 27)
 SECTIONS = {"front", "world", "us", "politics", "europe", "gulf", "asia", "africa", "americas",
             "business", "markets", "stocks", "tech", "energy", "healthcare", "research", "opinion",
-            "cartoon", "explainers"}
+            "cartoon", "cartoons", "explainers"}
 
 
 def main() -> int:
