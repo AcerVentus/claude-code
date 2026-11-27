@@ -2592,11 +2592,685 @@
    {
     "time": "2026-11-27T12:28:37Z",
     "note": "Morning edition: all desks filed"
+   },
+   {
+    "time": "2026-11-27T12:30:37Z",
+    "note": "Graphics desk: three interactive explainers on oil, markets and global health aid"
    }
   ],
   "name": "The Manu Times",
   "date": "2026-11-27",
   "edition_no": 1,
-  "updated_at": "2026-11-27T12:28:37Z"
+  "updated_at": "2026-11-27T12:30:37Z"
+ },
+ "explainers": {
+  "items": [
+   {
+    "id": "hormuz-oil-opec-explainer",
+    "section": "energy",
+    "title": "Why oil is climbing again, and what OPEC+ does next",
+    "dek": "Attacks on Gulf shipping and Saudi refineries have pulled Brent off a three-month low just before producers meet on 2027 output, but the bigger picture still points to a glut.",
+    "slides": [
+     {
+      "kicker": "The hook",
+      "title": "Brent snaps a four-week losing streak",
+      "text": "Brent crude traded near $96.60 a barrel early on Friday, heading for a weekly rise of about 4% and its first weekly gain in four weeks. Only days earlier, worries about oversupply had pushed it to a three-month low. The trigger for the turnaround was a run of attacks on tankers and energy facilities in the Gulf.",
+      "visual": {
+       "type": "stat",
+       "value": "$96.61",
+       "label": "Brent crude per barrel, 27 Nov (04:50 GMT)",
+       "sub": "On course for a weekly gain of about 4%, after trading near $89 on 24 Nov"
+      }
+     },
+     {
+      "kicker": "The context",
+      "title": "The strait that broke the oil market",
+      "text": "The International Energy Agency calls this year's disruption at the Strait of Hormuz the largest energy supply shock the world has faced. Flows through the strait fell from about 20 million barrels a day to around 3 mb/d between March and May, and the IEA estimates world oil demand fell by about 2.7 mb/d in 2026. In a prolonged-risk case, bypass pipelines, other suppliers and lower demand could shrink the world's need for Hormuz oil sharply over the next decade.",
+      "visual": {
+       "type": "bar",
+       "unit": "mb/d",
+       "items": [
+        {
+         "label": "Pre-crisis flows",
+         "value": 20
+        },
+        {
+         "label": "Mar-May 2026",
+         "value": 3,
+         "highlight": true
+        },
+        {
+         "label": "Needed in 2030 (prolonged risk)",
+         "value": 8.5
+        },
+        {
+         "label": "Needed in 2035 (prolonged risk, below)",
+         "value": 2
+        }
+       ]
+      }
+     },
+     {
+      "kicker": "The week",
+      "title": "Five days of escalation",
+      "text": "The week's attacks hit both sides of the supply chain: shipping lanes and refineries. Iran's Revolutionary Guard said tankers moving through Hormuz without its permission had struck sea mines, claims that could not be independently verified, while the US said it was continuing to enforce a naval blockade of Iranian ports. Yemen's Houthis, aligned with Iran, targeted Saudi refineries.",
+      "visual": {
+       "type": "timeline",
+       "events": [
+        {
+         "date": "24 Nov",
+         "text": "Brent trades around $89 a barrel after glut fears drove it to a three-month low"
+        },
+        {
+         "date": "25 Nov",
+         "text": "Houthis say they targeted Ras Tanura, Saudi Arabia's largest refinery; the coalition says it intercepted drones"
+        },
+        {
+         "date": "26 Nov",
+         "text": "Strike on Aramco's Jazan refinery kills a Nepali worker; two Italians killed in drone attack on Kuwait; Brent rises for a third session"
+        },
+        {
+         "date": "27 Nov",
+         "text": "Brent near $96.60, heading for its first weekly gain in four weeks"
+        },
+        {
+         "date": "29 Nov",
+         "text": "OPEC+ ministers meet to set 2027 output policy"
+        }
+       ]
+      }
+     },
+     {
+      "kicker": "What's driving it",
+      "title": "Rerouting is costly",
+      "text": "The risk premium reflects real costs to trade as well as fears over supply. Container line Hapag-Lloyd estimates that sending ships around the strait costs it more than EUR 60 million a week. Iran says the waterway is closed to unauthorised traffic, and the US Treasury has added sanctions on more than two dozen Iranian exchange houses, front companies and officials.",
+      "visual": {
+       "type": "stat",
+       "value": "EUR 60m+",
+       "label": "Weekly cost to Hapag-Lloyd of rerouting ships around Hormuz",
+       "sub": "Company estimate, cited by The National"
+      }
+     },
+     {
+      "kicker": "Competing views",
+      "title": "$100 again, or back to the high $80s?",
+      "text": "Analysts disagree about which force will win. Supply risks in the Gulf argue for higher prices, while inventories and demand data point the other way. Both camps agree that Sunday's OPEC+ decision and events at Hormuz will set the direction.",
+      "visual": {
+       "type": "compare",
+       "left": {
+        "title": "Case for higher prices",
+        "points": [
+         "Further disruption in Hormuz, failed diplomacy with Iran or an OPEC+ cut could lift Brent back toward $100",
+         "ANZ says Brent could top $100 even without new escalation, but only with evidence of tighter supply",
+         "Attacks this week have hit Saudi refineries as well as tankers"
+        ]
+       },
+       "right": {
+        "title": "Case for lower prices",
+        "points": [
+         "US crude inventories have been rising",
+         "The IEA and the US EIA both estimate global oil demand contracted in 2026",
+         "Steady flows and looser quotas would confirm a surplus and push prices toward the high $80s"
+        ]
+       }
+      }
+     },
+     {
+      "kicker": "What to watch",
+      "title": "Sunday's OPEC+ meeting",
+      "text": "OPEC and its allies meet on 29 November to set production policy for 2027. Sources cited by Reuters, and analysts quoted by ICIS, expect current output targets to be rolled over at least through the first quarter. Members are reported to be divided: some want to defend prices, while Saudi Arabia appears under less pressure to deliver deeper cuts.",
+      "visual": {
+       "type": "stat",
+       "value": "29 Nov",
+       "label": "OPEC+ meets to set 2027 output policy",
+       "sub": "A rollover of current targets through Q1 2027 is the expected outcome"
+      }
+     },
+     {
+      "kicker": "The long view",
+      "title": "Where the energy money is going",
+      "text": "The IEA's new World Energy Outlook argues there is no credible pathway back to the energy world before Hormuz. It expects electricity's share of final energy use to approach 30% by 2035, from about 23% now. Investment is already tilting: of an expected $3.4 trillion in energy spending in 2026, about $2.2 trillion goes to clean energy and grids, while oil upstream investment falls for a third year. Critics such as the Institute for Energy Research argue the agency understates how durable oil and gas demand will be.",
+      "visual": {
+       "type": "bar",
+       "unit": "$tn",
+       "items": [
+        {
+         "label": "Total energy investment 2026",
+         "value": 3.4
+        },
+        {
+         "label": "Clean energy, grids, storage",
+         "value": 2.2,
+         "highlight": true
+        },
+        {
+         "label": "Oil, gas and coal",
+         "value": 1.2
+        },
+        {
+         "label": "Oil upstream (below)",
+         "value": 0.5
+        }
+       ]
+      }
+     }
+    ],
+    "sources": [
+     {
+      "name": "The National",
+      "url": "https://www.thenationalnews.com/business/energy/2026/11/27/oil-set-to-post-weekly-gain-as-middle-east-attacks-stoke-supply-concerns/"
+     },
+     {
+      "name": "ICIS",
+      "url": "https://www.icis.com/explore/resources/news/2026/11/25/11243387/oil-falls-on-supply-glut-concerns-eyes-on-29-nov-opec-meeting/"
+     },
+     {
+      "name": "EnergyNow",
+      "url": "https://energynow.com/2026/11/oil-prices-mixed-as-middle-east-supply-risks-clash-with-growing-u-s-inventories-ahead-of-opec-meeting/"
+     },
+     {
+      "name": "CNBC",
+      "url": "https://cnbc.com/2026/11/25/oil-wti-brent-hormuz-middle-east.html"
+     },
+     {
+      "name": "Zee Business",
+      "url": "https://www.zeebiz.com/markets/commodities/news-brent-crude-rises-4-in-a-week-set-for-first-weekly-gain-in-four-weeks-whats-driving-oil-prices-406068"
+     },
+     {
+      "name": "FinanceFeeds",
+      "url": "https://financefeeds.com/brent-crude-oil-price-95-58-thursday-three-day-rally-before-opec-plus-sunday-bull-100-bear-91/"
+     },
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/24/iran-trump-hormuz-crude-.html"
+     },
+     {
+      "name": "CBS News",
+      "url": "https://www.cbsnews.com/live-updates/iran-war-us-military-ai-weapons-oil/"
+     },
+     {
+      "name": "Arab News",
+      "url": "https://www.arabnews.com/saudi-arabia/houthi-attack-on-saudi-arabias-jazan-refinery-kills-nepali-worker-3014153"
+     },
+     {
+      "name": "NBC News",
+      "url": "https://www.nbcnews.com/world/saudi-arabia/yemen-houthi-rebels-attack-saudi-arabia-largest-oil-refinery-rcna611319"
+     },
+     {
+      "name": "CNN",
+      "url": "https://www.cnn.com/2026/11/26/middleeast/italians-killed-iranian-attack-kuwait-intl"
+     },
+     {
+      "name": "IEA World Energy Outlook 2026 - Executive Summary",
+      "url": "https://www.iea.org/reports/world-energy-outlook-2026/executive-summary"
+     },
+     {
+      "name": "World Oil: IEA - No credible pathway back to pre-Hormuz energy world",
+      "url": "https://www.worldoil.com/news/2026/11/19/iea-no-credible-pathway-back-to-pre-hormuz-energy-world-latest-outlook-finds/"
+     },
+     {
+      "name": "IEA World Energy Investment 2026 - Executive Summary",
+      "url": "https://www.iea.org/reports/world-energy-investment-2026/executive-summary"
+     },
+     {
+      "name": "Institute for Energy Research: IEA World Energy Outlook 2026",
+      "url": "https://www.instituteforenergyresearch.org/international-issues/iea-world-energy-outlook-2026/"
+     }
+    ]
+   },
+   {
+    "id": "black-friday-ai-rebound-explainer",
+    "section": "markets",
+    "title": "Wall Street's whiplash week, explained",
+    "dek": "A restored Nvidia chief, an intraday rout and a looming Fed hike sent stocks on a round trip before Friday's half-day session, and the AI trade is still at the centre of it.",
+    "slides": [
+     {
+      "kicker": "The hook",
+      "title": "Buyers come back for a half-day",
+      "text": "US stock futures rose sharply before Friday's shortened Black Friday session, which ends at 1pm ET. Early on Friday, Nasdaq 100 futures were up close to 3%, S&P 500 futures about 1.7% and Dow futures about 1%. The buying was concentrated in the artificial-intelligence and chip stocks that had been hit hardest this month.",
+      "visual": {
+       "type": "stat",
+       "value": "~3%",
+       "label": "Gain in Nasdaq 100 futures early Friday",
+       "sub": "S&P 500 futures up about 1.7%, Dow futures about 1%; NYSE and Nasdaq close at 1pm ET"
+      }
+     },
+     {
+      "kicker": "The context",
+      "title": "A round trip in five sessions",
+      "text": "The week began with a surge in Nvidia and ended with a rebound, but the days in between were rough. On Wednesday the S&P 500 fell as much as 3.2% intraday before recovering most of the loss. Even so, AP figures had the S&P up about 3.9% for the week through Wednesday.",
+      "visual": {
+       "type": "timeline",
+       "events": [
+        {
+         "date": "23 Nov",
+         "text": "Nvidia reinstates Jensen Huang as CEO; its shares close up 31%"
+        },
+        {
+         "date": "24 Nov",
+         "text": "Hardware sell-off: Analog Devices falls 17.4% and Dell 12%; a December Fed hike is fully priced"
+        },
+        {
+         "date": "25 Nov",
+         "text": "S&P 500 falls as much as 3.2% intraday and closes down 0.3%; VIX ends at 28.03"
+        },
+        {
+         "date": "26 Nov",
+         "text": "Wall Street shut for Thanksgiving; Stoxx 600 rises 1.83% on a tech rebound"
+        },
+        {
+         "date": "27 Nov",
+         "text": "Nikkei up 2.11% and Kospi 4.34%; Nvidia up about 4% before the US open"
+        }
+       ]
+      }
+     },
+     {
+      "kicker": "The data",
+      "title": "The rebound travelled, unevenly",
+      "text": "Once Wall Street stepped away for the holiday, Europe and then Asia rallied on technology stocks. India was the exception: the Sensex fell 1.17% as Brent topped $97 a barrel, hurting an oil-importing economy. Note that the closes below fall on different days because markets kept different holiday hours.",
+      "visual": {
+       "type": "bar",
+       "unit": "%",
+       "items": [
+        {
+         "label": "S&P 500 (25 Nov)",
+         "value": -0.25
+        },
+        {
+         "label": "Dow Jones (25 Nov)",
+         "value": 0.33
+        },
+        {
+         "label": "Nasdaq Composite (25 Nov)",
+         "value": -0.62
+        },
+        {
+         "label": "FTSE 100 (26 Nov)",
+         "value": 1.75
+        },
+        {
+         "label": "Stoxx 600 (26 Nov)",
+         "value": 1.83
+        },
+        {
+         "label": "Nikkei 225 (27 Nov)",
+         "value": 2.11
+        },
+        {
+         "label": "Kospi (27 Nov)",
+         "value": 4.34,
+         "highlight": true
+        },
+        {
+         "label": "Sensex (27 Nov)",
+         "value": -1.17
+        }
+       ]
+      }
+     },
+     {
+      "kicker": "What's driving it",
+      "title": "It's all about AI",
+      "text": "Nvidia's 31% jump on Huang's return lifted the whole market, but the gains faded as doubts returned over whether customers borrowing heavily to build data centres will earn back their spending. Reports said Nvidia had lost more than $2 trillion in market value from its October peak. Results were mixed: Analog Devices slumped, while Dell posted $22 billion of AI-server revenue and raised its full-year guidance.",
+      "visual": {
+       "type": "bar",
+       "unit": "%",
+       "items": [
+        {
+         "label": "Nvidia (23 Nov close)",
+         "value": 31,
+         "highlight": true
+        },
+        {
+         "label": "Analog Devices (24 Nov)",
+         "value": -17.4
+        },
+        {
+         "label": "Dell (24 Nov)",
+         "value": -12
+        },
+        {
+         "label": "Anthropic (24 Nov)",
+         "value": -6.5
+        },
+        {
+         "label": "Micron (27 Nov premarket)",
+         "value": 6.4
+        },
+        {
+         "label": "Nvidia (27 Nov premarket)",
+         "value": 4.2
+        }
+       ]
+      }
+     },
+     {
+      "kicker": "The other weight",
+      "title": "A Fed hike is all but certain",
+      "text": "October PCE inflation reached 3.8%, with core at 3.3%, and traders now treat a quarter-point Fed rate rise at the 8-9 December meeting as all but certain. Polymarket put the odds at 93.5% on 25 November, and some Fed officials have floated larger or additional moves. Treasury yields have eased nonetheless, with the 10-year near 4.86% after topping 5% earlier in the month.",
+      "visual": {
+       "type": "stat",
+       "value": "3.8%",
+       "label": "US PCE inflation in October",
+       "sub": "Core at 3.3%; a December quarter-point hike is fully priced"
+      }
+     },
+     {
+      "kicker": "Competing views",
+      "title": "Has the sell-off run its course?",
+      "text": "Analysts are split. Friday's bounce shows appetite for beaten-down chip stocks, but the fear gauge remains elevated. Both sides are watching AI spending and the Fed.",
+      "visual": {
+       "type": "compare",
+       "left": {
+        "title": "The worst may be over",
+        "points": [
+         "The S&P was up about 3.9% for the week through Wednesday despite the intraday rout",
+         "Dell beat on AI servers and raised full-year revenue guidance to $202 billion",
+         "The 10-year Treasury yield has eased from above 5% to about 4.86%"
+        ]
+       },
+       "right": {
+        "title": "More turbulence ahead",
+        "points": [
+         "The VIX near 28 signals continued nervousness",
+         "Doubts persist over debt-funded data-centre spending",
+         "Thin holiday volumes can magnify price moves, and a Fed hike is near certain"
+        ]
+       }
+      }
+     },
+     {
+      "kicker": "What to watch",
+      "title": "The next tests for the rally",
+      "text": "Friday's thin session is only a first reading of investor appetite. Early holiday-shopping figures will show how consumers are coping with higher rates and new tariffs. After that, central banks take over.",
+      "visual": {
+       "type": "timeline",
+       "events": [
+        {
+         "date": "27 Nov",
+         "text": "Stocks close at 1pm ET and bonds at 2pm ET in a shortened session"
+        },
+        {
+         "date": "29 Nov",
+         "text": "OPEC+ meets on 2027 output, a key factor for oil-sensitive markets such as India"
+        },
+        {
+         "date": "8-9 Dec",
+         "text": "Fed meeting, with a quarter-point hike priced in"
+        },
+        {
+         "date": "17 Dec",
+         "text": "ECB decision; markets see better than 90% odds of a rate rise"
+        }
+       ]
+      }
+     }
+    ],
+    "sources": [
+     {
+      "name": "Forbes",
+      "url": "https://www.forbes.com/sites/siladityaray/2026/11/27/stock-futures-surge-as-battered-ai-shares-rebound-ahead-of-shorterned-friday-trading/"
+     },
+     {
+      "name": "AP via WTOP",
+      "url": "https://wtop.com/national/2026/11/how-major-us-stock-indexes-fared-wednesday-11-25-2026"
+     },
+     {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/markets/live/stock-market-today-firday-november-27-dow-sp-500-nasdaq-black-friday-holiday-091152065.html"
+     },
+     {
+      "name": "Nvidia",
+      "url": "https://nvidianews.nvidia.com/news/nvidia-board-reinstates-jensen-huang-as-president-ceo-and-board-director"
+     },
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/23/nvidia-jensen-huang-ceo.html"
+     },
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/2026/11/24/anthropic-stock-ipo-price.html"
+     },
+     {
+      "name": "The Motley Fool",
+      "url": "https://www.fool.com/investing/2026/11/24/dell-just-reported-earnings-and-raised-its-forecast-by-usd10-billion-is-the-stock-a-buy-after-tuesday-s-selloff/"
+     },
+     {
+      "name": "Earnings Watcher",
+      "url": "https://earnings-watcher.com/wiki/earnings-reactions-2026-11-24"
+     },
+     {
+      "name": "The Globe and Mail",
+      "url": "https://www.theglobeandmail.com/investing/markets/inside-the-market/market-news/article-premarket-nasdaq-futures-surge-as-investors-pile-back-into-battered-ai/"
+     },
+     {
+      "name": "investingLive",
+      "url": "https://investinglive.com/stocks/european-stocks-surge-s-p-500-futures-finish-higher-in-thanksgiving-trading/"
+     },
+     {
+      "name": "Bangkok Post",
+      "url": "https://www.bangkokpost.com/business/general/3362244/asian-stocks-mostly-rise-as-markets-calm-after-tech-rout"
+     },
+     {
+      "name": "Business Standard",
+      "url": "https://www.business-standard.com/markets/news/stock-market-live-november-27-nse-bse-sensex-today-nifty50-gift-nifty-crude-oil-prices-mahanadi-coalfields-share-price-ipo-today-126112700100_1.html"
+     },
+     {
+      "name": "CNBC",
+      "url": "https://www.cnbc.com/amp/2026/11/24/treasury-yields-bonds-inflation.html"
+     },
+     {
+      "name": "FXStreet",
+      "url": "https://www.fxstreet.com/news/euro-stable-near-10970-against-us-dollar-as-ecb-path-priced-danske-bank-202611270721"
+     }
+    ]
+   },
+   {
+    "id": "global-health-aid-retreat-explainer",
+    "section": "healthcare",
+    "title": "The shrinking pot for global health",
+    "dek": "Donor funding for health in poorer countries is falling for a second year, and the cuts are reshaping who pays for vaccines, HIV drugs and clinics.",
+    "slides": [
+     {
+      "kicker": "The hook",
+      "title": "Lowest since 2012",
+      "text": "Development assistance for health is estimated at $42.6 billion in 2026, its lowest level since 2012, according to preliminary figures from the Institute for Health Metrics and Evaluation (IHME). This year's fall of about 5% is smaller than the steep drop of 2025, but it comes on top of it. The figures are preliminary and could be revised.",
+      "visual": {
+       "type": "stat",
+       "value": "$42.6bn",
+       "label": "Development assistance for health, 2026 (preliminary)",
+       "sub": "Down about 5% after a steeper fall in 2025, IHME estimates"
+      }
+     },
+     {
+      "kicker": "The context",
+      "title": "From growth story to retreat",
+      "text": "For two decades health aid was among the most dependable growth areas in development finance, peaking during the pandemic. The OECD, using a different measure, projects that aid for health will fall by 29-46% between 2024 and 2026, to its lowest level in almost two decades. Totals differ by series: one analysis of IHME data describes a fall from an $80 billion peak in 2021 to around $39 billion.",
+      "visual": {
+       "type": "stat",
+       "value": "29-46%",
+       "label": "OECD projected fall in official aid for health, 2024-2026",
+       "sub": "Taking it to its lowest level in almost two decades"
+      }
+     },
+     {
+      "kicker": "The data",
+      "title": "Who is cutting, and who is stepping up",
+      "text": "The biggest cut in 2026 came from the UK, which reduced health aid by 37% as it redirected its aid budget. The US, after dismantling USAID in 2025, cut a further 8%. Disbursements through UN agencies and Gavi, the vaccine alliance, also fell, while regional development banks and the Gates Foundation increased funding.",
+      "visual": {
+       "type": "bar",
+       "unit": "%",
+       "items": [
+        {
+         "label": "UK",
+         "value": -37,
+         "highlight": true
+        },
+        {
+         "label": "UN agencies",
+         "value": -18
+        },
+        {
+         "label": "Gavi",
+         "value": -15
+        },
+        {
+         "label": "US",
+         "value": -8
+        },
+        {
+         "label": "Japan",
+         "value": 2
+        },
+        {
+         "label": "Gates Foundation",
+         "value": 4
+        },
+        {
+         "label": "Regional development banks",
+         "value": 32
+        }
+       ]
+      }
+     },
+     {
+      "kicker": "The money",
+      "title": "In dollars, the gap is hard to fill",
+      "text": "Percentages flatter the risers. In cash terms, the UK's cut of $891 million and the fall of $873 million in UN agency disbursements dwarf the $270 million increase from regional development banks. Sub-Saharan Africa, historically the largest recipient, has absorbed the biggest reduction relative to other regions.",
+      "visual": {
+       "type": "bar",
+       "unit": "$m",
+       "items": [
+        {
+         "label": "UK",
+         "value": -891,
+         "highlight": true
+        },
+        {
+         "label": "UN agencies",
+         "value": -873
+        },
+        {
+         "label": "US",
+         "value": -668
+        },
+        {
+         "label": "Gavi",
+         "value": -447
+        },
+        {
+         "label": "Japan",
+         "value": 32
+        },
+        {
+         "label": "Regional development banks",
+         "value": 270
+        }
+       ]
+      }
+     },
+     {
+      "kicker": "The test case",
+      "title": "HIV gains at risk",
+      "text": "UNAIDS counted 1.2 million new HIV infections and 570,000 AIDS-related deaths in 2025, the lowest in more than 30 years. But it calls the response 'extremely fragile': prevention received only 11% of HIV funding in 2024 and has been hit hardest by cuts. If current funding levels persist, new infections could climb to as many as 1.4 million a year by 2030; full implementation of a June political declaration backed by 149 states could instead avert 3.2 million infections by 2030.",
+      "visual": {
+       "type": "stat",
+       "value": "1.4m",
+       "label": "Possible new HIV infections a year by 2030 if current funding persists",
+       "sub": "Up from 1.2 million in 2025, UNAIDS projects"
+      }
+     },
+     {
+      "kicker": "Competing views",
+      "title": "Correction or crisis?",
+      "text": "Experts disagree over what the retreat means. Some see a chance to end dependence on donors; others warn the shift is happening too fast for the countries left to pay. Health outcomes will take years to show in the data.",
+      "visual": {
+       "type": "compare",
+       "left": {
+        "title": "An overdue correction",
+        "points": [
+         "Donor-driven programmes built parallel systems and crowded out domestic spending",
+         "Regional development banks and national budgets offer a more sovereign model",
+         "Some middle-income countries have already taken over HIV treatment costs"
+        ]
+       },
+       "right": {
+        "title": "Transition by default",
+        "points": [
+         "Many low-income countries spend more on debt service than on health",
+         "The IMF sees global public debt nearing 100% of GDP by the end of the decade",
+         "Abrupt cuts to drugs, vaccines and nets risk resistance and resurgent transmission"
+        ]
+       }
+      }
+     },
+     {
+      "kicker": "What to watch",
+      "title": "The calendar ahead",
+      "text": "World AIDS Day on 1 December will put the HIV numbers in the spotlight, but the same arithmetic applies to immunisation, maternal health and malaria. The bigger question for 2027 is whether Gavi, the Global Fund and recipient governments can adapt fast enough to protect programmes, especially prevention.",
+      "visual": {
+       "type": "timeline",
+       "events": [
+        {
+         "date": "Jun 2026",
+         "text": "149 UN member states adopt a political declaration on HIV"
+        },
+        {
+         "date": "Jul 2026",
+         "text": "UNAIDS special report calls the HIV response 'extremely fragile'"
+        },
+        {
+         "date": "Oct 2026",
+         "text": "IHME preliminary estimates put 2026 health aid at $42.6bn"
+        },
+        {
+         "date": "1 Dec 2026",
+         "text": "World AIDS Day; UNAIDS had flagged a Global AIDS Update for November"
+        },
+        {
+         "date": "2027",
+         "text": "Gavi and Global Fund replenishment cycles test donor commitment"
+        }
+       ]
+      }
+     }
+    ],
+    "sources": [
+     {
+      "name": "Think Global Health: The state of global health funding, October 2026",
+      "url": "https://www.thinkglobalhealth.org/article/the-state-of-global-health-funding-october-2026"
+     },
+     {
+      "name": "Ghana News Agency: Global health funding estimated to fall to $42.6 billion in 2026",
+      "url": "https://gna.org.gh/2026/11/global-health-funding-estimated-to-fall-to-42-6-billion-in-2026/"
+     },
+     {
+      "name": "OECD: The latest 2026 ODA projections reveal aid for health is further at risk",
+      "url": "https://www.oecd.org/en/data/insights/data-explainers/2026/06/the-latest-2026-oda-projections-reveal-aid-for-health-is-further-at-risk.html"
+     },
+     {
+      "name": "UNAIDS press release: Special report at AIDS 2026 (July 2026)",
+      "url": "https://www.unaids.org/en/resources/presscentre/pressreleaseandstatementarchive/2026/july/20260727_pr_unaids_special_report_aids2026"
+     },
+     {
+      "name": "UNAIDS Global AIDS brief (June 2026)",
+      "url": "https://www.unaids.org/sites/default/files/2026-06/20260612_global_aids_brief_0.pdf"
+     },
+     {
+      "name": "UN News: UNAIDS report (July 2026)",
+      "url": "https://news.un.org/en/story/2026/07/1168033"
+     },
+     {
+      "name": "Fair Observer: Rebalancing power in global health",
+      "url": "https://www.fairobserver.com/politics/rebalancing-power-in-global-health-the-end-of-donor-driven-models/"
+     },
+     {
+      "name": "IMF Fiscal Monitor, April 2026",
+      "url": "https://www.imf.org/en/publications/fm/issues/2026/04/15/fiscal-monitor-april-2026"
+     }
+    ]
+   }
+  ]
  }
 }
