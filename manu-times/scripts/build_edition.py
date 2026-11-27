@@ -19,7 +19,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 EDITION = ROOT / "data" / "edition.json"
 LAUNCH = dt.date(2026, 11, 27)
 SECTIONS = {"front", "world", "us", "politics", "europe", "gulf", "asia", "africa", "americas",
-            "business", "markets", "stocks", "tech", "energy", "healthcare", "research", "opinion",
+            "business", "markets", "stocks", "tech", "energy", "healthcare", "research", "opinion", "lex",
             "cartoon", "cartoons", "explainers"}
 
 

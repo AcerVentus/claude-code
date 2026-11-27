@@ -330,6 +330,41 @@ figure.cartoon .story { display: block; font-family: var(--font-body); font-styl
   .x-dots button { width: 14px; } }
 @media (prefers-reduced-motion: reduce) { .x-chart rect.b, .x-chart path.s, .x-slide-in, .x-timeline li { animation: none; } }
 
+/* ---------- Lex: the investment column ---------- */
+.lex-intro { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 36px; align-items: center; padding-bottom: 22px; border-bottom: 1px solid var(--ink); }
+.lex-intro p { margin: 0 0 10px; max-width: 62ch; }
+.lex-intro .disclaimer { font-size: 14px; color: var(--ink-soft); font-style: italic; }
+.lex-jump { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.lex-jump button { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; background: transparent;
+  color: var(--ink); border: 1px solid var(--ink); padding: 7px 12px; cursor: pointer; }
+.lex-jump button:hover { background: var(--ink); color: var(--paper); }
+@media (max-width: 860px) { .lex-intro { grid-template-columns: 1fr; } }
+.lex-region { padding-block: 26px; border-bottom: 1px solid var(--ink); scroll-margin-top: 60px; }
+.lex-region-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 28px; align-items: baseline; margin-bottom: 20px; }
+.lex-region-head h3 { font-family: var(--font-head); font-style: italic; font-weight: 700; font-size: clamp(28px, 3.6vw, 40px); margin: 0; }
+.lex-region-head p { margin: 0; color: var(--ink-soft); font-size: 16px; max-width: 70ch; }
+@media (max-width: 700px) { .lex-region-head { grid-template-columns: 1fr; } }
+.lex-notes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.lex-note { padding: 0 24px; border-left: 1px solid var(--rule); min-width: 0; }
+.lex-note:first-child { border-left: 0; padding-left: 0; } .lex-note:last-child { padding-right: 0; }
+@media (max-width: 1000px) { .lex-notes { grid-template-columns: 1fr; } .lex-note { padding: 22px 0 !important; border-left: 0; border-top: 1px solid var(--rule); }
+  .lex-note:first-child { border-top: 0; padding-top: 0 !important; } }
+.lex-note .body p { font-size: 16px; }
+.lex-note .examples { font-size: 14px; color: var(--ink-soft); margin: 0 0 12px; }
+.lex-note .examples b { font-weight: 600; color: var(--ink); }
+.stamp { display: inline-block; font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+  border: 2px solid currentColor; outline: 1px solid currentColor; outline-offset: 2px; padding: 4px 9px; margin: 2px 0 14px 4px;
+  transform: rotate(-3deg); animation: stamp .5s cubic-bezier(.2,.9,.3,1.3) both; animation-delay: .5s; }
+.stamp.v-go { color: var(--up); } .stamp.v-wait { color: var(--accent); } .stamp.v-long { color: var(--ink); }
+@keyframes stamp { from { opacity: 0; transform: rotate(-12deg) scale(1.8); } to { opacity: 1; transform: rotate(-3deg) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .stamp { animation: none; } }
+.bb { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 6px 0 14px; padding: 12px 14px; background: var(--paper-deep); }
+.bb h5 { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; margin: 0 0 6px; font-weight: 500; }
+.bb .bull h5 { color: var(--up); } .bb .bear h5 { color: var(--live); }
+.bb ul { margin: 0; padding-left: 16px; font-size: 14px; line-height: 1.5; } .bb li { margin-bottom: 5px; }
+@media (max-width: 460px) { .bb { grid-template-columns: 1fr; } }
+.lex-note table.quotes { font-size: 14px; margin-bottom: 8px; }
+
 /* ---------- Page turn ---------- */
 .turn { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; margin-top: 34px; border-top: 3px double var(--ink); padding-top: 14px; }
 .turn a { text-decoration: none; font-family: var(--font-head); font-size: 18px; }
@@ -371,8 +406,8 @@ footer.colophon { margin-top: 40px; border-top: 1px solid var(--rule); padding-t
 const PAGES = [
   ["front", "A1", "Front Page"], ["world", "A2", "World"], ["us", "A3", "The US"], ["politics", "A4", "Politics"],
   ["europe", "A5", "Europe"], ["gulf", "A6", "The Gulf"], ["asia", "A7", "Asia"], ["africa", "A8", "Africa"],
-  ["americas", "A9", "The Americas"], ["business", "B1", "Business"], ["markets", "B2", "Markets"], ["stocks", "B3", "Stocks"],
-  ["tech", "B4", "Technology"], ["energy", "B5", "Energy"], ["healthcare", "B6", "Healthcare"],
+  ["americas", "A9", "The Americas"], ["business", "B1", "Business"], ["markets", "B2", "Markets"], ["stocks", "B3", "Stocks"], ["lex", "B4", "Lex"],
+  ["tech", "B5", "Technology"], ["energy", "B6", "Energy"], ["healthcare", "B7", "Healthcare"],
   ["research", "C1", "Research"], ["opinion", "C2", "Opinion"]
 ];
 const IDS = PAGES.map(p => p[0]);
@@ -648,6 +683,34 @@ function renderStocks() {
     <div class="section-band">${movers}</div>` + explainersFor("stocks") + storyGrid(s.stories);
 }
 
+function verdictClass(v) {
+  v = String(v || "").toLowerCase();
+  return /pricey|wait|watch|entry/.test(v) ? "v-wait" : /long/.test(v) ? "v-long" : "v-go";
+}
+function renderLex() {
+  const L = ED.lex, regions = (L && L.regions) || [];
+  if (!regions.length) return pageHead("lex") + filing("Lex");
+  const intro = `<div class="lex-intro"><div>
+      <span class="kicker mono">The investment column</span>
+      <p>${esc(L.intro || "Lex weighs where the money could be made next, market by market: the argument, the numbers behind it, and the case against.")}</p>
+      <p class="disclaimer">Lex is general commentary on markets, not personal financial advice. Prices can fall as well as rise; check the sources and your own circumstances before investing.</p>
+      <div class="lex-jump">${regions.map((r, i) => `<button type="button" data-lex="${i}">${esc(r.region)}</button>`).join("")}</div></div>
+    <div>${spotFig("lex")}</div></div>`;
+  const body = regions.map((r, i) => `<section class="lex-region" id="lex-${i}">
+    <div class="lex-region-head"><h3>${esc(r.region)}</h3><p>${esc(r.summary || "")}</p></div>
+    <div class="lex-notes">${(r.notes || []).map(n => `<article class="lex-note">
+      <span class="kicker mono">${esc(n.theme || "")}${n.horizon ? " · " + esc(n.horizon) : ""}</span>
+      <h3 class="hl hl-m">${esc(n.title)}</h3>
+      ${n.verdict ? `<div class="stamp ${verdictClass(n.verdict)}">${esc(n.verdict)}</div>` : ""}
+      <div class="body">${paras(n.body)}</div>
+      ${n.examples ? `<p class="examples"><b>Ways in:</b> ${esc(n.examples)}</p>` : ""}
+      <div class="bb"><div class="bull"><h5>The case</h5><ul>${(n.bull || []).map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+        <div class="bear"><h5>The risks</h5><ul>${(n.bear || []).map(x => `<li>${esc(x)}</li>`).join("")}</ul></div></div>
+      ${(n.numbers || []).length ? `<div class="table-wrap"><table class="quotes"><thead><tr><th>Measure</th><th>Value</th><th>As of</th></tr></thead><tbody>
+        ${n.numbers.map(m => `<tr><td>${esc(m.metric)}</td><td>${esc(m.value)}</td><td class="asof">${esc(m.asof || "")}</td></tr>`).join("")}</tbody></table></div>` : ""}
+      ${sources(n.sources)}</article>`).join("")}</div></section>`).join("");
+  return pageHead("lex") + intro + body;
+}
 function renderOpinion() {
   const o = ED.opinion;
   if (!o || !(o.debates || []).length) return pageHead("opinion") + filing("opinion");
@@ -717,6 +780,7 @@ function renderFront() {
     let h = ED[id]?.lead?.headline;
     if (id === "opinion") h = ED.opinion?.debates?.[0]?.question;
     if (id === "research") h = ED.research?.pieces?.[0]?.headline;
+    if (id === "lex") h = ED.lex?.regions?.[0]?.notes?.[0]?.title;
     return h ? `<a href="#${id}"><span class="mono" style="color:var(--accent)">${pg} · ${esc(name)}</span><h4>${esc(h)}</h4></a>` : "";
   }).join("");
   const log = (ED.meta?.update_log || []).slice(-6).reverse();
@@ -736,12 +800,14 @@ function show() {
   if (!ED) return;
   let id = (location.hash || "").slice(1);
   if (!IDS.includes(id)) id = "front";
-  const render = { front: renderFront, markets: renderMarkets, stocks: renderStocks, opinion: renderOpinion, research: renderResearch }[id];
+  const render = { front: renderFront, lex: renderLex, markets: renderMarkets, stocks: renderStocks, opinion: renderOpinion, research: renderResearch }[id];
   XS = [];
   const html = render ? render() : renderSection(id);
   document.getElementById("main").innerHTML = `<div class="page">${html}${turn(id)}</div>`;
   initDecks();
-  document.querySelectorAll(".page .story-grid > *, .page .lead-grid > *, .page .front-grid > *, .page .numbers > div, .page .inside a, .page .debate, .page .research-piece, .page .explainer, .page .page-cartoon, .page .cartoon-band > *, .page .editorial")
+  document.querySelectorAll("[data-lex]").forEach(b => b.addEventListener("click", () =>
+    document.getElementById("lex-" + b.dataset.lex)?.scrollIntoView({ behavior: "smooth", block: "start" })));
+  document.querySelectorAll(".page .story-grid > *, .page .lead-grid > *, .page .front-grid > *, .page .numbers > div, .page .inside a, .page .debate, .page .research-piece, .page .lex-note, .page .explainer, .page .page-cartoon, .page .cartoon-band > *, .page .editorial")
     .forEach(el => el.classList.add("reveal"));
   document.querySelectorAll("nav.index a").forEach(a => {
     if (a.dataset.id === id) { a.setAttribute("aria-current", "page"); a.scrollIntoView({ block: "nearest", inline: "center" }); }

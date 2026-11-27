@@ -40,6 +40,7 @@ only the sections that need changing to `<raw>/<desk>.json` and validates it wit
 | Science and industry | tech, energy, healthcare |
 | Opinion (morning only) | opinion |
 | Research (morning only) | research |
+| Lex (morning only; two desks: India + US, Europe + developing markets) | lex |
 | Illustrator (morning only) | cartoon (front page) and cartoons (2-3 more, for Opinion and other pages) |
 | Graphics (morning, plus any hour with a big data-heavy story) | explainers |
 
@@ -98,6 +99,12 @@ explainers = {"items": [{"id","section","title","dek","sources",
             //   {"type":"line","unit","series":[{"name","points":[{"x","y"}]}]}   (real series only)
             //   {"type":"timeline","events":[{"date","text"}]}
             //   {"type":"compare","left":{"title","points"},"right":{"title","points"}}
+lex      = {"intro", "regions": [{"region": "India|United States|Europe|Developing markets", "summary",
+            "notes": [{"title","theme","examples","body","bull","bear",
+                       "numbers": [{"metric","value","asof"}], "verdict","horizon","sources"}] (3)}] (4)}
+            // verdict: Promising | Promising, but pricey | Watch for an entry | Long-term buy-and-hold
+            // every note has a real bear case; at least one "wait" verdict per desk; sourced
+            // figures only; general commentary, never personal advice
 research = {"pieces": [{"headline","dek","theme","key_findings","body","methodology",
             "data": [{"label","value","unit"}] (optional), "sources"}] (3)}
 ```
