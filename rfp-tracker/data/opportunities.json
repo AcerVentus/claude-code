@@ -330,6 +330,56 @@
  {
   "also": [
    {
+    "date": "2026-11-18",
+    "headline": "Adnoc Onshore grants extra time for Bab gas cap well tie-in bids",
+    "stage": "tender",
+    "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNLUY2YUxjWUlqN3R4a2NFalQyYjhGNFRwM20tZ0pFZWloVkUwUVNSV1ZoVFh3S1ZKM2JNMkJyTFl4aDM2cXRxS2lBOHdieVVXWDB4cEltUml5alU5aWIteEQ5YjVXMWZHbHRYV1ZuTy0xem1OTk5UWktGUXF5M0JHUTNjdWNVMzNJVVZvQjNB?oc=5"
+   }
+  ],
+  "approach": {
+   "notes": [
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Onshore work: Mannesmann Energy, Jereh.",
+    "Another package is live (tender, 2026-11-18): Adnoc Onshore grants extra time for Bab gas cap well tie-in bids"
+   ],
+   "targets": []
+  },
+  "client": "ADNOC Onshore",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-11-02",
+  "headline": "Bab gas cap well tie-ins: 99 wells, a separate project from the Bab and North East Bab oil tie-ins",
+  "id": "p-bab-gas-cap-well-tie-ins",
+  "last_found": "2026-11-27",
+  "last_published": "2026-11-24",
+  "name": "Bab Gas Cap well tie-ins",
+  "notes": [
+   "Research 24 Nov: the tie-in scope is split into 18 EPC packages; MEED has put the budget at $800m-plus and, in an earlier report, $1.2bn. MEED reported on 27 Oct that contractors were selected for a 'Bab and North East Bab One' tie-in project, without naming them; it is unconfirmed whether that is the same tender. No bidders named in free sources.",
+   "Research 27 Nov, correcting the 24 Nov note: this $800m-plus project ties in 99 new gas cap wells (60 producers, 39 injectors) from reservoirs KH-2, SH-1 and LK-1. The $1.2bn budget and the 27 Oct 'contractors selected' report belong to a different project, the Bab and North East Bab oil well tie-ins. Which of the two is split into 18 EPC packages is not clear from the summaries. No bidders named."
+  ],
+  "outlook": false,
+  "parties": {},
+  "priority": "High",
+  "score": 162,
+  "sectors": [
+   "gas",
+   "onshore"
+  ],
+  "signal_ids": [
+   "n-428c07727824",
+   "m-8db62a3b1f85",
+   "n-9868af88366e",
+   "m-b2e2e941d57b",
+   "n-ed75bd105663"
+  ],
+  "stage": "bid_evaluation",
+  "status": "active",
+  "value_usd": 800000000.0
+ },
+ {
+  "also": [
+   {
     "date": "2026-11-06",
     "headline": "Borouge International Taps Linde for EU2 Expansion and EU3 Cracker Upgrade",
     "stage": "awarded",
@@ -413,55 +463,6 @@
   "stage": "tender",
   "status": "active",
   "value_usd": null
- },
- {
-  "also": [
-   {
-    "date": "2026-11-18",
-    "headline": "Adnoc Onshore grants extra time for Bab gas cap well tie-in bids",
-    "stage": "tender",
-    "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNLUY2YUxjWUlqN3R4a2NFalQyYjhGNFRwM20tZ0pFZWloVkUwUVNSV1ZoVFh3S1ZKM2JNMkJyTFl4aDM2cXRxS2lBOHdieVVXWDB4cEltUml5alU5aWIteEQ5YjVXMWZHbHRYV1ZuTy0xem1OTk5UWktGUXF5M0JHUTNjdWNVMzNJVVZvQjNB?oc=5"
-   }
-  ],
-  "approach": {
-   "notes": [
-    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Onshore work: Mannesmann Energy, Jereh.",
-    "Another package is live (tender, 2026-11-18): Adnoc Onshore grants extra time for Bab gas cap well tie-in bids"
-   ],
-   "targets": []
-  },
-  "client": "ADNOC Onshore",
-  "contract_type": "EPC",
-  "deadline": "",
-  "filed": true,
-  "first_found": "2026-11-23",
-  "first_published": "2026-10-27",
-  "headline": "Bab gas cap well tie-ins: 18 EPC packages, bids extended again",
-  "id": "p-bab-gas-cap-well-tie-ins",
-  "last_found": "2026-11-26",
-  "last_published": "2026-11-24",
-  "name": "Bab Gas Cap well tie-ins",
-  "notes": [
-   "Research 24 Nov: the tie-in scope is split into 18 EPC packages; MEED has put the budget at $800m-plus and, in an earlier report, $1.2bn. MEED reported on 27 Oct that contractors were selected for a 'Bab and North East Bab One' tie-in project, without naming them; it is unconfirmed whether that is the same tender. No bidders named in free sources."
-  ],
-  "outlook": false,
-  "parties": {},
-  "priority": "High",
-  "score": 158,
-  "sectors": [
-   "gas",
-   "onshore"
-  ],
-  "signal_ids": [
-   "n-b1a2bf48a400",
-   "n-428c07727824",
-   "m-8db62a3b1f85",
-   "n-9868af88366e",
-   "n-ed75bd105663"
-  ],
-  "stage": "bid_evaluation",
-  "status": "active",
-  "value_usd": 800000000.0
  },
  {
   "also": [],
@@ -635,6 +636,41 @@
   "stage": "awarded",
   "status": "active",
   "value_usd": 392000000.0
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": []
+  },
+  "client": "ADNOC Onshore",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-10-27",
+  "headline": "Bab and North East Bab oil well tie-ins: contractors selected, not yet named",
+  "id": "p-bab-and-north-east-bab-oil-well-tie-ins",
+  "last_found": "2026-11-27",
+  "last_published": "2026-10-27",
+  "name": "Bab and North East Bab oil well tie-ins",
+  "notes": [
+   "Research 27 Nov: MEED reported on 27 Oct that ADNOC Onshore selected contractors for this project, budgeted at about $1.2bn, to tie in wells across the Bab and North East Bab oil developments. MEED Projects lists it as 'AiP5 Production Enhancement Plan: Bab & North East Bab Tie-In Facilities'. The winners are named only in MEED's paid article."
+  ],
+  "outlook": false,
+  "parties": {},
+  "priority": "High",
+  "score": 154,
+  "sectors": [
+   "onshore"
+  ],
+  "signal_ids": [
+   "m-3d40a0e1eac3",
+   "n-b1a2bf48a400"
+  ],
+  "stage": "awarded",
+  "status": "active",
+  "value_usd": 1200000000.0
  },
  {
   "also": [
@@ -930,6 +966,255 @@
   "also": [],
   "approach": {
    "notes": [],
+   "targets": [
+    {
+     "kind": "hiring",
+     "links": [
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22SML%20Engineering%20%26%20Contracting%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Resourcing Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22SML%20Engineering%20%26%20Contracting%22%20Resourcing%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer engineers or a work package they can hand over instead of hiring.",
+     "org": "SML Engineering & Contracting",
+     "roles": [
+      "Engineering Manager",
+      "Resourcing Manager"
+     ],
+     "urgency": 3,
+     "why": "Advertising roles for Lower Zakum long-term development."
+    },
+    {
+     "kind": "winner",
+     "links": [
+      {
+       "role": "Project Director",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22NMDC%20Energy%20%28NPCC%29%22%20Project%20Director%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22NMDC%20Energy%20%28NPCC%29%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Subcontracts Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22NMDC%20Energy%20%28NPCC%29%22%20Subcontracts%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
+     "org": "NMDC Energy (NPCC)",
+     "roles": [
+      "Project Director",
+      "Engineering Manager",
+      "Subcontracts Manager"
+     ],
+     "urgency": 4,
+     "why": "Won Lower Zakum long-term development."
+    },
+    {
+     "kind": "winner",
+     "links": [
+      {
+       "role": "Project Director",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Target%20Engineering%22%20Project%20Director%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Target%20Engineering%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Subcontracts Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Target%20Engineering%22%20Subcontracts%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
+     "org": "Target Engineering",
+     "roles": [
+      "Project Director",
+      "Engineering Manager",
+      "Subcontracts Manager"
+     ],
+     "urgency": 4,
+     "why": "Won Lower Zakum long-term development."
+    }
+   ]
+  },
+  "client": "ADNOC Offshore",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-26",
+  "first_published": "2026-11-25",
+  "headline": "Lower Zakum long-term development phase 1: NMDC Energy holds a $2.64bn EPC contract",
+  "id": "p-lower-zakum-long-term-development",
+  "last_found": "2026-11-27",
+  "last_published": "2026-11-27",
+  "name": "Lower Zakum long-term development",
+  "notes": [
+   "Research 27 Nov: ADNOC Offshore awarded about $7.5bn of contracts for LTDP-1 in early 2025, in three EPC packages: topside facilities on an artificial island, wellhead towers and pipelines, and the Das Island terminal. MEED headlined NMDC Energy's $2.64bn win in March 2025; which package is not stated. Technip Energies did the FEED. Commissioning is expected by end 2027.",
+   "Research 27 Nov: Target Engineering Construction Company is the EPC contractor for package 5 (three new oil processing trains at Das Island) and subcontracted the detailed engineering design to Wood in May 2025. The contractor for the island topside package is not named in free sources."
+  ],
+  "outlook": false,
+  "parties": {
+   "NMDC Energy (NPCC)": {
+    "evidence": [
+     "m-16624a47d712"
+    ],
+    "first_seen": "2026-11-27",
+    "last_seen": "2026-11-27",
+    "role": "winner",
+    "type": "epc"
+   },
+   "SML Engineering & Contracting": {
+    "evidence": [
+     "li-4494651218"
+    ],
+    "first_seen": "2026-11-25",
+    "last_seen": "2026-11-25",
+    "role": "hiring",
+    "type": "unlisted"
+   },
+   "Target Engineering": {
+    "evidence": [
+     "m-abc8505d5daa"
+    ],
+    "first_seen": "2026-11-27",
+    "last_seen": "2026-11-27",
+    "role": "winner",
+    "type": "epc"
+   }
+  },
+  "priority": "High",
+  "score": 145,
+  "sectors": [
+   "gas",
+   "offshore"
+  ],
+  "signal_ids": [
+   "li-4494651218",
+   "m-16624a47d712",
+   "m-abc8505d5daa"
+  ],
+  "stage": "execution",
+  "status": "active",
+  "value_usd": 2640000000.0
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": [
+    {
+     "kind": "winner",
+     "links": [
+      {
+       "role": "Project Director",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Tecnicas%20Reunidas%22%20Project%20Director%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Tecnicas%20Reunidas%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Subcontracts Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Tecnicas%20Reunidas%22%20Subcontracts%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
+     "org": "Tecnicas Reunidas",
+     "roles": [
+      "Project Director",
+      "Engineering Manager",
+      "Subcontracts Manager"
+     ],
+     "urgency": 4,
+     "why": "Won Upper Zakum expansion."
+    },
+    {
+     "kind": "winner",
+     "links": [
+      {
+       "role": "Project Director",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22NMDC%20Energy%20%28NPCC%29%22%20Project%20Director%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22NMDC%20Energy%20%28NPCC%29%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Subcontracts Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22NMDC%20Energy%20%28NPCC%29%22%20Subcontracts%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
+     "org": "NMDC Energy (NPCC)",
+     "roles": [
+      "Project Director",
+      "Engineering Manager",
+      "Subcontracts Manager"
+     ],
+     "urgency": 4,
+     "why": "Won Upper Zakum expansion."
+    }
+   ]
+  },
+  "client": "ADNOC Offshore",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-26",
+  "first_published": "2026-11-26",
+  "headline": "Upper Zakum 1.5 million b/d expansion: third EPC package reported awarded to NMDC Energy",
+  "id": "p-upper-zakum-expansion",
+  "last_found": "2026-11-27",
+  "last_published": "2026-11-27",
+  "name": "Upper Zakum expansion",
+  "notes": [
+   "Research 26 Nov: ADNOC Offshore split the UZ 1.5MMBD EPC scope into three packages. MEED reported on 18 June 2026 that Tecnicas Reunidas was selected for two of them. An unverified LinkedIn post says NMDC Energy has the third (unconfirmed). MEED reported on 8 July 2026 that PMC deals were awarded; the consultants are named only in its paid article.",
+   "Research 27 Nov: TradeArabia reports Tecnicas Reunidas's two contracts at $5.75bn, its largest ever as sole contractor, and says the third package went to NMDC Energy. MEED's June 2026 report said NMDC Energy had yet to announce its award for package two, so treat NMDC's package as reported by one source. MEED estimates the whole project at more than $10bn."
+  ],
+  "outlook": false,
+  "parties": {
+   "NMDC Energy (NPCC)": {
+    "evidence": [
+     "m-647634b5c5ae"
+    ],
+    "first_seen": "2026-11-27",
+    "last_seen": "2026-11-27",
+    "role": "winner",
+    "type": "epc"
+   },
+   "Tecnicas Reunidas": {
+    "evidence": [
+     "m-6678869208b9"
+    ],
+    "first_seen": "2026-11-26",
+    "last_seen": "2026-11-26",
+    "role": "winner",
+    "type": "epc"
+   }
+  },
+  "priority": "High",
+  "score": 135,
+  "sectors": [
+   "brownfield",
+   "offshore"
+  ],
+  "signal_ids": [
+   "m-6678869208b9",
+   "m-647634b5c5ae"
+  ],
+  "stage": "execution",
+  "status": "active",
+  "value_usd": null
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
    "targets": []
   },
   "client": "ADNOC Gas",
@@ -965,80 +1250,8 @@
  {
   "also": [],
   "approach": {
-   "notes": [],
-   "targets": [
-    {
-     "kind": "winner",
-     "links": [
-      {
-       "role": "Project Director",
-       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Tecnicas%20Reunidas%22%20Project%20Director%20UAE"
-      },
-      {
-       "role": "Engineering Manager",
-       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Tecnicas%20Reunidas%22%20Engineering%20Manager%20UAE"
-      },
-      {
-       "role": "Subcontracts Manager",
-       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Tecnicas%20Reunidas%22%20Subcontracts%20Manager%20UAE"
-      }
-     ],
-     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
-     "org": "Tecnicas Reunidas",
-     "roles": [
-      "Project Director",
-      "Engineering Manager",
-      "Subcontracts Manager"
-     ],
-     "urgency": 4,
-     "why": "Won Upper Zakum expansion."
-    }
-   ]
-  },
-  "client": "ADNOC Offshore",
-  "contract_type": "EPC",
-  "deadline": "",
-  "filed": true,
-  "first_found": "2026-11-26",
-  "first_published": "2026-11-26",
-  "headline": "Upper Zakum 1.5 million b/d expansion: Tecnicas Reunidas holds two EPC packages; PMC consultants appointed",
-  "id": "p-upper-zakum-expansion",
-  "last_found": "2026-11-26",
-  "last_published": "2026-11-26",
-  "name": "Upper Zakum expansion",
-  "notes": [
-   "Research 26 Nov: ADNOC Offshore split the UZ 1.5MMBD EPC scope into three packages. MEED reported on 18 June 2026 that Tecnicas Reunidas was selected for two of them. An unverified LinkedIn post says NMDC Energy has the third (unconfirmed). MEED reported on 8 July 2026 that PMC deals were awarded; the consultants are named only in its paid article."
-  ],
-  "outlook": false,
-  "parties": {
-   "Tecnicas Reunidas": {
-    "evidence": [
-     "m-6678869208b9"
-    ],
-    "first_seen": "2026-11-26",
-    "last_seen": "2026-11-26",
-    "role": "winner",
-    "type": "epc"
-   }
-  },
-  "priority": "High",
-  "score": 133,
-  "sectors": [
-   "brownfield",
-   "offshore"
-  ],
-  "signal_ids": [
-   "m-6678869208b9"
-  ],
-  "stage": "execution",
-  "status": "active",
-  "value_usd": null
- },
- {
-  "also": [],
-  "approach": {
    "notes": [
-    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Offshore work: McDermott, Technip Energies, Larsen & Toubro, Tecnicas Reunidas."
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Offshore work: NMDC Energy (NPCC), McDermott, Technip Energies, Larsen & Toubro."
    ],
    "targets": []
   },
@@ -1104,8 +1317,8 @@
   "first_published": "2026-11-11",
   "headline": "Wison Begins Work on ADNOC Gas Habshan Processing Train Under $3.9B EPC Contract - News and Statistics",
   "id": "p-habshan-gas-complex-incl-carbon-capture",
-  "last_found": "2026-11-23",
-  "last_published": "2026-11-18",
+  "last_found": "2026-11-27",
+  "last_published": "2026-11-26",
   "name": "Habshan gas complex (incl. carbon capture)",
   "notes": [],
   "outlook": false,
@@ -1119,10 +1332,11 @@
      "n-4faeca263642",
      "n-7b3dfdc410ac",
      "n-b5228f6fa3a4",
-     "n-aa17529a56c8"
+     "n-aa17529a56c8",
+     "n-0df9855c1091"
     ],
     "first_seen": "2026-11-11",
-    "last_seen": "2026-11-18",
+    "last_seen": "2026-11-26",
     "role": "contractor",
     "type": "epc"
    }
@@ -1141,7 +1355,8 @@
    "n-4faeca263642",
    "n-7b3dfdc410ac",
    "n-b5228f6fa3a4",
-   "n-aa17529a56c8"
+   "n-aa17529a56c8",
+   "n-0df9855c1091"
   ],
   "stage": "execution",
   "status": "active",
@@ -1348,71 +1563,6 @@
    "n-bff19e8edd4e"
   ],
   "stage": "awarded",
-  "status": "active",
-  "value_usd": null
- },
- {
-  "also": [],
-  "approach": {
-   "notes": [],
-   "targets": [
-    {
-     "kind": "hiring",
-     "links": [
-      {
-       "role": "Engineering Manager",
-       "url": "https://www.linkedin.com/search/results/people/?keywords=%22SML%20Engineering%20%26%20Contracting%22%20Engineering%20Manager%20UAE"
-      },
-      {
-       "role": "Resourcing Manager",
-       "url": "https://www.linkedin.com/search/results/people/?keywords=%22SML%20Engineering%20%26%20Contracting%22%20Resourcing%20Manager%20UAE"
-      }
-     ],
-     "offer": "Offer engineers or a work package they can hand over instead of hiring.",
-     "org": "SML Engineering & Contracting",
-     "roles": [
-      "Engineering Manager",
-      "Resourcing Manager"
-     ],
-     "urgency": 3,
-     "why": "Advertising roles for Lower Zakum long-term development."
-    }
-   ]
-  },
-  "client": "ADNOC Offshore",
-  "contract_type": "",
-  "deadline": "",
-  "filed": true,
-  "first_found": "2026-11-26",
-  "first_published": "2026-11-25",
-  "headline": "Project Manager (ADNOC Offshore Project)",
-  "id": "p-lower-zakum-long-term-development",
-  "last_found": "2026-11-26",
-  "last_published": "2026-11-25",
-  "name": "Lower Zakum long-term development",
-  "notes": [],
-  "outlook": false,
-  "parties": {
-   "SML Engineering & Contracting": {
-    "evidence": [
-     "li-4494651218"
-    ],
-    "first_seen": "2026-11-25",
-    "last_seen": "2026-11-25",
-    "role": "hiring",
-    "type": "unlisted"
-   }
-  },
-  "priority": "Medium",
-  "score": 70,
-  "sectors": [
-   "gas",
-   "offshore"
-  ],
-  "signal_ids": [
-   "li-4494651218"
-  ],
-  "stage": "",
   "status": "active",
   "value_usd": null
  },

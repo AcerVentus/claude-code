@@ -1,24 +1,25 @@
 id,opportunity,client,stage,contract_type,value_usd,priority,score,status,winner,bidders,other_firms,approach_first,deadline,first_seen,last_news,signals
 p-bab-gas-cap-development,Bab Gas Cap development,ADNOC Gas,Bids in / evaluation,EPC,8000000000,High,173,active,,Larsen & Toubro; Petrofac; Technip Energies; JGC; Sinopec Engineering; Maire Tecnimont; CPECC,,Larsen & Toubro,,2026-11-17,2026-11-26,7
 p-rumaitha-shanayel-rums-field-facilities,Rumaitha & Shanayel (RUMS) field facilities,ADNOC Onshore,Out to tender,EPC,1200000000,High,164,active,,,,,,2026-11-17,2026-11-18,3
+p-bab-gas-cap-well-tie-ins,Bab Gas Cap well tie-ins,ADNOC Onshore,Bids in / evaluation,EPC,800000000,High,162,active,,,,,,2026-11-02,2026-11-24,5
 p-borouge-ethane-cracker-expansion-eu2-eu3,Borouge ethane cracker expansion (EU2 / EU3),Borouge,Out to tender,EPC,,High,159,active,Linde Engineering,,,Linde Engineering,,2026-11-06,2026-11-15,4
-p-bab-gas-cap-well-tie-ins,Bab Gas Cap well tie-ins,ADNOC Onshore,Bids in / evaluation,EPC,800000000,High,158,active,,,,,,2026-10-27,2026-11-24,5
 p-north-east-bab-neb-facilities-upgrade,North East Bab (NEB) facilities upgrade,ADNOC Onshore,Awarded,EPC,,High,157,active,Mannesmann Energy,,,Mannesmann Energy,,2026-11-14,2026-11-25,14
 p-bu-hasa-field-development,Bu Hasa field development,ADNOC Onshore,Awarded,EPC,392000000,High,155,active,Jereh,,,Jereh,,2026-11-13,2026-11-13,2
+p-bab-and-north-east-bab-oil-well-tie-ins,Bab and North East Bab oil well tie-ins,ADNOC Onshore,Awarded,EPC,1200000000,High,154,active,,,,,,2026-10-27,2026-10-27,2
 p-bu-hasa-enhanced-oil-recovery-eor,Bu Hasa enhanced oil recovery (EOR),ADNOC Onshore,Bids in / evaluation,EPC,2000000000,High,154,active,,,,,,2026-11-03,2026-11-11,4
 p-ruwais-diyab-unconventional-gas-development,Ruwais Diyab unconventional gas development,ADNOC Onshore,Awarded,,2700000000,High,152,active,Jereh,,,Jereh,,2026-11-02,2026-11-15,15
 p-umm-shaif-field-development,Umm Shaif field development,ADNOC Offshore,In execution,EPC,1000000000,High,147,active,McDermott; Larsen & Toubro,,Technip Energies,McDermott,,2026-11-02,2026-11-25,3
+p-lower-zakum-long-term-development,Lower Zakum long-term development,ADNOC Offshore,In execution,EPC,2640000000,High,145,active,NMDC Energy (NPCC); Target Engineering,,SML Engineering & Contracting,SML Engineering & Contracting,,2026-11-25,2026-11-27,3
+p-upper-zakum-expansion,Upper Zakum expansion,ADNOC Offshore,In execution,EPC,,High,135,active,Tecnicas Reunidas; NMDC Energy (NPCC),,,Tecnicas Reunidas,,2026-11-26,2026-11-27,2
 s-14a1dcd4b23e,"Local firm wins Adnoc Gas project detailed engineering works: 56-inch, 127km gas pipeline (winner not named)",ADNOC Gas,Awarded,engineering,,High,134,active,,,,,,2026-10-28,2026-10-28,2
-p-upper-zakum-expansion,Upper Zakum expansion,ADNOC Offshore,In execution,EPC,,High,133,active,Tecnicas Reunidas,,,Tecnicas Reunidas,,2026-11-26,2026-11-26,1
 p-sarb-umm-lulu,SARB & Umm Lulu,ADNOC Offshore,Out to tender,EPC,,High,110,active,,,,,,2026-11-16,2026-11-16,1
-p-habshan-gas-complex-incl-carbon-capture,Habshan gas complex (incl. carbon capture),ADNOC Gas,In execution,EPC,3900000000,High,105,active,,,Wison Engineering,Wison Engineering,,2026-11-11,2026-11-18,8
+p-habshan-gas-complex-incl-carbon-capture,Habshan gas complex (incl. carbon capture),ADNOC Gas,In execution,EPC,3900000000,High,105,active,,,Wison Engineering,Wison Engineering,,2026-11-11,2026-11-26,9
 s-b9df893a0aa1,$8 billion-plus Adnoc Gas project reaches key bid milestone,ADNOC Gas,Out to tender,,8000000000,High,92,active,,,,,,2026-11-17,2026-11-18,2
 s-599ea85ff274,Adnoc poised to launch multiple tenders for offshore megaproject,ADNOC (Group),Out to tender,,,Medium,80,active,,,,,,2026-10-28,2026-10-28,1
 s-8db0752df847,Adnoc prepares new wave of oil and gas tenders for 2027,ADNOC (Group),Out to tender,,,Medium,80,active,,,,,,2026-10-25,2026-10-25,1
 s-e4755dd249f0,ADNOC LNG: 3 teams vie for UAE plant,ADNOC LNG,Out to tender,,,Medium,78,active,,,,,,2026-10-25,2026-10-25,1
 s-c14f9d1f3f09,ADNOC promises 40 percent shorter tenders and reveals what it will buy in 2027 and 2028,ADNOC (Group),Out to tender,,,Medium,75,active,,,,,,2026-10-25,2026-10-25,1
 s-1cab06aa9edc,ADNOC and ADNOC Gas Sign About 30 Agreements Around ADIPEC 2026,ADNOC Gas,Awarded,,,Medium,72,active,,,,,,2026-11-25,2026-11-25,1
-p-lower-zakum-long-term-development,Lower Zakum long-term development,ADNOC Offshore,Unclear,,,Medium,70,active,,,SML Engineering & Contracting,SML Engineering & Contracting,,2026-11-25,2026-11-25,1
 s-70f74145d929,Adnoc Onshore to upgrade existing oil fields,ADNOC Onshore,Planned / early,,,Medium,65,active,,,,ADNOC Onshore,,2026-11-18,2026-11-18,1
 s-48b809a704c4,"Mannesmann Energy plans ADNOC facility upgrade project, two UAE representation agreements",ADNOC (Group),Planned / early,,,Low,50,active,,,Mannesmann Energy,,,2026-11-04,2026-11-04,1
 s-146ad6ceb4f8,ADNOC Approves Major UAE Gas Development to Boost Domestic Supply,ADNOC (Group),Planned / early,,,Low,45,active,,,,,,2026-11-02,2026-11-02,1

@@ -1,0 +1,68 @@
+[
+ {
+  "kind": "research",
+  "title": "Bab gas cap well tie-ins: 99 wells, a separate project from the Bab and North East Bab oil tie-ins",
+  "project": "Bab Gas Cap well tie-ins",
+  "client": "ADNOC Onshore",
+  "stage": "bid_evaluation",
+  "contract_type": "EPC",
+  "value_usd": 800000000,
+  "publisher": "MEED (read from search summaries)",
+  "url": "https://www.meed.com/contractors-submit-bids-for-bab-gas-cap-well-tie-ins-project",
+  "published": "2026-11-24",
+  "note": "Research 27 Nov, correcting the 24 Nov note: this $800m-plus project ties in 99 new gas cap wells (60 producers, 39 injectors) from reservoirs KH-2, SH-1 and LK-1. The $1.2bn budget and the 27 Oct 'contractors selected' report belong to a different project, the Bab and North East Bab oil well tie-ins. Which of the two is split into 18 EPC packages is not clear from the summaries. No bidders named."
+ },
+ {
+  "kind": "research",
+  "title": "Bab and North East Bab oil well tie-ins: contractors selected, not yet named",
+  "project": "Bab and North East Bab oil well tie-ins",
+  "client": "ADNOC Onshore",
+  "stage": "awarded",
+  "contract_type": "EPC",
+  "value_usd": 1200000000,
+  "publisher": "MEED (read from search summaries)",
+  "url": "https://guest.meed.com/?p=18405",
+  "published": "2026-10-27",
+  "note": "Research 27 Nov: MEED reported on 27 Oct that ADNOC Onshore selected contractors for this project, budgeted at about $1.2bn, to tie in wells across the Bab and North East Bab oil developments. MEED Projects lists it as 'AiP5 Production Enhancement Plan: Bab & North East Bab Tie-In Facilities'. The winners are named only in MEED's paid article."
+ },
+ {
+  "kind": "research",
+  "title": "Lower Zakum long-term development phase 1: NMDC Energy holds a $2.64bn EPC contract",
+  "project": "Lower Zakum long-term development",
+  "client": "ADNOC Offshore",
+  "stage": "execution",
+  "contract_type": "EPC",
+  "winner": "NMDC Energy (NPCC)",
+  "value_usd": 2640000000,
+  "publisher": "MEED (read from search summaries)",
+  "url": "https://www.meed.com/nmdc-energy-wins-264bn-lower-zakum-offshore-oil-project-contract",
+  "published": "2026-11-27",
+  "note": "Research 27 Nov: ADNOC Offshore awarded about $7.5bn of contracts for LTDP-1 in early 2025, in three EPC packages: topside facilities on an artificial island, wellhead towers and pipelines, and the Das Island terminal. MEED headlined NMDC Energy's $2.64bn win in March 2025; which package is not stated. Technip Energies did the FEED. Commissioning is expected by end 2027."
+ },
+ {
+  "kind": "research",
+  "title": "Lower Zakum long-term development phase 1: Target Engineering is EPC contractor for package 5 at Das Island",
+  "project": "Lower Zakum long-term development",
+  "client": "ADNOC Offshore",
+  "stage": "execution",
+  "contract_type": "EPC",
+  "winner": "Target Engineering",
+  "publisher": "Wood press release / Offshore Magazine (read from search summaries)",
+  "url": "https://www.offshore-mag.com/equipment-engineering/news/55292328/wood-wood-assessing-design-needs-for-lower-zakum-production-upgrades",
+  "published": "2026-11-27",
+  "note": "Research 27 Nov: Target Engineering Construction Company is the EPC contractor for package 5 (three new oil processing trains at Das Island) and subcontracted the detailed engineering design to Wood in May 2025. The contractor for the island topside package is not named in free sources."
+ },
+ {
+  "kind": "research",
+  "title": "Upper Zakum 1.5 million b/d expansion: third EPC package reported awarded to NMDC Energy",
+  "project": "Upper Zakum expansion",
+  "client": "ADNOC Offshore",
+  "stage": "execution",
+  "contract_type": "EPC",
+  "winner": "NMDC Energy (NPCC)",
+  "publisher": "TradeArabia / MEED (read from search summaries)",
+  "url": "https://tradearabia.com/News/466031/T%C3%A9cnicas-Reunidas-wins-%245.75bn-ADNOC-mega-project-contracts/OGN",
+  "published": "2026-11-27",
+  "note": "Research 27 Nov: TradeArabia reports Tecnicas Reunidas's two contracts at $5.75bn, its largest ever as sole contractor, and says the third package went to NMDC Energy. MEED's June 2026 report said NMDC Energy had yet to announce its award for package two, so treat NMDC's package as reported by one source. MEED estimates the whole project at more than $10bn."
+ }
+]

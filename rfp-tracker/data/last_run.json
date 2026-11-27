@@ -1,80 +1,69 @@
 {
- "date": "2026-11-26",
- "digest": "digests/2026-11-26.md",
- "new_opportunities": [
-  {
-   "filed": true,
-   "id": "p-upper-zakum-expansion",
-   "name": "Upper Zakum expansion",
-   "stage": "execution"
-  },
-  {
-   "filed": false,
-   "id": "s-1cab06aa9edc",
-   "name": "ADNOC and ADNOC Gas Sign About 30 Agreements Around ADIPEC 2026",
-   "stage": "awarded"
-  },
-  {
-   "filed": true,
-   "id": "p-lower-zakum-long-term-development",
-   "name": "Lower Zakum long-term development",
-   "stage": ""
-  }
- ],
+ "date": "2026-11-27",
+ "digest": "digests/2026-11-27.md",
+ "new_opportunities": [],
  "newly_named_firms": [
   {
    "added": [
-    "CPECC",
-    "JGC",
-    "Larsen & Toubro",
-    "Maire Tecnimont",
-    "Petrofac",
-    "Sinopec Engineering",
-    "Technip Energies"
+    "NMDC Energy (NPCC)",
+    "Target Engineering"
    ],
-   "id": "p-bab-gas-cap-development"
+   "id": "p-lower-zakum-long-term-development"
+  },
+  {
+   "added": [
+    "NMDC Energy (NPCC)"
+   ],
+   "id": "p-upper-zakum-expansion"
   }
  ],
- "opportunities_active": 24,
- "signals_new": 17,
- "signals_total": 118,
+ "opportunities_active": 25,
+ "signals_new": 9,
+ "signals_total": 127,
  "source_health": {
   "bing-news": {
-   "errors": [],
-   "items": 65,
-   "kept": 1,
-   "ok": 8,
+   "errors": [
+    "ADNOC PMC OR \"engineering services\" contract: not well-formed (invalid token): line 1, column 41"
+   ],
+   "items": 56,
+   "kept": 0,
+   "ok": 7,
    "requests": 8
   },
   "google-news": {
    "errors": [],
-   "items": 204,
+   "items": 142,
    "kept": 1,
    "ok": 18,
    "requests": 18
   },
   "inbox": {
    "errors": [],
-   "items": 4,
-   "kept": 4,
+   "items": 5,
+   "kept": 5,
    "ok": 1,
    "requests": 1
   },
   "linkedin-jobs": {
-   "adverts_listed": 90,
-   "adverts_read": 22,
+   "adverts_listed": 87,
+   "adverts_read": 14,
    "errors": [],
-   "items": 12,
-   "kept": 11,
-   "ok": 34,
-   "requests": 34
+   "items": 3,
+   "kept": 3,
+   "ok": 26,
+   "requests": 26
   }
  },
  "stage_changes": [
   {
-   "from": "tender",
-   "id": "p-bab-gas-cap-well-tie-ins",
-   "to": "bid_evaluation"
+   "from": "bid_evaluation",
+   "id": "p-bab-and-north-east-bab-oil-well-tie-ins",
+   "to": "awarded"
+  },
+  {
+   "from": "",
+   "id": "p-lower-zakum-long-term-development",
+   "to": "execution"
   }
  ]
 }

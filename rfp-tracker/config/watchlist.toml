@@ -101,10 +101,16 @@ generic = true
 # ---------------------------------------------------------------------------
 
 # List a specific package above its parent project: the first match wins.
+# A separate project from the gas cap tie-ins below: oil wells across Bab and North East Bab.
+[[project]]
+name = "Bab and North East Bab oil well tie-ins"
+client = "ADNOC Onshore"
+aliases = ["re:North East Bab One", "re:selects contractors for well tie-?ins", "re:North East Bab Tie-?In"]
+
 [[project]]
 name = "Bab Gas Cap well tie-ins"
 client = "ADNOC Onshore"
-aliases = ["re:Bab gas cap well tie-?ins?", "re:well tie-?ins? (project|package|bids)"]
+aliases = ["re:Bab gas cap well tie-?ins?", "re:gas cap (production and injector )?well tie-?ins?"]
 
 [[project]]
 name = "Bu Hasa enhanced oil recovery (EOR)"
