@@ -293,7 +293,7 @@
   "also": [],
   "approach": {
    "notes": [
-    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Onshore work: Mannesmann Energy, Jereh."
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Onshore work: Mannesmann Energy, Jereh, Robt Stone."
    ],
    "targets": []
   },
@@ -338,7 +338,7 @@
   ],
   "approach": {
    "notes": [
-    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Onshore work: Mannesmann Energy, Jereh.",
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Onshore work: Mannesmann Energy, Jereh, Robt Stone.",
     "Another package is live (tender, 2026-11-18): Adnoc Onshore grants extra time for Bab gas cap well tie-in bids"
    ],
    "targets": []
@@ -376,6 +376,80 @@
   "stage": "bid_evaluation",
   "status": "active",
   "value_usd": 800000000.0
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": [
+    {
+     "kind": "winner",
+     "links": [
+      {
+       "role": "Project Director",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Robt%20Stone%22%20Project%20Director%20UAE"
+      },
+      {
+       "role": "Engineering Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Robt%20Stone%22%20Engineering%20Manager%20UAE"
+      },
+      {
+       "role": "Subcontracts Manager",
+       "url": "https://www.linkedin.com/search/results/people/?keywords=%22Robt%20Stone%22%20Subcontracts%20Manager%20UAE"
+      }
+     ],
+     "offer": "Offer detailed-engineering capacity, specialist studies (HAZOP, SIL, flow assurance, stress) and seconded engineers while they mobilise.",
+     "org": "Robt Stone",
+     "roles": [
+      "Project Director",
+      "Engineering Manager",
+      "Subcontracts Manager"
+     ],
+     "urgency": 2,
+     "why": "Won Bab and North East Bab oil well tie-ins."
+    }
+   ]
+  },
+  "client": "ADNOC Onshore",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-10-27",
+  "headline": "Bab and North East Bab oil well tie-ins: Robt Stone selected for EPC works",
+  "id": "p-bab-and-north-east-bab-oil-well-tie-ins",
+  "last_found": "2026-11-28",
+  "last_published": "2026-10-27",
+  "name": "Bab and North East Bab oil well tie-ins",
+  "notes": [
+   "Research 28 Nov: MEED reported on 27 Oct, citing industry sources, that ADNOC Onshore selected Robt Stone Middle East and Jereh Group for the EPC works. The project covers 18 packages with a budget of about $1.2bn. Bidders in May 2026 also included Galfar Emirates, Kalpataru Projects International, Matrix Construction and Target Engineering. Not confirmed by ADNOC. Jereh's share may be the $599m Bab and North East Bab contract in its 12 Nov announcement; that link is unconfirmed.",
+   "Research 27 Nov: MEED reported on 27 Oct that ADNOC Onshore selected contractors for this project, budgeted at about $1.2bn, to tie in wells across the Bab and North East Bab oil developments. MEED Projects lists it as 'AiP5 Production Enhancement Plan: Bab & North East Bab Tie-In Facilities'. The winners are named only in MEED's paid article."
+  ],
+  "outlook": false,
+  "parties": {
+   "Robt Stone": {
+    "evidence": [
+     "m-071e71a794ec"
+    ],
+    "first_seen": "2026-10-27",
+    "last_seen": "2026-10-27",
+    "role": "winner",
+    "type": "epc"
+   }
+  },
+  "priority": "High",
+  "score": 161,
+  "sectors": [
+   "onshore"
+  ],
+  "signal_ids": [
+   "m-071e71a794ec",
+   "m-3d40a0e1eac3",
+   "n-b1a2bf48a400"
+  ],
+  "stage": "awarded",
+  "status": "active",
+  "value_usd": 1200000000.0
  },
  {
   "also": [
@@ -638,41 +712,6 @@
   "value_usd": 392000000.0
  },
  {
-  "also": [],
-  "approach": {
-   "notes": [],
-   "targets": []
-  },
-  "client": "ADNOC Onshore",
-  "contract_type": "EPC",
-  "deadline": "",
-  "filed": true,
-  "first_found": "2026-11-23",
-  "first_published": "2026-10-27",
-  "headline": "Bab and North East Bab oil well tie-ins: contractors selected, not yet named",
-  "id": "p-bab-and-north-east-bab-oil-well-tie-ins",
-  "last_found": "2026-11-27",
-  "last_published": "2026-10-27",
-  "name": "Bab and North East Bab oil well tie-ins",
-  "notes": [
-   "Research 27 Nov: MEED reported on 27 Oct that ADNOC Onshore selected contractors for this project, budgeted at about $1.2bn, to tie in wells across the Bab and North East Bab oil developments. MEED Projects lists it as 'AiP5 Production Enhancement Plan: Bab & North East Bab Tie-In Facilities'. The winners are named only in MEED's paid article."
-  ],
-  "outlook": false,
-  "parties": {},
-  "priority": "High",
-  "score": 154,
-  "sectors": [
-   "onshore"
-  ],
-  "signal_ids": [
-   "m-3d40a0e1eac3",
-   "n-b1a2bf48a400"
-  ],
-  "stage": "awarded",
-  "status": "active",
-  "value_usd": 1200000000.0
- },
- {
   "also": [
    {
     "date": "2026-11-04",
@@ -683,7 +722,7 @@
   ],
   "approach": {
    "notes": [
-    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Onshore work: Mannesmann Energy, Jereh.",
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC Onshore work: Mannesmann Energy, Jereh, Robt Stone.",
     "Another package is live (tender, 2026-11-04): $2bn+ Bu Hasa EOR Project Opens Bidding as ADNOC Onshore Targets 70 Percent Output Rise"
    ],
    "targets": []
@@ -821,6 +860,45 @@
   "stage": "awarded",
   "status": "active",
   "value_usd": 2700000000.0
+ },
+ {
+  "also": [],
+  "approach": {
+   "notes": [],
+   "targets": []
+  },
+  "client": "ADNOC Gas",
+  "contract_type": "EPC",
+  "deadline": "",
+  "filed": true,
+  "first_found": "2026-11-23",
+  "first_published": "2026-10-28",
+  "headline": "Local firm wins Adnoc Gas project detailed engineering works: 56-inch, 127km gas pipeline (winner not named)",
+  "id": "p-habshan-to-al-nouf-gas-pipeline-ewec-mirfa-relocation-and-ai",
+  "last_found": "2026-11-28",
+  "last_published": "2026-11-28",
+  "name": "Habshan to Al-Nouf gas pipeline (Ewec Mirfa relocation and AI data centre)",
+  "notes": [
+   "Research 24 Nov: the work is detailed engineering for a 56-inch, 127km pipeline that will supply gas to phase two of an AI data centre in Abu Dhabi and support the relocation of Ewec's power assets in Mirfa. The winning local firm is named only in MEED's paid article.",
+   "Research 28 Nov: ADNOC Gas tendered this 56-inch, 127km pipeline in mid-April 2026 and received contractor prices by 13 Aug. EPC duration is 31 months from award. It will carry 600-660 million cf/d for AI data centre phase 2 and 650-715 million cf/d for Ewec's Mirfa relocation. An undated MEED item says the main contract was recently awarded; the EPC winner is not named in free sources. The 28 Oct 'local firm wins detailed engineering' report is for this pipeline."
+  ],
+  "outlook": false,
+  "parties": {},
+  "priority": "High",
+  "score": 151,
+  "sectors": [
+   "gas",
+   "onshore",
+   "pipelines"
+  ],
+  "signal_ids": [
+   "m-14ff0c612cbe",
+   "n-9b7321c8fe46",
+   "m-f3930a8f85b8"
+  ],
+  "stage": "awarded",
+  "status": "active",
+  "value_usd": null
  },
  {
   "also": [],
@@ -1212,38 +1290,47 @@
   "value_usd": null
  },
  {
-  "also": [],
+  "also": [
+   {
+    "date": "2026-10-25",
+    "headline": "Adnoc prepares new wave of oil and gas tenders for 2027: types listed",
+    "stage": "planned",
+    "url": "https://thenationalnews.com/business/energy/2026/10/25/adnoc-prepares-new-wave-of-oil-and-gas-tenders-for-2027"
+   }
+  ],
   "approach": {
-   "notes": [],
+   "notes": [
+    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC (Group) work: Jereh.",
+    "Forward look: this is advance notice of enquiries to come. Check which packages match your prequalification."
+   ],
    "targets": []
   },
-  "client": "ADNOC Gas",
-  "contract_type": "engineering",
+  "client": "ADNOC (Group)",
+  "contract_type": "",
   "deadline": "",
   "filed": false,
   "first_found": "2026-11-23",
-  "first_published": "2026-10-28",
-  "headline": "Local firm wins Adnoc Gas project detailed engineering works: 56-inch, 127km gas pipeline (winner not named)",
-  "id": "s-14a1dcd4b23e",
-  "last_found": "2026-11-24",
-  "last_published": "2026-10-28",
-  "name": "Local firm wins Adnoc Gas project detailed engineering works: 56-inch, 127km gas pipeline (winner not named)",
+  "first_published": "2026-10-25",
+  "headline": "Adnoc prepares new wave of oil and gas tenders for 2027: types listed",
+  "id": "s-fd7646aede4d",
+  "last_found": "2026-11-28",
+  "last_published": "2026-10-25",
+  "name": "Adnoc prepares new wave of oil and gas tenders for 2027: types listed",
   "notes": [
-   "Research 24 Nov: the work is detailed engineering for a 56-inch, 127km pipeline that will supply gas to phase two of an AI data centre in Abu Dhabi and support the relocation of Ewec's power assets in Mirfa. The winning local firm is named only in MEED's paid article."
+   "Research 28 Nov: for 2027 ADNOC plans tenders for offshore sour gas developments, an export gas pipeline, enhanced oil recovery projects, refinery residue upgrading, and extra export berths for NGL and sulphur. For 2028: onshore and offshore oilfield developments, an integrated onshore gas project, gas storage, and digitalisation and infrastructure upgrades. Values were not disclosed. The full list was shared at ADNOC's supplier forum."
   ],
-  "outlook": false,
+  "outlook": true,
   "parties": {},
   "priority": "High",
-  "score": 134,
+  "score": 117,
   "sectors": [
-   "gas",
-   "pipelines"
+   "gas"
   ],
   "signal_ids": [
-   "m-14ff0c612cbe",
-   "n-9b7321c8fe46"
+   "m-97ea32866fff",
+   "n-0c761f72e279"
   ],
-  "stage": "awarded",
+  "stage": "tender",
   "status": "active",
   "value_usd": null
  },
@@ -1427,41 +1514,6 @@
   ],
   "signal_ids": [
    "n-4cb171a7e8d3"
-  ],
-  "stage": "tender",
-  "status": "active",
-  "value_usd": null
- },
- {
-  "also": [],
-  "approach": {
-   "notes": [
-    "Bidders are not named in public sources yet. Finding the bidders list is the next step. Contractors most often seen on ADNOC (Group) work: Jereh.",
-    "Forward look: this is advance notice of enquiries to come. Check which packages match your prequalification."
-   ],
-   "targets": []
-  },
-  "client": "ADNOC (Group)",
-  "contract_type": "",
-  "deadline": "",
-  "filed": false,
-  "first_found": "2026-11-23",
-  "first_published": "2026-10-25",
-  "headline": "Adnoc prepares new wave of oil and gas tenders for 2027",
-  "id": "s-8db0752df847",
-  "last_found": "2026-11-23",
-  "last_published": "2026-10-25",
-  "name": "Adnoc prepares new wave of oil and gas tenders for 2027",
-  "notes": [],
-  "outlook": true,
-  "parties": {},
-  "priority": "Medium",
-  "score": 80,
-  "sectors": [
-   "gas"
-  ],
-  "signal_ids": [
-   "n-0c761f72e279"
   ],
   "stage": "tender",
   "status": "active",

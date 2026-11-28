@@ -1,69 +1,52 @@
 {
- "date": "2026-11-27",
- "digest": "digests/2026-11-27.md",
+ "date": "2026-11-28",
+ "digest": "digests/2026-11-28.md",
  "new_opportunities": [],
  "newly_named_firms": [
   {
    "added": [
-    "NMDC Energy (NPCC)",
-    "Target Engineering"
+    "Robt Stone"
    ],
-   "id": "p-lower-zakum-long-term-development"
-  },
-  {
-   "added": [
-    "NMDC Energy (NPCC)"
-   ],
-   "id": "p-upper-zakum-expansion"
+   "id": "p-bab-and-north-east-bab-oil-well-tie-ins"
   }
  ],
  "opportunities_active": 25,
- "signals_new": 9,
- "signals_total": 127,
+ "signals_new": 6,
+ "signals_total": 133,
  "source_health": {
   "bing-news": {
-   "errors": [
-    "ADNOC PMC OR \"engineering services\" contract: not well-formed (invalid token): line 1, column 41"
-   ],
-   "items": 56,
+   "errors": [],
+   "items": 68,
    "kept": 0,
-   "ok": 7,
+   "ok": 8,
    "requests": 8
   },
   "google-news": {
    "errors": [],
-   "items": 142,
-   "kept": 1,
+   "items": 106,
+   "kept": 0,
    "ok": 18,
    "requests": 18
   },
   "inbox": {
    "errors": [],
-   "items": 5,
-   "kept": 5,
+   "items": 4,
+   "kept": 4,
    "ok": 1,
    "requests": 1
   },
   "linkedin-jobs": {
    "adverts_listed": 87,
-   "adverts_read": 14,
-   "errors": [],
+   "adverts_read": 16,
+   "errors": [
+    "4 adverts left for the next run: the daily limit on adverts or minutes was reached"
+   ],
    "items": 3,
    "kept": 3,
-   "ok": 26,
-   "requests": 26
+   "left_for_next_run": 4,
+   "ok": 28,
+   "requests": 28
   }
  },
- "stage_changes": [
-  {
-   "from": "bid_evaluation",
-   "id": "p-bab-and-north-east-bab-oil-well-tie-ins",
-   "to": "awarded"
-  },
-  {
-   "from": "",
-   "id": "p-lower-zakum-long-term-development",
-   "to": "execution"
-  }
- ]
+ "stage_changes": []
 }

@@ -101,6 +101,11 @@ generic = true
 # ---------------------------------------------------------------------------
 
 # List a specific package above its parent project: the first match wins.
+[[project]]
+name = "Habshan to Al-Nouf gas pipeline (Ewec Mirfa relocation and AI data centre)"
+client = "ADNOC Gas"
+aliases = ["Ewec sales pipeline", "re:Habshan to Al.Nouf", "re:56-inch, 127km"]
+
 # A separate project from the gas cap tie-ins below: oil wells across Bab and North East Bab.
 [[project]]
 name = "Bab and North East Bab oil well tie-ins"
